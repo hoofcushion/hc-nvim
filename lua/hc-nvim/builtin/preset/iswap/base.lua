@@ -1,0 +1,21 @@
+return {
+ "mizlan/iswap.nvim",
+ cmd={
+  "ISwap",
+  "ISwapWith",
+  "ISwapWithRight",
+  "ISwapWithLeft",
+  "ISwapNode",
+  "ISwapNodeWith",
+  "ISwapNodeWithRight",
+  "ISwapNodeWithLeft",
+  "IMove",
+  "IMoveWith",
+  "IMoveWithRight",
+  "IMoveWithLeft",
+  "IMoveNode",
+  "IMoveNodeWith",
+  "IMoveNodeWithRight",
+  "IMoveNodeWithLeft",
+ },
+}

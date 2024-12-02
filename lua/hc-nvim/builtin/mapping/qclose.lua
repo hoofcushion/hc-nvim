@@ -1,0 +1,24 @@
+return {
+ {
+  pattern={
+   "PlenaryTestPopup",
+   "grug-far",
+   "help",
+   "lspinfo",
+   "notify",
+   "qf",
+   "spectre_panel",
+   "startuptime",
+   "tsplayground",
+   "neotest-output",
+   "checkhealth",
+   "neotest-summary",
+   "neotest-output-panel",
+   "dbout",
+   "gitsigns-blame",
+  },
+  lhs="q",
+  cmd="close",
+  buffer=true,
+ },
+}

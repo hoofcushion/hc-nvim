@@ -1,0 +1,5 @@
+return {
+ "HexDump",
+ "HexAssemble",
+ "HexToggle",
+}
