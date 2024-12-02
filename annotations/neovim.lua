@@ -1,0 +1,163 @@
+---@meta Neovim API
+---          Mode  | Norm | Ins | Cmd | Vis | Sel | Opr | Term | Lang |
+--- Command        +------+-----+-----+-----+-----+-----+------+------+
+--- [nore]map      | yes  |  -  |  -  | yes | yes | yes |  -   |  -   |
+--- n[nore]map     | yes  |  -  |  -  |  -  |  -  |  -  |  -   |  -   |
+--- [nore]map!     |  -   | yes | yes |  -  |  -  |  -  |  -   |  -   |
+--- i[nore]map     |  -   | yes |  -  |  -  |  -  |  -  |  -   |  -   |
+--- c[nore]map     |  -   |  -  | yes |  -  |  -  |  -  |  -   |  -   |
+--- v[nore]map     |  -   |  -  |  -  | yes | yes |  -  |  -   |  -   |
+--- x[nore]map     |  -   |  -  |  -  | yes |  -  |  -  |  -   |  -   |
+--- s[nore]map     |  -   |  -  |  -  |  -  | yes |  -  |  -   |  -   |
+--- o[nore]map     |  -   |  -  |  -  |  -  |  -  | yes |  -   |  -   |
+--- t[nore]map     |  -   |  -  |  -  |  -  |  -  |  -  | yes  |  -   |
+--- l[nore]map     |  -   | yes | yes |  -  |  -  |  -  |  -   | yes  |
+---@alias vim.api.keyset.set_keymap.mode
+---| ""
+---| "n"
+---| "!"
+---| "i"
+---| "c"
+---| "v"
+---| "x"
+---| "s"
+---| "o"
+---| "t"
+---| "l"
+
+---@param event vim.api.keyset.create_autocmd.events|vim.api.keyset.create_autocmd.events[]
+---@param opts vim.api.keyset.create_autocmd.opts
+---@return integer
+function vim.api.nvim_create_autocmd(event,opts) end
+---@class vim.api.create_autocmd.callback.args
+---@field id number
+---@field event string
+---@field group number?
+---@field match string
+---@field buf number
+---@field file string
+---@field data any
+
+---@class vim.api.keyset.create_autocmd.opts: vim.api.keyset.create_autocmd
+---@field callback? fun(ev:vim.api.create_autocmd.callback.args):boolean?
+
+---@alias vim.api.keyset.create_autocmd.events
+---| "BufFilePre"
+---| "BufHidden"
+---| "BufLeave"
+---| "BufModifiedSet"
+---| "BufNew"
+---| "BufNewFile"
+---| "BufRead"
+---| "BufWinLeave"
+---| "BufWipeout"
+---| "BufWrite"
+---| "BufWriteCmd"
+---| "BufWritePost"
+---| "BufWritePre"
+---| "ChanInfo"
+---| "ChanOpen"
+---| "CmdUndefined"
+---| "CmdlineChanged"
+---| "CmdlineEnter"
+---| "CmdlineLeave"
+---| "CmdwinEnter"
+---| "CmdwinLeave"
+---| "ColorScheme"
+---| "ColorSchemePre"
+---| "CompleteChanged"
+---| "CompleteDonePre"
+---| "CompleteDone"
+---| "CursorHold"
+---| "CursorHoldI"
+---| "CursorMoved"
+---| "CursorMovedI"
+---| "DiffUpdated"
+---| "DirChanged"
+---| "DirChangedPre"
+---| "ExitPre"
+---| "FileAppendCmd"
+---| "FileAppendPost"
+---| "FileAppendPre"
+---| "FileChangedRO"
+---| "FileChangedShell"
+---| "FocusGained"
+---| "FileChangedShellPost"
+---| "FileReadCmd"
+---| "FileReadPost"
+---| "FileReadPre"
+---| "FileType"
+---| "FileWriteCmd"
+---| "FileWritePost"
+---| "FileWritePre"
+---| "FilterReadPost"
+---| "FilterReadPre"
+---| "FilterWritePost"
+---| "FilterWritePre"
+---| "FocusGained"
+---| "FocusLost"
+---| "FuncUndefined"
+---| "UIEnter"
+---| "UILeave"
+---| "InsertChange"
+---| "InsertCharPre"
+---| "InsertEnter"
+---| "InsertLeavePre"
+---| "InsertLeave"
+---| "MenuPopup"
+---| "ModeChanged"
+---| "OptionSet"
+---| "QuickFixCmdPre"
+---| "QuickFixCmdPost"
+---| "QuitPre"
+---| "RemoteReply"
+---| "SearchWrapped"
+---| "RecordingEnter"
+---| "RecordingLeave"
+---| "SafeState"
+---| "SessionLoadPost"
+---| "ShellCmdPost"
+---| "Signal"
+---| "ShellFilterPost"
+---| "SourcePre"
+---| "SourcePost"
+---| "SourceCmd"
+---| "SpellFileMissing"
+---| "StdinReadPost"
+---| "StdinReadPre"
+---| "SwapExists"
+---| "Syntax"
+---| "TabEnter"
+---| "TabLeave"
+---| "TabNew"
+---| "TabNewEntered"
+---| "TabClosed"
+---| "TermOpen"
+---| "TermEnter"
+---| "TermLeave"
+---| "TermClose"
+---| "TermResponse"
+---| "TextChanged"
+---| "TextChangedI"
+---| "TextChangedP"
+---| "TextChangedT"
+---| "TextYankPost"
+---| "User"
+---| "UserGettingBored"
+---| "VimEnter"
+---| "VimLeave"
+---| "VimLeavePre"
+---| "VimResized"
+---| "VimResume"
+---| "VimSuspend"
+---| "WinClosed"
+---| "WinEnter"
+---| "WinLeave"
+---| "WinNew"
+---| "WinScrolled"
+---| "WinResized"
+---| "LspAttach"
+---| "BufFilePost"
+---| "BufEnter"
+---| "BufDelete"
+---| "BufAdd"
