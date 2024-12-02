@@ -12,18 +12,16 @@ checkdir(datapath)
 local lazypath=vim.fs.joinpath(datapath,"lazy") --[[@as string]]
 checkdir(lazypath)
 local bootstrappath=vim.fs.joinpath(lazypath,"bootstrap.lua") --[[@as string]]
-checkdir(bootstrappath)
 if not checkpath(bootstrappath) then
  local output=vim.fn.system({
   "curl",
   "-o",bootstrappath,
   "https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua",
  })
- if vim.v.shell_error ~= 0 then
+ if vim.v.shell_error~=0 then
   error(output)
  end
 end
-
 loadfile(bootstrappath)()
 ---@return boolean
 local function is_samefile(filename1,filename2)
