@@ -1,4 +1,5 @@
 return {
+ vscode=false,
  cmd="Noice",
  dependencies={
   "stevearc/dressing.nvim",
