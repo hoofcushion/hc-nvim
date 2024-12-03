@@ -1,3 +1,7 @@
+local Config=require("hc-nvim.config")
+if Config.platform.is_vscode then
+ return vim.lsp.buf.format
+end
 local function format(opts)
  if opts==nil then
   opts={}

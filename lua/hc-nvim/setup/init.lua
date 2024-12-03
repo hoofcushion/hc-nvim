@@ -10,7 +10,6 @@ local modules={
  "lazy",
  "vscode",
  "server",
- "lsp",
 }
 for _,modname in ipairs(modules) do
  Util.track(modname)
