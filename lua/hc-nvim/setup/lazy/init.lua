@@ -1,5 +1,4 @@
 local Util=require("hc-nvim.util")
-Util.track("plugin")
 Util.track("rewrite")
 require("hc-nvim.setup.lazy.handler")
 require("hc-nvim.setup.lazy.interload")
@@ -20,6 +19,5 @@ end
 Util.track("load presets")
 local Presets=require("hc-nvim.setup.lazy.preset")
 Presets.apply(Specs)
-Util.track()
 Util.track()
 return Specs

@@ -1,6 +1,5 @@
 local Config=require("hc-nvim.config")
 local Util=require("hc-nvim.util")
-Util.track("i18n")
 --- Load default languages pack
 for _,locale in ipairs(Config.locale.fallbacks) do
  local ok,pack=pcall(function()
@@ -10,4 +9,3 @@ for _,locale in ipairs(Config.locale.fallbacks) do
   Util.I18n.load(pack)
  end
 end
-Util.track()

@@ -12,6 +12,8 @@ local modules={
  "server",
  "lsp",
 }
-for _,mod in ipairs(modules) do
- require("hc-nvim.setup."..mod)
+for _,modname in ipairs(modules) do
+ Util.track(modname)
+ require("hc-nvim.setup."..modname)
+ Util.track()
 end
