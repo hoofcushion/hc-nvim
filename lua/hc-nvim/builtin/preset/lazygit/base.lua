@@ -1,4 +1,5 @@
 return {
+ vscode=false,
  config=false,
  cmd={
   "LazyGit",
