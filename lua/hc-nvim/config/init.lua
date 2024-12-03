@@ -123,6 +123,7 @@ M.performance={
 --- spec[2] is the setup name for the server, specify it to setup the server.
 --- e.g, lua language server has name lua-language-server as mason package, but lua_ls in nvim-lspconfig's setup function.
 M.server={
+ vscode=false,
  ensure_installed=true,
  auto_update=true,
  auto_setup=true,
