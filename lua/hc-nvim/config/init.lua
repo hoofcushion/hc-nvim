@@ -24,9 +24,9 @@ local uname=vim.uv.os_uname()
 M.platform={
  uname=uname,
  is_windows=uname.sysname:find("Windows",nil,true)~=nil,
- is_gui=vim.g.gui==true,
- is_vscode=vim.g.vscode==true,
- is_neovide=vim.g.neovide==true,
+ is_gui=vim.fn.has("gui_running"),
+ is_vscode=vim.g.vscode==1,
+ is_neovide=vim.g.neovide==1,
 }
 M.ui={
  ---@type
