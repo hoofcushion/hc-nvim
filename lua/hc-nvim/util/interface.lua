@@ -1,8 +1,6 @@
 local api=vim.api
 local Util=require("hc-nvim.util")
 --- custom mapping util
-local seted={}
-a=seted
 local Keymap={}
 ---@param mode string
 ---@param lhs string
@@ -12,7 +10,6 @@ local Keymap={}
 local function set(buffer,mode,lhs,rhs,opts)
  --- HACK: Work-around for nvim_buf_del_keymap
  rhs=rhs.."<ignore>"
- seted[lhs]=(seted[lhs] or 0) +1
  if buffer~=nil then
   api.nvim_buf_set_keymap(buffer,mode,lhs,rhs,opts)
   return
