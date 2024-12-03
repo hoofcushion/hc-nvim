@@ -1,4 +1,3 @@
-local Util=require("hc-nvim.util")
 return {
  ensure_installed="all",
  highlight={
