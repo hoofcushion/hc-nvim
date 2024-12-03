@@ -1,4 +1,7 @@
 local Config=require("hc-nvim.config")
+if Config.platform.is_vscode then
+ return
+end
 if Config.server.auto_setup then
  vim.api.nvim_create_autocmd("BufEnter",{
   callback=function(ev)

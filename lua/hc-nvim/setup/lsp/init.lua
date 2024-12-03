@@ -1,3 +1,7 @@
+local Config=require("hc-nvim.config")
+if Config.platform.is_vscode then
+ return
+end
 vim.api.nvim_create_autocmd("LspAttach",{
  once=true,
  callback=function()
