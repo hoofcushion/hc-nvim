@@ -650,15 +650,6 @@ end
 local function set_config(client,config)
  client.config.settings.Lua=config
 end
-local function auto_set(client,config)
- config=config or get_config()
- if client==nil then
-  client=vim.lsp.get_clients({name="lua_ls"})[1]
- end
- if client~=nil then
-  set_config(client,config)
- end
-end
 local M={}
 M.cmd={
  -- auto change language
@@ -670,11 +661,11 @@ M.cmd={
 M.settings={
  Lua=Settings.normal,
 }
-M.init=function()
- auto_set()
+M.on_init=function(client)
+ set_config(client,get_config())
  vim.api.nvim_create_autocmd({"DirChanged","SessionLoadPost"},{
   callback=function()
-   auto_set()
+   set_config(client,get_config())
   end,
  })
 end
