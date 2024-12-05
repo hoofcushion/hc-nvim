@@ -48,11 +48,11 @@ function RangeMark:new(start,finish,indexed,vmode,winid,bufnr)
  new.cursor_e=finish
  start=vim.deepcopy(start)
  finish=vim.deepcopy(finish)
- if start[1]>finish[1] then
-  start[1],finish[1]=finish[1],start[1]
- end
- if start[2]>finish[2] then
-  start[2],finish[2]=finish[2],start[2]
+ if  start[1]>finish[1]
+ or  start[1]==finish[1]
+ and start[2]>finish[2]
+ then
+  start,finish=finish,start
  end
  new.start=start
  new.finish=finish
