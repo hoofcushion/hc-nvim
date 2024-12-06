@@ -35,8 +35,8 @@ local Specs={
  {"echasnovski/mini.ai"},
  {"echasnovski/mini.operators"},
  {"folke/flash.nvim"},
- {dir="hc-substitute"},
- {dir="hc-func",                                main="hc-func",                            event=Enter},
+ {"hc-substitute",                              main="hc-substitute",                      virtual=true},
+ {"hc-func",                                    main="hc-func",                            virtual=true,                       event=Enter},
 
  --- Edit
  {"echasnovski/mini.align"},
