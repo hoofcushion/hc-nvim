@@ -29,20 +29,16 @@ Lazy.getname=Util.Cache.create(Lazy.getname)
 ---@return LazySpec
 function Lazy.foreach(spec,fn)
  if type(spec)=="string" then
-  spec={spec}
- end
- if spec.import~=nil then
-  return spec
- elseif spec[2]~=nil
- or     type(spec[1])=="table"
- then
+  return Lazy.foreach({spec},fn)
+ elseif #spec>1 and Util.is_list(spec) then
   for i,v in ipairs(spec) do
    spec[i]=Lazy.foreach(v,fn)
   end
   return spec
  elseif Lazy.getname(spec) then
-  ---@diagnostic disable-next-line: param-type-mismatch
   return fn(spec) or spec
+ elseif spec.import~=nil then
+  return spec
  end
  return spec
 end
