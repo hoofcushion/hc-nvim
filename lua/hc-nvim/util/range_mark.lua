@@ -24,6 +24,19 @@ local RangeMark={
  ---| "cursor_s" # The start position of the visual selection
  ---| "cursor_e" # The end position of the visual selection
 }
+local CursorPos={}
+function CursorPos.is_above(lhs,rhs)
+ return lhs[1]<rhs[1]
+end
+function CursorPos.is_below(lhs,rhs)
+ return lhs[1]>rhs[1]
+end
+function CursorPos.is_before(lhs,rhs)
+ return CursorPos.is_above(lhs,rhs) or (lhs[1]==rhs[1] and lhs[2]<rhs[2])
+end
+function CursorPos.is_after(lhs,rhs)
+ return CursorPos.is_below(lhs,rhs) or (lhs[1]==rhs[1] and lhs[2]>rhs[2])
+end
 ---
 --- Create a new RangeMark.
 ---@param start position
@@ -48,10 +61,7 @@ function RangeMark:new(start,finish,indexed,vmode,winid,bufnr)
  new.cursor_e=finish
  start=vim.deepcopy(start)
  finish=vim.deepcopy(finish)
- if  start[1]>finish[1]
- or  start[1]==finish[1]
- and start[2]>finish[2]
- then
+ if CursorPos.is_after(start,finish) then
   start,finish=finish,start
  end
  new.start=start
@@ -62,7 +72,9 @@ function RangeMark:new(start,finish,indexed,vmode,winid,bufnr)
  if bufnr~=nil then
   new.bufnr=bufnr
  end
- if vmode==nil then vmode=Util.get_vmode() end
+ if vmode==nil then
+  vmode=Util.get_vmode()
+ end
  new.vmode=vmode
  return new
 end
@@ -80,11 +92,7 @@ end
 --- Check if the RangeMark is after `rhs`.
 ---@param rhs RangeMark
 function RangeMark:is_after(rhs)
- if
-     self.start[1]~=rhs.start[1]
- and self.start[1]>rhs.start[1] -- At downward
- or  self.start[2]>rhs.start[2] -- At rightward
- then
+ if is_after(self.start,rhs.start) then
   return true
  end
  return false
@@ -130,7 +138,7 @@ end
 ---@param line integer
 ---@param column integer
 ---@return position
-local function adjust(pos,line,column)
+local function pos_offset(pos,line,column)
  return {pos[1]+line,pos[2]+column}
 end
 ---@param pos RangeMark.position"
@@ -138,28 +146,28 @@ end
 ---@param column integer
 ---@return position
 function RangeMark:get_pos(pos,line,column)
- return adjust(self[pos],line,column)
+ return pos_offset(self[pos],line,column)
 end
 ---
---- Get the length of the RangeMark horizontally.
-function RangeMark:len()
+--- Get the width of the RangeMark.
+function RangeMark:get_width()
  return 1+self.finish[2]-self.start[2]
 end
 ---
---- Get the length of the RangeMark vertically.
-function RangeMark:height()
+--- Get the height of the RangeMark.
+function RangeMark:get_height()
  return 1+self.finish[1]-self.start[1]
 end
 ---
---- Reset the length of the RangeMark horizontally.
----@param length integer
-function RangeMark:set_length(length)
+--- Reset the width of the RangeMark.
+---@param width integer
+function RangeMark:set_width(width)
  local left,right=self.cursor_s,self.cursor_e
  if left[2]>right[2] then
   left,right=right,left
  end
- -- Column form 0 to 0 is length 1.
- local newcol=math.max(left[2]+length-1,0)
+ -- Column form 0 to 0 is width 1.
+ local newcol=math.max(left[2]+width-1,0)
  newcol=math.min(newcol,vim.v.maxcol)
  right[2]=newcol
  local finish=self.finish
@@ -175,9 +183,9 @@ function RangeMark:set_height(height)
  local finish=self.finish
  finish[1]=newline
 end
-function RangeMark:set_size(height,length)
+function RangeMark:set_size(height,width)
  self:set_height(height)
- self:set_length(length)
+ self:set_width(width)
 end
 ---
 --- Move the RangeMark by `line` and `column`.
@@ -262,15 +270,15 @@ function RangeMark:swap(rhs)
  local lhs=self
  local vreg1=lhs:yank()
  local vreg2=rhs:yank()
- local vhit1=lhs:height()
+ local vhit1=lhs:get_height()
  local vhit2=rhs:height()
- local vlen1=lhs:len()
+ local vlen1=lhs:get_width()
  local vlen2=rhs:len()
  lhs:put(vreg2)
  local vmode=rhs.vmode
  if
  --- Chars horizontal movement
- --- Charwise in same line and different length
+ --- Charwise in same line and different width
  vmode=="v"
  and rhs.start[1]==lhs.start[1]
  and vlen2~=vlen1
@@ -279,7 +287,7 @@ function RangeMark:swap(rhs)
  or vmode=="V"
  and vhit2~=vhit1
  --- Block horizontal movement
- --- Blockwise in same line, same height, and different length
+ --- Blockwise in same line, same height, and different width
  or vmode==""
  and rhs.start[1]==lhs.start[1]
  and vhit2==vhit1
