@@ -6,14 +6,19 @@ local startuptime_events={
  ["sourcecmd"]=true,
  ["sourcepost"]=true,
  ["sourcepre"]=true,
- ["bufenter"]=true,
- ["bufreadpost"]=true,
- ["bufnewfile"]=true,
- ["vimenter"]=true,
- ["uienter"]=true,
+ ["cmdlineenter"]=true,
+ ["insertenter"]=true,
 }
 local raw=Loader._load
 local TaskSequence=require("hc-nvim.util.task_sequence").new()
+local safestate=false
+vim.api.nvim_create_autocmd("SafeState",{
+ once=true,
+ callback=function()
+  TaskSequence:start(Config.performance.plugin.load_cooldown)
+  safestate=true
+ end,
+})
 ---@param plugin LazyPlugin
 ---@param reason {[string]:string}
 ---@param opts? {force:boolean}
@@ -22,11 +27,14 @@ function Loader._load(plugin,reason,opts)
  if  Config.performance.plugin.load_cooldown~=0
  and plugin.lazy==true
  and event~=nil
- and not startuptime_events[event:lower()] then
+ and not startuptime_events[event:lower()]
+ then
   TaskSequence:add(function()
    raw(plugin,reason,opts)
   end)
-  TaskSequence:start(Config.performance.plugin.load_cooldown)
+  if safestate then
+   TaskSequence:start(Config.performance.plugin.load_cooldown)
+  end
   return
  end
  raw(plugin,reason,opts)

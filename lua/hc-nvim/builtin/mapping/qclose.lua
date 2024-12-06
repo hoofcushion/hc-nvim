@@ -1,5 +1,6 @@
 return {
  {
+  event="filetype",
   pattern={
    "PlenaryTestPopup",
    "grug-far",

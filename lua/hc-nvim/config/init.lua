@@ -78,7 +78,7 @@ M.performance={
  plugin={
   --- Duration (ms) to wait, when loading plugin continuously.
   --- Set to 0 to disable.
-  load_cooldown=0,
+  load_cooldown=1,
  },
  --- How a file recognize as a bigfile.
  --- Lsp and treesitter will not attach it for performance.

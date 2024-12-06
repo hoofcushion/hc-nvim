@@ -30,7 +30,7 @@ Lazy.getname=Util.Cache.create(Lazy.getname)
 function Lazy.foreach(spec,fn)
  if type(spec)=="string" then
   return Lazy.foreach({spec},fn)
- elseif #spec>1 and Util.is_list(spec) then
+ elseif (#spec>1 or type(spec[1])=="table") and Util.is_list(spec) then
   for i,v in ipairs(spec) do
    spec[i]=Lazy.foreach(v,fn)
   end

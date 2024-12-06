@@ -1,9 +1,12 @@
 local Util=require("hc-nvim.util")
-local TaskSequence={}
+local TaskSequence={
+}
+if false then
+ TaskSequence.timer=vim.uv.new_timer() or error()
+end
 function TaskSequence.new()
  local obj=Util.Class.new(TaskSequence)
  obj.fns={}
- obj.done=true
  obj.timer=vim.uv.new_timer() or error("Failed to create timer")
  return obj
 end
@@ -12,24 +15,26 @@ function TaskSequence:add(fn)
  return self
 end
 function TaskSequence:extend(fns)
- table.move(fns,1,#fns,#self.fns+1,self.fns)
+ Util.list_extend(self.fns,fns)
  return self
 end
 function TaskSequence:start(interval)
- if self.done==false or #self.fns==0 then
+ if self.timer:is_active() then
   return
  end
- self.done=false
+ local fn=table.remove(self.fns,1)
+ if fn==nil then
+  self.timer:stop()
+  return
+ end
  self.timer:start(interval,0,vim.schedule_wrap(function()
-  table.remove(self.fns,1)()
-  self.done=true
+  fn()
   self:start(interval)
  end))
  return self
 end
 function TaskSequence:stop()
  self.timer:stop()
- self.done=true
  return self
 end
 return TaskSequence
