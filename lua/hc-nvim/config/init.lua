@@ -1,10 +1,10 @@
 local M={}
 ---@param lang string
 local function get_locale(lang)
-	local s=lang:find(".",1,true) -- remove encoding
-	if s then
-		lang=lang:sub(1,s-1)
-	end
+ local s=lang:find(".",1,true) -- remove encoding
+ if s then
+  lang=lang:sub(1,s-1)
+ end
  local language,country=string.match(lang,"^(.-)_(.-)$")
  return {
   language=language,
@@ -148,7 +148,7 @@ M.server={
   {name="cbfmt"},
   {name="prettier"},
   {name="stylua",              setup="formatting.stylua"},
-  {name="codespell"},
+  {name="codespell",           setup="diagnostic.stylua"},
   {name="write-good",          setup="write_good"},
   -- {nil,                   "spell"},
  },

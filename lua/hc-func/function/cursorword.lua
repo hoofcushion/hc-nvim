@@ -1,11 +1,11 @@
 local Config=require("hc-func.config")
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local Options=Config.options.cursorword
-local LocalVars=Util.LocalVars.create()
 local CursorWordAu=Util.Autocmd.new()
-local FuncBind=Util.FuncBind.new()
 local Highlight=Util.Highlight.new()
 local Timer=Util.Timer.new()
+local env=Util.LocalEnv.new()
+local lock=Util.TaskLock.new()
 --- ---
 --- Matcher class
 --- ---
@@ -40,18 +40,18 @@ function CursorWord.match()
  if pattern==nil then
   return
  end
- if pattern==LocalVars.buffer.current_pattern then
+ if pattern==env.buffer.current_pattern then
   return
  end
  CursorWord.clear()
- LocalVars.buffer.current_pattern=pattern
+ env.buffer.current_pattern=pattern
  Match.add(Options.hl_group,pattern)
 end
 function CursorWord.clear()
  Match.fini()
- LocalVars.buffer.current_pattern=nil
+ env.buffer.current_pattern=nil
 end
-CursorWord.match=FuncBind:bind(CursorWord.match)
+CursorWord.match=lock:bind(CursorWord.match)
 local M={}
 function M.activate()
  CursorWordAu:activate()
@@ -88,6 +88,6 @@ function M.disable()
  CursorWordAu:fini()
  Highlight:fini()
  Timer:fini()
- LocalVars:reset()
+ env:reset()
 end
 return M

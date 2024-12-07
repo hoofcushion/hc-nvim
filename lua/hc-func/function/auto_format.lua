@@ -1,7 +1,7 @@
 local method="textDocument/formatting"
 local Config=require("hc-func.config")
 local Options=Config.options.auto_format
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local AutoFormatAu=Util.Autocmd.new()
 AutoFormatAu:add({
  {"BufWritePre",{

@@ -3,8 +3,8 @@ local function refesh_codelens(...)
   vim.lsp.codelens.refresh(...)
  end
 end
-local Util=require("hc-func.util")
-local LocalVars=Util.LocalVars.create()
+local Util=require("hc-nvim.util")
+local env=Util.LocalEnv.new()
 local CodeLensAu=Util.Autocmd.new()
 CodeLensAu:add({
  {"BufWritePre",{
@@ -36,6 +36,6 @@ function M.enable()
 end
 function M.disable()
  CodeLensAu:delete()
- LocalVars:reset()
+ env:reset()
 end
 return M

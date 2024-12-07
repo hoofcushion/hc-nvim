@@ -1,4 +1,4 @@
-local Class=require("hc-func.class")
+local Util=require('hc-nvim.util')
 ---@class Highlight
 local Highlight={
  hls={},
@@ -28,7 +28,7 @@ function Highlight:extend(groups)
  end
 end
 function Highlight.new()
- local obj=Class.new(Highlight)
+ local obj=Util.Class.new(Highlight)
  obj.hls={}
  return obj
 end

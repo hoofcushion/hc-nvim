@@ -1,5 +1,5 @@
 local Config=require("hc-func.config")
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local Options=Config.options.document_highlight
 local DocHLAu=Util.Autocmd.new()
 local Timer=Util.Timer.new()

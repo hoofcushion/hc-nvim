@@ -1,4 +1,5 @@
-local Class=require("hc-func.class")
+local Util=require("hc-nvim.util")
+--- LocalEnv give individual local environments buffer, window, tabpage base on its unique id for each module
 ---@enum (key) localvars.scope
 local scopes={
  buffer={
@@ -13,7 +14,6 @@ local scopes={
     end,
    })
   end,
-  fallback=vim.b,
  },
  window={
   validate=vim.api.nvim_win_is_valid,
@@ -27,7 +27,6 @@ local scopes={
     end,
    })
   end,
-  fallback=vim.w,
  },
  tab={
   validate=vim.api.nvim_tabpage_is_valid,
@@ -41,55 +40,45 @@ local scopes={
     end,
    })
   end,
-  fallback=vim.t,
  },
 }
-local function tbl_check(t,k)
- local ret=t[k]
- if ret==nil then
-  ret={}
-  t[k]=ret
- end
- return ret
-end
-local function mk_var_accessor(scope,id)
- local info=scopes[scope]
- local vars=setmetatable({},{
+local function make_env(info,id)
+ ---@type table<integer,table>
+ local env=setmetatable({},{
   __newindex=function(t,k,v)
    info.destroy(t,k)
    rawset(t,k,v)
   end,
  })
- local mt={}
- function mt:__newindex(key,value)
-  tbl_check(vars,id or info.current())[key]=value
- end
- function mt:__index(key)
-  if id==nil and type(key)=="number" and info.validate(key) then
-   return mk_var_accessor(scope,key)
-  end
-  return tbl_check(vars,id or info.current())[key]
- end
- return setmetatable({},mt)
+ return setmetatable({},{
+  __newindex=function(_,k,v)
+   Util.tbl_check(env,id or info.current())[k]=v
+  end,
+  __index=function(_,k)
+   if id==nil and type(k)=="number" and info.validate(k) then
+    return make_env(info,k)
+   end
+   return Util.tbl_check(env,id or info.current())[k]
+  end,
+ })
 end
----@class localvars
+---@class LocalEnv
 ---@field window vim.var_accessor
 ---@field buffer vim.var_accessor
 ---@field tab vim.var_accessor
-local M={
+local LocalEnv={
  buffer=vim.b,
  window=vim.w,
  tab=vim.t,
 }
-function M:reset()
- for scope in pairs(scopes) do
-  self[scope]=mk_var_accessor(scope)
+function LocalEnv:reset()
+ for k,v in pairs(scopes) do
+  self[k]=make_env(v)
  end
 end
----@return localvars
-function M.create()
- local obj=Class.new(M)
+function LocalEnv.new()
+ local obj=Util.Class.new(LocalEnv)
  obj:reset()
  return obj
 end
-return M
+return LocalEnv

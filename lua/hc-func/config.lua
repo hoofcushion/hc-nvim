@@ -1,4 +1,4 @@
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local Validate=require("hc-nvim.util.validate")
 local function empty_fn() end
 ---@class HCFunc.options
@@ -12,10 +12,7 @@ local default_options={
     local text
     local mode=vim.fn.mode()
     if vmode[mode] then
-     text=table.concat(
-      fn.getregion(fn.getpos("."),fn.getpos("v"),{type=mode}),
-      "\n"
-     )
+     text=table.concat(fn.getregion(fn.getpos("."),fn.getpos("v"),{type=mode}),"\n")
     else
      text=vim.fn.expand("<cword>")
     end
@@ -181,7 +178,7 @@ local valitab={
 }
 local current_options=default_options
 local M={}
-M.options=Util.ReferenceTbl.create(setmetatable({},{
+M.options=Util.Reference.create(setmetatable({},{
  __index=function(_,k)
   return current_options[k]
  end,

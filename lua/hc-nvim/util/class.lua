@@ -12,8 +12,8 @@ end
 ---@generic T
 ---@param base T
 ---@return T|table
-function Class.new(base)
- return setmetatable({},Class.get_mt(base))
+function Class.new(base,new)
+ return setmetatable(new or {},Class.get_mt(base))
 end
 function Class.set(base,class)
  setmetatable(base,Class.get_mt(class))

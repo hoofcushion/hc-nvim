@@ -11,7 +11,7 @@
 ---@field enable boolean
 ---@field active boolean
 ---@field suspend boolean
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local Config=require("hc-func.config")
 ---@enum (key) HCFunc.function.modname
 local modnames={

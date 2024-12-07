@@ -1,4 +1,4 @@
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 ---@diagnostic disable: duplicate-set-field
 ---@class Timers
 ---@field timers table<integer,uv.uv_timer_t>
@@ -7,7 +7,7 @@ local Timer={
  params ={},
 }
 function Timer:new_timer(timeout,repeat_,callback)
- local timer=Util.new_timer()
+ local timer=vim.uv.new_timer() or error()
  table.insert(self.timers,timer)
  self.params[timer]={timeout=timeout,repeat_=repeat_,callback=callback}
  return timer

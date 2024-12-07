@@ -1,12 +1,12 @@
 local Config=require("hc-func.config")
 local Function=require("hc-func.function")
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local TogglerAu=Util.Autocmd.new()
 local Options=Config.options.toggler
 --- Short cut to get entries from functionalities name
 ---@type HCFunc.toggler.rule
 local TogglerRules=Util.Cache.table(function(name)
- return Util.FallbackTbl.create(Options.rule.default,Options.rule[name])
+ return Util.Fallback.create(Options.rule.default,Options.rule[name])
 end)
 local function check_bo(rules,name)
  return rules[name][vim.bo[name]]~=false

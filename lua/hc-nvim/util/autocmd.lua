@@ -1,4 +1,4 @@
-local Class=require("hc-func.class")
+local Util=require("hc-nvim.util")
 ---@class Autocmd
 local Autocmd={
  active       =false, ---@type boolean
@@ -9,7 +9,7 @@ local Autocmd={
 }
 ---@param opts Autocmd?
 function Autocmd.new(opts)
- local obj=Class.new(Autocmd)
+ local obj=Util.Class.new(Autocmd)
  obj.attached_bufs={}
  obj.ids={}
  obj.params={}
@@ -22,7 +22,7 @@ function Autocmd.new(opts)
 end
 ---@param opts Autocmd
 function Autocmd:set(opts)
- return Class.new(self,opts)
+ return Util.Class.new(self,opts)
 end
 ---@private
 function Autocmd:cb_decor(callback)
@@ -78,7 +78,7 @@ function Autocmd:buf_toggle()
  return self
 end
 function Autocmd:buf_fini()
- self.bufffer=false
+ self.buffer=false
  self.attached_bufs={}
  return self
 end
@@ -96,13 +96,12 @@ function Autocmd:toggle()
 end
 function Autocmd:add(params)
  for _,param in ipairs(params) do
-  local opts=param[2]
-  if opts~=nil then
-   local callback=opts.callback
-   if callback~=nil then
-    opts.callback=self:cb_decor(callback)
+  pcall(function(...)
+   local opts=param[2]
+   if opts.callback~=nil then
+    opts.callback=self:cb_decor(opts.callback)
    end
-  end
+  end)
   table.insert(self.params,param)
  end
  return self

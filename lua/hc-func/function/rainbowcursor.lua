@@ -1,6 +1,6 @@
 local Config=require("hc-func.config")
 local Options=Config.options.rainbowcursor
-local Util=require("hc-func.util")
+local Util=require("hc-nvim.util")
 local Autocmd=Util.Autocmd.new()
 local Updater=Util.Timer.new()
 local ColorIter={
@@ -92,7 +92,7 @@ function M.deactivate()
 end
 function M.enable()
  HiGroup.hl_group=Options.hl_group
- local FuncBind=Util.FuncBind.new(Options.throttle)
+ local FuncBind=Util.TaskLock.new(Options.throttle)
  --- ---
  --- setup rainbow cursor iterator
  --- ---
