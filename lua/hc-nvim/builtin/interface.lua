@@ -365,7 +365,7 @@ return {
  {name=NS.numb_toggle,mode="n",lhs="<leader>op"},
 },{
  override={tags="wildfire"},
- {index="keymaps.init_selection",  value="<s-cr>"},
+ {index="keymaps.init_selection",  value="<cr>"},
  {index="keymaps.node_incremental",value="<cr>", lazykey=false},
  {index="keymaps.node_decremental",value="<esc>",lazykey=false},
 },{

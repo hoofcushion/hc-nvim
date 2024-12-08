@@ -114,7 +114,7 @@ function BufferCache.loadmod(modname)
  local info=vim.loader.find(modname)[1]
  if info then
   return BufferCache.load("module-"..info.modname,info.modpath,function()
-   return loadfile(info.modname)()
+   return require(info.modname)
   end)
  end
 end

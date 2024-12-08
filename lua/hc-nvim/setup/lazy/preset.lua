@@ -4,12 +4,10 @@ local Plugin=require("lazy.core.plugin")
 local Mappings=require("hc-nvim.setup.mapping")
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
+ local prefix="hc-nvim.builtin.preset."..name.."."
  return Util.Cache.table(function(field)
-  local modname=("hc-nvim.builtin.preset.%s.%s"):format(name,field)
-  local info=Util.find_mod(modname)
-  if info then
-   return require(modname)
-  end
+  local modname=prefix..field
+   return Util.load_local_mod(modname)
  end)
 end)
 --- hook after specific plugin

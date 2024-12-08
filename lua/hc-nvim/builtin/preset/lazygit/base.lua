@@ -1,6 +1,6 @@
 return {
  vscode=false,
- config=false,
+ config=true,
  cmd={
   "LazyGit",
   "LazyGitConfig",

@@ -8,7 +8,7 @@ local Util=require("hc-nvim.util.lazy_tab").create({
  Event       ="hc-nvim.util.event",
  Fallback    ="hc-nvim.util.fallback",
  HLGroup     ="hc-nvim.util.hl_group",
- Highlight     ="hc-nvim.util.highlight",
+ Highlight   ="hc-nvim.util.highlight",
  I18n        ="hc-nvim.util.i18n",
  Interface   ="hc-nvim.util.interface",
  KeyRecorder ="hc-nvim.util.key_recorder",
@@ -38,7 +38,7 @@ if false then
   Event       =require("hc-nvim.util.event"),
   Fallback    =require("hc-nvim.util.fallback"),
   HLGroup     =require("hc-nvim.util.hl_group"),
- Highlight     =require("hc-nvim.util.highlight"),
+  Highlight   =require("hc-nvim.util.highlight"),
   I18n        =require("hc-nvim.util.i18n"),
   Interface   =require("hc-nvim.util.interface"),
   KeyRecorder =require("hc-nvim.util.key_recorder"),
@@ -76,7 +76,7 @@ end
 ---@generic T
 ---@param _ T
 ---@return T
-function Util.lua_ls_rename(obj,_)
+function Util.lua_ls_alias(_,obj)
  return obj
 end
 --- ---
@@ -88,10 +88,18 @@ end
 function Util.unpacklen(t)
  return unpack(t,1,t.n)
 end
-local function prequire(modname)
- return vim.F.ok_or_nil(pcall(require,modname))
+function Util.ok_or_nil(ok,...)
+ if ok then
+  return ...
+ end
 end
-Util.prequire=Util.lua_ls_rename(prequire,require)
+function Util.nilpcall(...)
+ return Util.ok_or_nil(pcall(...))
+end
+--- Like require but return nil instead error when failed
+Util.prequire=Util.lua_ls_alias(require,function(modname)
+ return Util.nilpcall(require,modname)
+end)
 --- Function that does nothing.
 function Util.empty_f() end
 --- Table that always empty.
@@ -221,10 +229,28 @@ function Util.batch(fn,...)
   if ret then return ret end
  end
 end
+do
+ local opts={paths=Util.paths,rtp=false}
+ local function find(modname)
+  return vim.loader.find(modname,opts)[1]
+ end
+ function Util.find_local_mod(...)
+  return Util.batch(find,...)
+ end
+end
+--- Similar to `require`, but slightly faster
+--- It only search module in `Util.paths` and don't cache thing.
+function Util.load_local_mod(modname)
+ local info=Util.find_local_mod(modname)
+ if info then
+  return loadfile(info.modpath)()
+ end
+end
+local function find_mod(modname)
+ return vim.loader.find(modname)[1]
+end
 function Util.find_mod(...)
- return Util.batch(function(modname)
-                    return vim.loader.find(modname)[1]
-                   end,...)
+ return Util.batch(find_mod,...)
 end
 --- Get all mod starts in giving prefix
 ---@param modnames string|string[]
@@ -566,9 +592,10 @@ function Util.rfind(s,pattern,init,plain)
  return rf(s,string.find(string.reverse(s),pattern,init,plain))
 end
 ---@param str    string
----@param prefix string
-function Util.startswith(str,prefix)
- return str:sub(1,#prefix)==prefix
+---@param fix string
+function Util.startswith(str,fix)
+ if #fix>#str then return false end
+ return str:sub(1,#fix)==fix
 end
 local pattern={
  vim.fn.stdpath("config") --[[@as string]],
@@ -586,9 +613,10 @@ function Util.is_profile(file)
  end
 end
 ---@param str    string
----@param suffix string
-function Util.endswith(str,suffix)
- return #suffix==0 or str:sub(- #suffix)==suffix
+---@param fix string
+function Util.endswith(str,fix)
+ if #fix>#str then return false end
+ return #fix==0 or str:sub(- #fix)==fix
 end
 ---@param str    string
 ---@param chars  string

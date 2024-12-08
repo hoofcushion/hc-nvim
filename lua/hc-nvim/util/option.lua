@@ -30,6 +30,7 @@ local is_valid={
  w         =true,
  t         =true,
 }
+--- some option is slow to set, lazy load it for startup speed
 local delay={
  clipboard="SafeState",
 }

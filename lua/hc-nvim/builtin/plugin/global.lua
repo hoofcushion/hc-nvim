@@ -6,13 +6,13 @@ local Specs={
  {"folke/tokyonight.nvim",                      lazy=false},
  {"nvimdev/dashboard-nvim",                     lazy=false,                                cond=vim.fn.argv(0)==""},
  {"folke/noice.nvim",                           lazy=false},
+ {"rcarriga/nvim-notify"},
+ {"stevearc/dressing.nvim"},
 
  {"folke/which-key.nvim",                       event="SafeState"},
 
  --- Information
  {"nvim-lualine/lualine.nvim",                  event=Enter},
- {"rcarriga/nvim-notify",                       event=Enter},
- {"stevearc/dressing.nvim",                     event=Enter},
  {"Bekaboo/dropbar.nvim",                       event=Enter},
  {"nvim-ufo",                                   event=Enter},
  {"ldelossa/buffertag",                         event=Enter},
@@ -31,16 +31,16 @@ local Specs={
  {"echasnovski/mini.ai"},
  {"echasnovski/mini.operators"},
  {"folke/flash.nvim"},
- {"hc-substitute",                              main="hc-substitute",                      virtual=true},
- {"hc-func",                                    main="hc-func",                            virtual=true,                       event=Enter},
 
  --- Edit
+ {"hc-substitute",                              main="hc-substitute",                      virtual=true},
  {"echasnovski/mini.align"},
  {"echasnovski/mini.surround"},
  {"numToStr/Comment.nvim"},
  {"gbprod/yanky.nvim"},
 
  --- Tools
+ {"hc-func",                                    main="hc-func",                            virtual=true,                       event=Enter},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},

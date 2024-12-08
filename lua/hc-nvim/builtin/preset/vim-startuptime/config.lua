@@ -1,3 +1,3 @@
 return function()
- vim.g.startuptime_tries=10
+ vim.g.startuptime_tries=30
 end
