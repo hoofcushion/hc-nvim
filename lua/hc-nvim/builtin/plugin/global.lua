@@ -3,24 +3,24 @@ local Enter={"BufReadPost","BufNewFile","BufWritePre"}
 ---@type LazySpec
 local Specs={
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
- {"folke/tokyonight.nvim",                      lazy=false},
- {"nvimdev/dashboard-nvim",                     lazy=false,                                cond=vim.fn.argv(0)==""},
- {"folke/noice.nvim",                           lazy=false},
+ {"folke/tokyonight.nvim",            lazy=false},
+ {"nvimdev/dashboard-nvim",           lazy=false,                                cond=vim.fn.argv(0)==""},
+ {"folke/noice.nvim",                 lazy=false},
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
- {"folke/which-key.nvim",                       event="SafeState"},
+ {"folke/which-key.nvim",             event="SafeState"},
 
  --- Information
- {"nvim-lualine/lualine.nvim",                  event=Enter},
- {"Bekaboo/dropbar.nvim",                       event=Enter},
- {"nvim-ufo",                                   event=Enter},
- {"ldelossa/buffertag",                         event=Enter},
- {"chentoast/marks.nvim",                       event=Enter},
- {"rainbowhxch/beacon.nvim",                    event=Enter},
+ {"nvim-lualine/lualine.nvim",        event=Enter},
+ {"Bekaboo/dropbar.nvim",             event=Enter},
+ {"nvim-ufo",                         event=Enter},
+ {"ldelossa/buffertag",               event=Enter},
+ {"chentoast/marks.nvim",             event=Enter},
+ {"rainbowhxch/beacon.nvim",          event=Enter},
 
- {"smjonas/live-command.nvim",                  event="CmdlineEnter"},
- {"nacro90/numb.nvim",                          event="CmdlineEnter"},
+ {"smjonas/live-command.nvim",        event="CmdlineEnter"},
+ {"nacro90/numb.nvim",                event="CmdlineEnter"},
 
  --- Searchers
  {"ibhagwan/fzf-lua"},
@@ -33,21 +33,21 @@ local Specs={
  {"folke/flash.nvim"},
 
  --- Edit
- {"hc-substitute",                              main="hc-substitute",                      virtual=true},
+ {"hc-substitute",                    main="hc-substitute",                      virtual=true},
  {"echasnovski/mini.align"},
  {"echasnovski/mini.surround"},
  {"numToStr/Comment.nvim"},
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hc-func",                                    main="hc-func",                            virtual=true,          event=Enter},
+ {"hc-func",                          main="hc-func",                            virtual=true,          event=Enter},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
  {"dstein64/vim-startuptime"},
  {"folke/zen-mode.nvim"},
  {"glepnir/dbsession.nvim"},
- {"nvim-neo-tree/neo-tree.nvim",                lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
+ {"nvim-neo-tree/neo-tree.nvim",      lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
  -- {"nvim-telescope/telescope-file-browser.nvim", lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
  -- {"nvim-tree/nvim-tree.lua",                    event=Events.DirEnter},
  {"nvim-pack/nvim-spectre"},
@@ -55,8 +55,8 @@ local Specs={
  {"smoka7/multicursors.nvim"},
 
  --- Completions
- {"L3MON4D3/LuaSnip",                           event="InsertEnter"},
- {"rafamadriz/friendly-snippets",               event=Events.LazyLoad("LuaSnip")},
+ {"L3MON4D3/LuaSnip",                 event="InsertEnter"},
+ {"rafamadriz/friendly-snippets",     event=Events.LazyLoad("LuaSnip")},
  -- {"hrsh7th/nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
  {
   "iguanacucumber/magazine.nvim",
