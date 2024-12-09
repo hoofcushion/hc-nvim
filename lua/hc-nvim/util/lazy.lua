@@ -1,17 +1,21 @@
 local Util=require("hc-nvim.util")
 local Lazy={}
+local trimmed={
+ [".lua"]=true,
+ [".nvim"]=true,
+}
 ---@param name string
 function Lazy.normname(name)
  local _,e=Util.rfind(name,"/",nil,true)
  if e then
   name=name:sub(e+1)
  end
- if Util.startswith(name,"mini.") then
-  name="mini-"..Util.trimprefix(name,"mini.")
- end
  local _,e=Util.rfind(name,".",nil,true)
- if e then
+ if e~=nil and trimmed[name:sub(e)] then
   name=name:sub(1,e-1)
+ end
+ if name:find(".",1,true) then
+  name=name:gsub("%.","-")
  end
  return name
 end

@@ -1,5 +1,6 @@
 local Util=require("hc-nvim.util")
---- PERF: load builtins with
+vim.opt.rtp:append(Util.root_path)
+_G.NS=require("hc-nvim.namespace")
 local raw=require
 require=Util.lua_ls_alias(raw,function(modname)
  if Util.startswith(modname,"hc-nvim.builtin") then
@@ -7,7 +8,6 @@ require=Util.lua_ls_alias(raw,function(modname)
  end
  return raw(modname)
 end)
-vim.opt.rtp:append(Util.root_path)
 local modules={
  "i18n",
  "option",

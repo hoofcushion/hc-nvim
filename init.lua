@@ -1,5 +1,5 @@
 --- hc-nvim/init.lua
---- use this file as a distro starter for hc-nvim
+--- You can use this file as a starter for hc-nvim
 require("bootstrap")
 require("lazy").setup({
  spec={

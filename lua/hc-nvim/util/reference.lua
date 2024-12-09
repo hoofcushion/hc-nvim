@@ -1,3 +1,7 @@
+--- ---
+--- A reference of a table is a fake table that correspond to key index
+--- And return real value of that index, but it block all newindex.
+--- ---
 local Util=require("hc-nvim.util")
 local Reference={}
 --- return a reference table of `main`
@@ -14,10 +18,7 @@ local Reference={}
 --- raw.a.b=nil
 --- print(t.a.b) -- nil
 ---```
----@generic T
----@param main T
----@return T
-function Reference.create(main,keys)
+local function _create(main,keys)
  if type(main)~="table" then
   return main
  end
@@ -40,11 +41,29 @@ function Reference.create(main,keys)
    if type(ret)=="table" then
     local _keys=Util.deepcopy(keys)
     table.insert(_keys,k)
-    return Reference.create(main,_keys)
+    return _create(main,_keys)
    end
    return ret
   end,
   __newindex=Util.empty_f,
  })
+end
+---@generic T
+---@param main T
+---@return T
+function Reference.create(main)
+ return _create(main,{})
+end
+--- Use `sup` to keep access local environment's table locals
+---@generic T
+---@param sup fun():T
+---@return T
+function Reference.get(sup)
+ local mt; mt={
+  __index=function (_, k)
+   return sup()[k]
+  end
+ }
+ return _create(setmetatable({},mt),{})
 end
 return Reference

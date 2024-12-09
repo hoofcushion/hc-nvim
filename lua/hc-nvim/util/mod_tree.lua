@@ -1,3 +1,4 @@
+--- Travel filesystem in table.
 local  Util=require("hc-nvim.util")
 local function modtree(tree,path,func)
  return setmetatable({},{

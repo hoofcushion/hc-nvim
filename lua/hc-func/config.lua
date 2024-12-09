@@ -114,7 +114,6 @@ local default_options={
   enabled=true,
  },
 }
-setmetatable(default_options,{__newindex=empty_fn})
 local valitab={
  cursorword={
   enabled="boolean",
@@ -176,17 +175,9 @@ local valitab={
   enabled="boolean",
  },
 }
-local current_options=default_options
 local M={}
-M.options=Util.Reference.create(setmetatable({},{
- __index=function(_,k)
-  return current_options[k]
- end,
-}))
---- Lua ls notation
-if false then
- M.options=default_options
-end
+local current_options=default_options
+M.options=Util.Reference.get(function() return current_options end)
 function M.fini()
  current_options=default_options
 end

@@ -40,7 +40,7 @@ local Specs={
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hc-func",                                    main="hc-func",                            virtual=true,                       event=Enter},
+ {"hc-func",                                    main="hc-func",                            virtual=true,          event=Enter},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -56,18 +56,25 @@ local Specs={
 
  --- Completions
  {"L3MON4D3/LuaSnip",                           event="InsertEnter"},
- {"altermo/ultimate-autopair.nvim",             event={"InsertEnter","CmdlineEnter"}},
+ {"rafamadriz/friendly-snippets",               event=Events.LazyLoad("LuaSnip")},
  -- {"hrsh7th/nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
- {"iguanacucumber/magazine.nvim",               name="nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
- --- Cmp sources
- {"dmitmel/cmp-cmdline-history",                event="CmdlineEnter"},
- {"FelipeLema/cmp-async-path",                  event={"CmdlineEnter","InsertEnter"}},
- {"hrsh7th/cmp-buffer",                         event={"CmdlineEnter","InsertEnter"}},
- {"hrsh7th/cmp-cmdline",                        event="CmdlineEnter"},
- {"hrsh7th/cmp-nvim-lsp",                       event="LspAttach"},
- {"petertriho/cmp-git",                         ft="gitcommit",                            dependencies="nvim-lua/plenary.nvim"},
- {"saadparwaiz1/cmp_luasnip",                   event=Events.LazyLoad("LuaSnip")},
- {"folke/lazydev.nvim",                         event=Events.NeoConfig},
+ {
+  "iguanacucumber/magazine.nvim",
+  name="nvim-cmp",
+  event={"InsertEnter","CmdlineEnter"},
+  dependencies={
+   "dmitmel/cmp-cmdline-history",
+   "FelipeLema/cmp-async-path",
+   "hrsh7th/cmp-buffer",
+   "hrsh7th/cmp-cmdline",
+   "hrsh7th/cmp-nvim-lsp",
+   "petertriho/cmp-git",
+   "saadparwaiz1/cmp_luasnip",
+  },
+ },
+ -- {"Saghen/blink.cmp",                           lazy=false},
+
+
 
  --- Highlighter
  {"NvChad/nvim-colorizer.lua",                  event=Enter},
@@ -96,6 +103,7 @@ local Specs={
 
  --- LSP tools
  {"Wansmer/symbol-usage.nvim",                  event="LspAttach"},
+ {"folke/lazydev.nvim",                         event=Events.NeoConfig},
 
  --- Treesitter
  {"nvim-treesitter/nvim-treesitter",            event=Enter},
@@ -107,6 +115,7 @@ local Specs={
  {"Wansmer/binary-swap.nvim"},
  {"mizlan/iswap.nvim"},
  {"nvim-treesitter/nvim-treesitter-textobjects"},
+ {"altermo/ultimate-autopair.nvim",             event={"InsertEnter","CmdlineEnter"}},
 
  {"windwp/nvim-ts-autotag"},
  {"abecodes/tabout.nvim"},
