@@ -1,29 +1,29 @@
 # Intro
 
-The hc-nvim is a configuration for Neovim.
+`hc-nvim` is a configuration for Neovim.
 
-The hc is the abbreviation of owner Hoof Cushion.
+`hc` stands for the abbreviation of the owner Hoof Cushion.
 
-The goals of hc-nvim:
+## Goals of `hc-nvim`
 
-- Simple.
-- Centralize.
-- Extendable.
-- Decouple.
-- Linear.
+- Simple
+- Centralize
+- Extendable
+- Decouple
+- Linear
 
 # Usage
 
 ## Installation
 
-Dependencies:
+### Dependencies
 
-- neovim
-- git
+- Neovim
+- Git
 
 ### Unix
 
-Run command in the terminal:
+Run the following command in the terminal:
 
 ```sh
 cd ~
@@ -34,7 +34,7 @@ git clone https://github.com/hoofcushion/hc-nvim nvim
 
 ### Windows
 
-Press Win+r, puts "powershell", press enter, then run commands:
+Press `Win+r`, type "powershell", press enter, then run the following commands:
 
 ```powershell
 cd ~
@@ -51,8 +51,7 @@ This command prints your config directory:
 nvim --headless -c "echo stdpath('config') | q"
 ```
 
-Goto the directory it prints and run
-Make sure the directory is empty and had backup.
+Navigate to the directory it prints and ensure the directory is empty and backed up.
 
 ```sh
 git clone https://github.com/hoofcushion/hc-nvim .
@@ -60,20 +59,20 @@ git clone https://github.com/hoofcushion/hc-nvim .
 
 ### Lazy.nvim
 
-If you had lazy.nvim, hc-nvim as a plugin can installed by it:
+If you are using `lazy.nvim`, `hc-nvim` can be installed as a plugin with the following configuration:
 
 ```lua
 require("lazy").setup({
-	spec = {
-		{ "hoofcushion/hc-nvim", import = "hc-nvim.export" },
-	},
-	default = {
-		lazy = true,
-	},
+    spec = {
+        { "hoofcushion/hc-nvim", import = "hc-nvim.export" },
+    },
+    default = {
+        lazy = true,
+    },
 })
 ```
 
-### Trouble
+### Troubleshoot
 
-- Setup proxy to before using git.
-- Use checkhealth command.
+- Set up a proxy before using git.
+- Use the `checkhealth` command to diagnose issues.
