@@ -1,5 +1,4 @@
 return {
- "nvim-telescope/telescope-file-browser.nvim",
  main="telescope",
  vscode=false,
  dependencies={

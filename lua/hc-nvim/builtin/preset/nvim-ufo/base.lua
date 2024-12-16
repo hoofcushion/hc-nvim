@@ -1,6 +1,5 @@
 return {
  vscode=false,
- "kevinhwang91/nvim-ufo",
  cmd={
   "UfoEnable",
   "UfoDisable",

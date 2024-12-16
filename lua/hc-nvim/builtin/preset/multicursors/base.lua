@@ -1,6 +1,5 @@
 return {
  vscode=false,
- "smoka7/multicursors.nvim",
  cmd={
   "MCstart",
   "MCvisual",

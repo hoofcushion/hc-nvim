@@ -1,5 +1,4 @@
 return {
- "nvim-treesitter/nvim-treesitter",
  main="nvim-treesitter.configs",
  version="*", -- Use stable version to prevent 神必 error
  build=":TSUpdate",

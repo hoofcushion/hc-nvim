@@ -1,6 +1,5 @@
 return {
  vscode=false,
- "folke/zen-mode.nvim",
  cmd={
   "ZenMode",
  },

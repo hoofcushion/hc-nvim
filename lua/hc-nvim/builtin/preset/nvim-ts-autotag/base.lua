@@ -1,5 +1,4 @@
 return {
- "windwp/nvim-ts-autotag",
  main="nvim-treesitter.configs",
  ft={
   "astro",

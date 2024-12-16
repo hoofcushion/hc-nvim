@@ -1,6 +1,5 @@
 return {
  vscode=false,
- "MeanderingProgrammer/markdown.nvim",
  main="render-markdown",
  name="render-markdown",
  depencencies={
