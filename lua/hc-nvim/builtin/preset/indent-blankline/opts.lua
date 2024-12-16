@@ -15,8 +15,7 @@ return {
   show_end=true,
   char="┃",
   injected_languages=true,
-  --- Get the first and the middle position highlight
-  highlight=(function() return {rainbow[#rainbow],rainbow[math.ceil(#rainbow/2)]} end)(),
+  highlight=rainbow,
  },
  exclude={
   filetypes=Config.performance.exclude.filetypes,

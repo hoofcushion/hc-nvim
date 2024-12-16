@@ -48,19 +48,7 @@ local function set(scope,name,value)
  vim[scope][name]=to_option(value)
 end
 ---@alias options table<string,any>
-local function set_options(scope,opts)
- for name,value in pairs(opts) do
-  if is_valid[scope] then
-   set(scope,name,to_option(value))
-  end
- end
-end
 ---@alias scope_options table<string,table<string,any>>
-local function set_map(scope_opts)
- for scope,opts in pairs(scope_opts) do
-  set_options(scope,opts)
- end
-end
 local Option={}
 ---@class AutoOptsSpec
 ---@field event   string|string[]?
@@ -75,16 +63,22 @@ function Option.set(opts)
    Option.set(v)
   end
  elseif opts.options then
-  for _,spec in ipairs(opts) do
-   vim.api.nvim_create_autocmd(spec.event or "filetype",{
-    pattern=spec.pattern,
-    callback=function()
-     set_map(spec.options)
-    end,
-   })
+  vim.api.nvim_create_autocmd(opts.event or "filetype",{
+   pattern=opts.pattern,
+   callback=function()
+    vim.schedule(function()
+     Option.set(opts.options)
+    end)
+   end,
+  })
+  return
+ end
+ for scope,opt in pairs(opts) do
+  for name,value in pairs(opt) do
+   if is_valid[scope] then
+    set(scope,name,value)
+   end
   end
- else
-  set_map(opts)
  end
 end
 return Option

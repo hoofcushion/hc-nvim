@@ -121,6 +121,12 @@ function Preset.apply(specs)
    spec.priority=priority
    priority=priority-1
   end
+  if spec.auto==true then
+   spec.lazy=vim.fn.argc()==0
+  end
+  if spec.vscode and not vim.g.vscode then
+   spec.enabled=false
+  end
   -- get preset
   local name=Util.Lazy.getname(spec)
   local modname=Util.Lazy.normname(name)

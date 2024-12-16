@@ -130,9 +130,7 @@ function Event:create_user_event(name,opts)
   callback=function(event)
    local ok=opts.trigger(event)
    if ok then
-    vim.schedule(function()
-     vim.api.nvim_exec_autocmds("User",{pattern=name})
-    end)
+    vim.api.nvim_exec_autocmds("User",{pattern=name})
     if opts.clear then
      vim.api.nvim_del_augroup_by_id(id)
     end

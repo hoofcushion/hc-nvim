@@ -35,16 +35,10 @@ end
 local function extend(ret,language,country,translations)
  if type(translations)=="table" then
   for k,translation in pairs(translations) do
-   local t,c=Util.tbl_check(ret,k)
-   if c then
-    t.map={}
-   end
-   extend(
-    t,
-    language,
-    country,
-    translation
-   )
+   local t=Util.tbl_check(ret,k,function ()
+    return {map={}}
+   end)
+   extend(t,language,country,translation)
   end
  elseif type(translations)=="string" then
   Util.tbl_check(ret.map,language)[country]=translations

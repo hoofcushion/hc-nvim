@@ -28,13 +28,15 @@ function Lazy.getname(spec)
 end
 Lazy.normname=Util.Cache.create(Lazy.normname)
 Lazy.getname=Util.Cache.create(Lazy.getname)
----@param spec LazySpec
----@param fn fun(spec:LazyPluginSpec)
+---@generic T
+---@param spec T|LazySpec
+---@param fn fun(spec:T)
 ---@return LazySpec
 function Lazy.foreach(spec,fn)
  if type(spec)=="string" then
-  return Lazy.foreach({spec},fn)
- elseif (#spec>1 or type(spec[1])=="table") and Util.is_list(spec) then
+  spec={spec}
+ end
+ if (#spec>1 or type(spec[1])=="table") and Util.is_list(spec) then
   for i,v in ipairs(spec) do
    spec[i]=Lazy.foreach(v,fn)
   end

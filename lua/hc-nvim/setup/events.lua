@@ -37,12 +37,12 @@ M.DirEnter=M.Create("DirEnter","BufEnter",{
 })
 M.FileEnter=M.Create("FileEnter","BufEnter",{
  trigger=function(ev)
-  return vim.bo.buftype==""
+  return ev.file~=""
  end,
 })
 M.FileWinEnter=M.Create("FileWinEnter","BufWinEnter",{
  trigger=function(ev)
-  return vim.bo.buftype==""
+  return ev.file~=""
  end,
 })
 M.NeoConfig=M.Create("NeoConfig","BufEnter",{
@@ -52,11 +52,10 @@ M.NeoConfig=M.Create("NeoConfig","BufEnter",{
   end
  end,
 })
-M.LeaveDashBoard=M.Create("LeaveDashBoard","BufDelete",{
+M.LeaveDashBoard=M.Create("LeaveDashBoard","BufWipeOut",{
  trigger=function(ev)
   return ev.buf==1
  end,
- clear=true,
 })
 -- local t=vim.uv.new_timer()
 -- local cb=function()

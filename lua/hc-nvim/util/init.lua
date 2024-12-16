@@ -5,6 +5,7 @@ local Util=require("hc-nvim.util.lazy_tab").create({
  Cache       ="hc-nvim.util.cache",
  Class       ="hc-nvim.util.class",
  Clock       ="hc-nvim.util.clock",
+ Color       ="hc-nvim.util.color",
  Event       ="hc-nvim.util.event",
  Fallback    ="hc-nvim.util.fallback",
  HLGroup     ="hc-nvim.util.hl_group",
@@ -35,6 +36,7 @@ if false then
   Cache       =require("hc-nvim.util.cache"),
   Class       =require("hc-nvim.util.class"),
   Clock       =require("hc-nvim.util.clock"),
+  Color       =require("hc-nvim.util.color"),
   Event       =require("hc-nvim.util.event"),
   Fallback    =require("hc-nvim.util.fallback"),
   HLGroup     =require("hc-nvim.util.hl_group"),
@@ -104,6 +106,7 @@ end)
 function Util.empty_f() end
 --- Table that always empty.
 Util.empty_t=setmetatable({},{
+ __index=Util.empty_f,
  __newindex=Util.empty_f,
  __tostring=function()
   return "table<empty>"
@@ -118,10 +121,10 @@ function Util.number_get_place(number)
  end
  return math.floor(math.log(number,10)/3)
 end
-function Util.number_sub(number,positive,negative)
+function Util.number_sub(number,int,dec)
  local whole,frac=Util.number_split(number)
- whole=whole%(10^positive)
- local percentile=10^(math.abs(negative))
+ whole=whole%(10^int)
+ local percentile=10^(dec)
  frac=math.floor(frac*(percentile))/percentile
  return whole+frac
 end
@@ -209,15 +212,6 @@ function Util.get_source(stack)
  local info=debug.getinfo(stack~=nil and stack or 2,"S")
  return info and info.source:sub(2) or "?"
 end
-function Util.getinfo(stack,...)
- local info=debug.getinfo(2+(stack~=nil and stack-1 or 0))
- local ret={}
- for i=1,select("#",...) do
-  local key=select(i,...)
-  table.insert(ret,tostring(info[key]))
- end
- return table.concat(ret,"|")
-end
 Util.root_path=vim.fn.fnamemodify(Util.get_source(),":h:h:h:h")
 Util.paths={
  Util.root_path,
@@ -298,7 +292,8 @@ local empty_check={
 }
 Util.empty_check=empty_check
 function Util.is_empty(x)
- return empty_check[type(x)](x)
+ local check=empty_check[type(x)]
+ return check and check(x) or nil
 end
 function Util.is_truthy(x)
  return x==true
@@ -324,40 +319,37 @@ end
 function Util.is_fat_table(tbl)
  return next(tbl)~=nil
 end
+function Util.validate(x,t)
+ if type(x)==t then
+  return true
+ end
+ error(("Expect %s, got %s"):format(t,type(x)))
+end
 --- ---
 --- Table
 --- ---
-function Util.tbl_check(t,k)
- local create=false
+--- Check field exists
+--- Put expr to initialize if it not exist.
+--- If expr not provided, a empty table is used as fallback.
+---@overload fun(t,k):table
+---@generic T:table
+---@generic K
+---@generic V
+---@param t T
+---@param k K
+---@param e fun(T,K):V
+---@return V
+function Util.tbl_check(t,k,e)
  local ret=t[k]
  if ret==nil then
-  create=true
-  ret={}
-  t[k]=ret
- end
- return ret,create
-end
----@generic T
----@param expr fun():T
----@return T
-function Util.tbl_echeck(t,k,expr)
- local ret=t[k]
- if ret==nil then
-  ret=expr==nil and {} or expr()
-  t[k]=ret
- end
- return ret
-end
-function Util.tbl_pcheck(t,k)
- local ret=t[k]
- if ret==nil then
-  ret={}
+  ret=e==nil and {} or e(t,k)
   t[k]=ret
  elseif type(ret)~="table" then
   error("Expected table at key '"..tostring(k).."' but got '"..type(ret).."'")
  end
  return ret
 end
+--- Clear a table.
 function Util.tbl_clear(tbl)
  for k in pairs(tbl) do
   tbl[k]=nil
@@ -436,19 +428,24 @@ function Util.list_flatten(dst,...)
  end
  return dst
 end
+local function prefer(repl,orig)
+ if repl==nil or repl==orig or type(repl)~=type(orig) then
+  return orig
+ end
+ if orig==nil then
+  return repl
+ end
+end
 local function override(dst,src,cache)
- if src==nil
- or dst==src
- or cache[dst]==true
- then
+ if cache[dst]==true then
   return dst
  end
- if dst==nil
- or type(src)~="table"
- or type(dst)~="table"
- or cache[src]==true
- then
+ if cache[src]==true then
   return src
+ end
+ local has_prefer=prefer(dst,src)
+ if has_prefer~=nil then
+  return has_prefer
  end
  cache[dst]=true
  cache[src]=true
@@ -457,6 +454,8 @@ local function override(dst,src,cache)
  end
  return dst
 end
+--- Use src's elements to override dst
+--- Return dst
 ---@generic T
 ---@param dst T
 ---@param src T
@@ -477,18 +476,19 @@ end
 function Util.deepcopy(orig)
  return deepcopy(orig)
 end
+--- Rawset key-value for the root __index of tbl
 local function deepset(tbl,key,val)
  rawset(tbl,key,val)
- if tbl[key]==val then
+ if tbl[key]==nil then
   return
  end
  local mt=getmetatable(tbl)
- if mt==nil then
+ if mt==nil or mt.__index==nil then
   return
  end
  local super=mt.__index
  if type(super)~="table" then
-  error("cannot set value for a non-table __index")
+  error("cannot deep set value for non-table __index")
  end
  deepset(super,key,val)
 end
@@ -514,16 +514,6 @@ function Util.totable(any)
  end
  return any
 end
-function Util.concat(...)
- local ret=""
- for i=1,select("#",...) do
-  local v=select(i,...)
-  if v~=nil then
-   ret=ret..v
-  end
- end
- return ret
-end
 --- Like totable but return nil if input is a `empty table` or `nil`
 ---@generic T
 ---@param any T
@@ -540,15 +530,18 @@ function Util.to_fat_table(any)
  end
  return any
 end
-function Util.eval(expr,...)
- return type(expr)=="function" and expr(...) or expr
-end
-function Util.deep_eval(expr,...)
- local ret=expr
- while type(ret)=="function" do
-  ret=Util.eval(ret,...)
+function Util.concat(...)
+ local ret=""
+ for i=1,select("#",...) do
+  local v=select(i,...)
+  if v~=nil then
+   ret=ret..v
+  end
  end
  return ret
+end
+function Util.eval(expr,...)
+ return type(expr)=="function" and expr(...) or expr
 end
 ---@generic T
 ---@param ... T
@@ -601,9 +594,6 @@ local pattern={
  vim.fn.stdpath("config") --[[@as string]],
  vim.fn.stdpath("data") --[[@as string]],
 }
-function Util.depth(file)
- return file:gsub()
-end
 function Util.is_profile(file)
  file=string.lower(file)
  for _,v in ipairs(pattern) do
@@ -612,7 +602,15 @@ function Util.is_profile(file)
   end
  end
 end
----@param str    string
+function Util.get_size(id)
+ if type(id)=="number" then
+  return vim.api.nvim_buf_get_offset(id,vim.api.nvim_buf_line_count(id))
+ else
+  local info=vim.uv.fs_stat(id)
+  return info~=nil and info.size or nil
+ end
+end
+---@param str string
 ---@param fix string
 function Util.endswith(str,fix)
  if #fix>#str then return false end
@@ -661,7 +659,7 @@ function Util.tbl_get(tbl,keys)
  end
  local e=#keys
  for i=1,e do
-  tbl=Util.tbl_pcheck(tbl,keys[i])
+  tbl=Util.tbl_check(tbl,keys[i])
  end
  return tbl
 end
@@ -674,7 +672,7 @@ function Util.tbl_set(tbl,keys,val)
  end
  local e=#keys
  for i=1,e-1 do
-  tbl=Util.tbl_pcheck(tbl,keys[i])
+  tbl=Util.tbl_check(tbl,keys[i])
  end
  tbl[keys[e]]=val
  return tbl
@@ -686,7 +684,7 @@ function Util.tbl_newindex(tbl,...)
   if v==nil then
    error(string.format("invalid index at %d",i))
   end
-  tbl=Util.tbl_pcheck(tbl,v)
+  tbl=Util.tbl_check(tbl,v)
  end
  tbl[select(e-1,...)]=select(e,...)
 end
@@ -697,7 +695,7 @@ function Util.tbl_index(tbl,...)
   if v==nil then
    error(string.format("invalid index at %d",i))
   end
-  tbl=Util.tbl_pcheck(tbl,v)
+  tbl=Util.tbl_check(tbl,v)
  end
  return tbl[select(e,...)]
 end

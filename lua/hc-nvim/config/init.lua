@@ -70,6 +70,13 @@ M.ui={
     return math.ceil(factor*size)
    end
   end)(),
+  ---@type table<"horizontal"|"vertical"|"width"|"height",string>
+  percentage=setmetatable({},{
+   __index=function(_,k)
+    local factor=M.ui.window[k]
+    return string.format("%d%%",factor*100)
+   end,
+  }),
  },
 }
 M.performance={
@@ -83,33 +90,12 @@ M.performance={
  --- How a file recognize as a bigfile.
  --- Lsp and treesitter will not attach it for performance.
  bigfile={
-  size_kb=1024,
-  size_bytes=1024^2,
   lines=1024*10,
   bytes=1024^2,
-  ---@param self any
-  ---@param format
-  ---| "B"  # bytes
-  ---| "KB" # kilobytes
-  ---| "MB" # megabytes
-  ---| "l"  # lines
-  ---@return integer
-  as=function(self,format)
-   if format=="B" then
-    return self.bytes
-   elseif format=="KB" then
-    return self.bytes/1024
-   elseif format=="MB" then
-    return self.bytes/(1024^2)
-   elseif format=="l" then
-    return self.lines
-   end
-   error("unknown format at #2")
-  end,
  },
  exclude={
   filetypes={
-   "",
+   "bigfile",
   },
   buftypes={
    "terminal",

@@ -1,10 +1,14 @@
+---@module "lazy"
+
 local Events=require("hc-nvim.setup.events")
-local Enter={"BufReadPost","BufNewFile","BufWritePre"}
----@type LazySpec
-local Specs={
+local Enter={Events.LeaveDashBoard,"BufReadPre","BufNewFile","BufWritePre"}
+---@type LazySpec|{
+--- auto: boolean?,
+---}
+return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",            lazy=false},
- {"nvimdev/dashboard-nvim",           lazy=false,                                cond=vim.fn.argv(0)==""},
+ {"nvimdev/dashboard-nvim",           lazy=false,cond=vim.fn.argc()==0},
  {"folke/noice.nvim",                 lazy=false},
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
@@ -40,7 +44,7 @@ local Specs={
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hc-func",                          main="hc-func",                            virtual=true,          event=Enter},
+ {"hc-func",                          main="hc-func",                            virtual=true,        event=Enter},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -81,8 +85,8 @@ local Specs={
  {"echasnovski/mini.trailspace",                event=Enter},
  {"folke/todo-comments.nvim",                   event=Enter},
  {"nfrid/due.nvim",                             event=Enter},
- -- {"lukas-reineke/indent-blankline.nvim",        event=Enter},
- -- {"hiphish/rainbow-delimiters.nvim",            event=Enter},
+ {"lukas-reineke/indent-blankline.nvim",        event=Enter},
+ {"hiphish/rainbow-delimiters.nvim",            event=Enter,                           auto=true},
 
  --- AI
  -- {"zbirenbaum/copilot.lua"},
@@ -129,4 +133,3 @@ local Specs={
  --- Libraries
  {"nvim-tree/nvim-web-devicons"},
 }
-return Specs

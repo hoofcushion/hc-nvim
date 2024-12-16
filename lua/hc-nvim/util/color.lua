@@ -1,3 +1,4 @@
+local Color={}
 ---@param p number
 ---@param q number
 ---@param h number
@@ -8,6 +9,7 @@ local function hue_to_rgb(p,q,h)
  if h<2/3 then return p+(q-p)*(2/3-h)*6; end
  return p
 end
+Color.hue_to_rgb=hue_to_rgb
 ---@param h number
 ---@param s number
 ---@param l number
@@ -24,27 +26,5 @@ local function hsl_to_rgb(h,s,l)
  local r,g,b=hue_to_rgb(p,q,h+1/3),hue_to_rgb(p,q,h),hue_to_rgb(p,q,h-1/3)
  return math.floor(r*255),math.floor(g*255),math.floor(b*255)
 end
-local function rgb_to_colorcode(r,g,b)
- return string.format("#%02x%02x%02x",r,g,b)
-end
-local Util=require("hc-nvim.util")
-local M={}
-local function create(a,s,l,name)
- local groups={}
- for i=0,360,360/a do
-  i=math.floor(i)
-  local group={name.."_"..tostring(i),{fg=rgb_to_colorcode(hsl_to_rgb(i,s,l))}}
-  table.insert(groups,group)
- end
- return Util.HLGroup.create(groups)
-end
----@type table<string,HLGroup>
-local HLGroups={}
-function M.create(a,s,l)
- local name=string.format("Rainbow_HSL_%03d_%03d_%03d",a,s,l)
- local group=Util.tbl_check(HLGroups,name,function()
-  return create(a,s,l,name):set_hl():attach()
- end)
- return group:getnames()
-end
-return M
+Color.hsl_to_rgb=hsl_to_rgb
+return Color
