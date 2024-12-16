@@ -140,6 +140,10 @@ function Preset.apply(specs)
     return getter(plugin,field,orig,preset,modname)
    end
   end
+  if spec.dependencies~=nil then
+   spec={spec,spec.dependencies}
+   spec.dependencies=nil
+  end
  end)
 end
 return Preset
