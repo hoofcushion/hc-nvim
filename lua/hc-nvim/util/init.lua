@@ -185,9 +185,9 @@ local is_visualmode={
  [""]=true,
 }
 function Util.get_vmode()
- local vmode=vim.api.nvim_get_mode().mode
- if is_visualmode[vmode:sub(1,1)]==nil then
-  vmode=vim.fn.visualmode() --[[@as visualmode]]
+ local vmode=vim.api.nvim_get_mode().mode:sub(1,1)
+ if is_visualmode[vmode]==nil then
+  return vim.fn.visualmode() --[[@as visualmode]]
  end
  return vmode
 end
@@ -205,7 +205,9 @@ Util.pipe=pipe
 --- ---
 ---@param name string?
 function Util.track(name)
- require("lazy.util").track(name)
+ Util.try(function()
+  require("lazy.util").track(name)
+ end)
 end
 ---@param stack integer?
 function Util.get_source(stack)
@@ -293,7 +295,7 @@ local empty_check={
 Util.empty_check=empty_check
 function Util.is_empty(x)
  local check=empty_check[type(x)]
- return check and check(x) or nil
+ return check and check(x) or false
 end
 function Util.is_truthy(x)
  return x==true
@@ -428,6 +430,7 @@ function Util.list_flatten(dst,...)
  end
  return dst
 end
+--- Use `repl` to replace `orig` if their type matched and orig isn't nil
 local function prefer(repl,orig)
  if repl==nil or repl==orig or type(repl)~=type(orig) then
   return orig
@@ -436,12 +439,11 @@ local function prefer(repl,orig)
   return repl
  end
 end
+--- Override a value recursively
+--- Use cache to check loop
 local function override(dst,src,cache)
- if cache[dst]==true then
+ if cache[dst] or cache[src] then
   return dst
- end
- if cache[src]==true then
-  return src
  end
  local has_prefer=prefer(dst,src)
  if has_prefer~=nil then
@@ -463,6 +465,50 @@ end
 function Util.override(dst,src)
  return override(dst,src,{})
 end
+function Util.trace(msg)
+ vim.notify(msg,vim.log.levels.TRACE)
+end
+function Util.debug(msg)
+ vim.notify(msg,vim.log.levels.DEBUG)
+end
+function Util.info(msg)
+ vim.notify(msg,vim.log.levels.INFO)
+end
+function Util.warn(msg)
+ vim.notify(msg,vim.log.levels.WARN)
+end
+function Util.error(msg)
+ vim.notify(msg,vim.log.levels.ERROR)
+end
+function Util.off(msg)
+ vim.notify(msg,vim.log.levels.OFF)
+end
+function Util.try(fn,catch)
+ if catch==nil then
+  catch=Util.error
+ end
+ xpcall(fn,function(ok,err)
+  if not ok then
+   catch(err)
+  end
+ end)
+end
+--- Run callback immediately if no arg passing to neovim when launch
+--- Else it runs when entering first buf
+function Util.auto(callback)
+ if vim.fn.argc()~=0 then
+  Util.try(callback)
+ else
+  vim.api.nvim_create_autocmd("BufWipeOut",{
+   callback=function(ev)
+    if ev.buf==1 then
+     Util.try(callback)
+     return true
+    end
+   end,
+  })
+ end
+end
 local function deepcopy(orig)
  if type(orig)~="table" then
   return orig
@@ -473,6 +519,9 @@ local function deepcopy(orig)
  end
  return ret
 end
+---@generic T
+---@param orig T
+---@return T
 function Util.deepcopy(orig)
  return deepcopy(orig)
 end
@@ -515,21 +564,20 @@ function Util.totable(any)
  return any
 end
 --- Like totable but return nil if input is a `empty table` or `nil`
----@generic T
----@param any T
----@return T[]|nil
+---@return table?
 function Util.to_fat_table(any)
  if type(any)~="table" then
-  if any==nil then
-   return
+  if any~=nil then
+   return {any}
   end
-  return {any}
- end
- if next(any)==nil then
   return
  end
- return any
+ if next(any)~=nil then
+  return any
+ end
 end
+---@param ... string
+---@return string
 function Util.concat(...)
  local ret=""
  for i=1,select("#",...) do
@@ -540,6 +588,10 @@ function Util.concat(...)
  end
  return ret
 end
+---@generic T
+---@param ... any
+---@param expr T|fun(...:any):T
+---@return T
 function Util.eval(expr,...)
  return type(expr)=="function" and expr(...) or expr
 end
@@ -758,4 +810,75 @@ end
 function Util.rpairs(tbl,range)
  return range_iter,{tbl,range,1,#range}
 end
+local function _gsplit(s)
+ if s.done then
+  return
+ end
+ -- special case for sep == ""
+ -- simply iterate all chars
+ if s.sep=="" then
+  if s.i==s.len then
+   s.done=true
+  end
+  local i=s.i
+  s.i=s.i+1
+  return s.str:sub(i,i)
+ end
+ -- normal split using string.find
+ local j,k=string.find(s.str,s.sep,s.i,s.plain)
+ if j==nil then
+  if s.trimempty and s.i>s.len then
+   return
+  end
+  s.done=true
+  return s.str:sub(s.i)
+ end
+ --- simply skip this iteration
+ if s.trimempty and k==1 then
+  s.i=s.i+1
+  return _gsplit(s)
+ end
+ -- string.find("a|c","|") returns (2,2)
+ -- so use previous i and e-1 gives "a"
+ local i=s.i
+ s.i=k+1
+ return s.str:sub(i,k-1)
+end
+local function gsplit(str,sep,opts)
+ local plain,trimempty
+ if type(opts)=="boolean" then
+  plain=opts
+ else
+  vim.validate({s={str,"s"},sep={sep,"s"},opts={opts,"t",true}})
+  opts=opts or {}
+  plain,trimempty=opts.plain,opts.trimempty
+ end
+ return _gsplit,
+  {
+   str=str,
+   sep=sep,
+   i=1,
+   len=#str,
+   plain=plain,
+   trimempty=trimempty,
+   done=false,
+  }
+end
+local function split(str,sep,opts)
+ local list={}
+ for s in gsplit(str,sep,opts) do
+  table.insert(list,s)
+ end
+ return list
+end
+--- A faster version of vim.gsplit
+function Util.gsplit(str,sep,opts)
+ return gsplit(str,sep,opts)
+end
+--- A faster version of vim.split
+function Util.split(str,sep,opts)
+ return split(str,sep,opts)
+end
+vim.split=Util.lua_ls_alias(vim.split,split)
+vim.gsplit=Util.lua_ls_alias(vim.gsplit,gsplit)
 return Util

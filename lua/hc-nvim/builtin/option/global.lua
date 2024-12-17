@@ -33,11 +33,11 @@ return {
   laststatus=3,    -- Global statusline shared in every window
 
   --- Display ---
-  list=true,                  -- Show some invisible characters -- Show invisible characters such as tabs and spaces
-  listchars={                 -- Define characters for different types of invisible characters
-   eol="$",                   -- Line ending character
-   tab="\\-",                 -- Tab character
-   space="·",                 -- Space character
+  list=true,  -- Show some invisible characters -- Show invisible characters such as tabs and spaces
+  listchars={ -- Define characters for different types of invisible characters
+   eol="$",   -- Line ending character
+   tab="| ",  -- Tab character
+   space="·", -- Space character
    -- multispace="---+",           -- Multiple consecutive space character
    -- lead=":",                    -- Leading space character
    -- leadmultispace="---+",       -- Leading multiple consecutive space character

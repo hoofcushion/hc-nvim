@@ -2,22 +2,22 @@ local Config=require("hc-nvim.config")
 if Config.platform.is_vscode and not Config.server.vscode then
  return
 end
+local Util=require("hc-nvim.util")
 if Config.server.auto_setup then
- vim.api.nvim_create_autocmd("BufReadPost",{
-  once=true,
-  callback=function()
-   local Handler=require("hc-nvim.setup.server.handler")
-   local specs=Config.server.list
-   for _,spec in ipairs(specs) do
-    Handler.load(spec)
-   end
-  end,
- })
+ Util.auto(function()
+  Util.track("server setup")
+  local Handler=require("hc-nvim.setup.server.handler")
+  local specs=Config.server.list
+  for _,spec in ipairs(specs) do
+   Handler.load(spec)
+  end
+  Util.track()
+ end)
 end
 vim.api.nvim_create_autocmd("LspAttach",{
  once=true,
  callback=function()
-  local Util=require("hc-nvim.util")
+  Util.track("server attach")
   ---@param cap lsp.Methods
   local function has_cap(cap)
    return function()
@@ -54,5 +54,6 @@ vim.api.nvim_create_autocmd("LspAttach",{
    end,
   })
   lspMaps:create(true)
+  Util.track()
  end,
 })

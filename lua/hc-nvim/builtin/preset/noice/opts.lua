@@ -29,9 +29,6 @@ return {
    size={
     height=Config.ui.window.percentage.height,
     width=Config.ui.window.percentage.width,
-    win_options={
-     border=require("hc-nvim.rsc").border[Config.ui.border],
-    },
    },
   },
   -- popupmenu,,

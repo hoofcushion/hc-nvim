@@ -3,6 +3,7 @@
 - [ ] remove unnecessary function
 - [ ] shrink codebase (under 10k)
 - [ ] improve project structure
+- [ ] split hc-func to sub plugins
 
 ## Done:
 

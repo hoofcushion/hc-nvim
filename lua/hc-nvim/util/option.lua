@@ -66,9 +66,7 @@ function Option.set(opts)
   vim.api.nvim_create_autocmd(opts.event or "filetype",{
    pattern=opts.pattern,
    callback=function()
-    vim.schedule(function()
-     Option.set(opts.options)
-    end)
+    Option.set(opts.options)
    end,
   })
   return
