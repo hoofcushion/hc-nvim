@@ -96,6 +96,9 @@ M.performance={
  exclude={
   filetypes={
    "bigfile",
+   "dashboard",
+   "lazy",
+   "noice",
   },
   buftypes={
    "terminal",
