@@ -46,7 +46,7 @@ return {
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",              event=Enter,                   main="hc-func",      virtual=true},
+ {"hoofcushion/hc-func",              event=Enter,                    main="hc-func",      virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -84,7 +84,7 @@ return {
 
  --- Highlighter
  {"NvChad/nvim-colorizer.lua",                  event=Enter},
- {"echasnovski/mini.trailspace",                event=Enter,                        virtual=true},
+ {"echasnovski/mini.trailspace",                event=Enter,                         virtual=true},
  {"folke/todo-comments.nvim",                   event=Enter},
  {"nfrid/due.nvim",                             event=Enter},
  {"lukas-reineke/indent-blankline.nvim",        event=Enter},

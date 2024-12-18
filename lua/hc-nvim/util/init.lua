@@ -235,12 +235,15 @@ do
  end
 end
 --- Similar to `require`, but slightly faster
---- It only search module in `Util.paths` and don't cache thing.
-function Util.load_local_mod(modname)
+--- It only search module in `Util.paths`
+function Util.local_require(modname)
  local info=Util.find_local_mod(modname)
  if info then
-  return loadfile(info.modpath)()
+  local ret=assert(loadfile(info.modpath))() or true
+  package.loaded[modname]=ret
+  return ret
  end
+ return nil
 end
 local function find_mod(modname)
  return vim.loader.find(modname)[1]

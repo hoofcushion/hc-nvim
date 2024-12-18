@@ -2,12 +2,31 @@ local Util=require("hc-nvim.util")
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
 local Mappings=require("hc-nvim.setup.mapping")
+--- Get all available path of preset at once
+local presets={}
+do
+ local function find_file(filename)
+  return vim.loader.find(filename,{patterns={""}})[1].modpath
+ end
+ for name in vim.fs.dir(find_file("hc-nvim.builtin.preset")) do
+  local fields={}
+  presets[name]=fields
+  local dir=find_file("hc-nvim.builtin.preset."..name)
+  for name2 in vim.fs.dir(dir) do
+   fields[name2:sub(1,-5)]=dir.."/"..name2
+  end
+ end
+end
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
- local prefix="hc-nvim.builtin.preset."..name.."."
+ local fields=presets[name]
+ if not fields then
+  return Util.empty_t
+ end
  return Util.Cache.table(function(field)
-  local modname=prefix..field
-   return Util.load_local_mod(modname)
+  if fields[field] then
+   return loadfile(fields[field])()
+  end
  end)
 end)
 --- hook after specific plugin
@@ -23,23 +42,24 @@ local Hook={
  hooks={},
 }
 ---@param hooks hookspec[]
-function Hook:add(hooks)
- local checked=self.checked
+function Hook.add(hooks)
+ local checked=Hook.checked
  for _,v in ipairs(hooks) do
   local cond={}
   for _,name in pairs(v[1]) do
-   if checked[name]==nil then
+   if checked[name]~=true then
     cond[name]=true
    end
   end
   local hook={cond=cond,func=v[2]}
-  table.insert(self.hooks,hook)
+  table.insert(Hook.hooks,hook)
  end
 end
-function Hook:check(name)
- local checked=self.checked
- local hooks=self.hooks
+function Hook.check(name)
+ local checked=Hook.checked
  checked[name]=true
+ --- update hooks
+ local hooks=Hook.hooks
  for k,hook in pairs(hooks) do
   local cond=hook.cond
   if cond[name]~=nil then
@@ -51,6 +71,7 @@ function Hook:check(name)
   end
  end
 end
+--- hooked lazy plugin field
 local PresetGetter={
  keys=function(plugin,field,orig,preset,name)
   orig=orig or preset[field]
@@ -106,10 +127,10 @@ local PresetGetter={
   Util.eval(preset.after,plugin)
   local hook=preset.hook
   if hook then
-   Hook:add(hook)
+   Hook.add(hook)
   end
-  Hook:check(name)
-  Hook:check(plugin.name)
+  Hook.check(name)
+  Hook.check(plugin.name)
  end,
 }
 local priority=2^10

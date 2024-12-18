@@ -19,6 +19,7 @@ function Lazy.normname(name)
  end
  return name
 end
+Lazy.normname=Util.Cache.create(Lazy.normname)
 ---@param spec table
 function Lazy.getname(spec)
  return spec.name
@@ -26,8 +27,6 @@ function Lazy.getname(spec)
   or spec.dir
   or spec.url
 end
-Lazy.normname=Util.Cache.create(Lazy.normname)
-Lazy.getname=Util.Cache.create(Lazy.getname)
 ---@generic T
 ---@param spec T|LazySpec
 ---@param fn fun(spec:T)
