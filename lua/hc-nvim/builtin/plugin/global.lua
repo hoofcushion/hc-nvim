@@ -1,23 +1,25 @@
 ---@module "lazy"
 
 local Events=require("hc-nvim.setup.events")
-local Enter={Events.LeaveDashBoard,"BufReadPre","BufNewFile","BufWritePre"}
+local Enter={"BufReadPost","BufNewFile","BufWritePre"}
 ---@type LazySpec|{
 --- auto: boolean?,
 ---}
 return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",            lazy=false},
- {"nvimdev/dashboard-nvim",           lazy=false,                                cond=vim.fn.argc()==0},
+ {"nvimdev/dashboard-nvim",           lazy=false,                     cond=vim.fn.argc()==0},
  {"folke/noice.nvim",                 lazy=false},
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
+ {"echasnovski/mini.nvim"},
+
  {"folke/which-key.nvim",             event="SafeState"},
 
  --- Information
- {"nvim-lualine/lualine.nvim",        event=Enter,                               auto=true},
- {"Bekaboo/dropbar.nvim",             event=Enter,                               auto=true},
+ {"nvim-lualine/lualine.nvim",        event=Enter,                    auto=true},
+ {"Bekaboo/dropbar.nvim",             event=Enter,                    auto=true},
  {"nvim-ufo",                         event=Enter},
  {"ldelossa/buffertag",               event=Enter},
  {"chentoast/marks.nvim",             event=Enter},
@@ -32,26 +34,26 @@ return {
 
  --- Motions
  {"chrisgrieser/nvim-spider"},
- {"echasnovski/mini.ai"},
- {"echasnovski/mini.operators"},
+ {"echasnovski/mini.ai",              virtual=true},
+ {"echasnovski/mini.operators",       virtual=true},
  {"folke/flash.nvim"},
 
  --- Edit
- {"hc-substitute",                    main="hc-substitute",                      virtual=true},
- {"echasnovski/mini.align"},
- {"echasnovski/mini.surround"},
+ {"hoofcushion/hc-substitute",        virtual=true},
+ {"echasnovski/mini.align",           virtual=true},
+ {"echasnovski/mini.surround",        virtual=true},
  {"numToStr/Comment.nvim"},
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hc-func",                          main="hc-func",                            virtual=true,        event=Enter},
+ {"hoofcushion/hc-func",              event=Enter,                   main="hc-func",      virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
  {"dstein64/vim-startuptime"},
  {"folke/zen-mode.nvim"},
  {"glepnir/dbsession.nvim"},
- {"nvim-neo-tree/neo-tree.nvim",      lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
+ {"nvim-neo-tree/neo-tree.nvim",      ft="directory"},
  -- {"nvim-telescope/telescope-file-browser.nvim", lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
  -- {"nvim-tree/nvim-tree.lua",                    event=Events.DirEnter},
  {"nvim-pack/nvim-spectre"},
@@ -82,7 +84,7 @@ return {
 
  --- Highlighter
  {"NvChad/nvim-colorizer.lua",                  event=Enter},
- {"echasnovski/mini.trailspace",                event=Enter},
+ {"echasnovski/mini.trailspace",                event=Enter,                        virtual=true},
  {"folke/todo-comments.nvim",                   event=Enter},
  {"nfrid/due.nvim",                             event=Enter},
  {"lukas-reineke/indent-blankline.nvim",        event=Enter},

@@ -499,9 +499,9 @@ function Util.auto(callback)
  if vim.fn.argc()~=0 then
   Util.try(callback)
  else
-  vim.api.nvim_create_autocmd("BufWipeOut",{
+  vim.api.nvim_create_autocmd("BufAdd",{
    callback=function(ev)
-    if ev.buf==1 then
+    if Util.is_editable() then
      Util.try(callback)
      return true
     end
@@ -881,4 +881,14 @@ function Util.split(str,sep,opts)
 end
 vim.split=Util.lua_ls_alias(vim.split,split)
 vim.gsplit=Util.lua_ls_alias(vim.gsplit,gsplit)
+function Util.split_at(str,pos)
+ return str:sub(1,pos-1),str:sub(pos+1)
+end
+function Util.split_by(str,sep,plain)
+ local pos=str:find(sep,plain)
+ if pos then
+  return str:sub(1,pos-1),str:sub(pos+1)
+ end
+ return str
+end
 return Util

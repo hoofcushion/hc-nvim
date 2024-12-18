@@ -1,26 +1,28 @@
 local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
 local cache={}
+--- PERF:
 --- Update value of function when specific event happens
+--- Greatly improve lualine speed.
 ---@generic F
----@param event vim.api.keyset.create_autocmd.events
+---@param event vim.api.keyset.create_autocmd.events|vim.api.keyset.create_autocmd.events[]
 ---@param func F
 ---@return F
 local function when(event,pattern,func)
- if cache[event]==nil then
+ if cache[func]==nil then
   vim.api.nvim_create_autocmd(event,{
    pattern=pattern,
    callback=function()
-    cache[event]=true
+    cache[func]=true
    end,
   })
-  cache[event]=true
+  cache[func]=true
  end
  return function()
-  if cache[event]==true then
-   cache[event]=Util.packlen(func())
+  if cache[func]==true then
+   cache[func]=Util.packlen(func())
   end
-  return Util.unpacklen(cache[event])
+  return Util.unpacklen(cache[func])
  end
 end
 return {
@@ -58,32 +60,44 @@ return {
    {
     "mode",
     icons_enabled=true,
-    fmt=(function()
-     return function()
-      local raw=vim.fn.mode(1)
-      return "["..raw.."] "..(Util.I18n.get("modemap",raw) or "")
-     end
-    end)(),
+    fmt=Util.Cache.create(function()
+     local raw=vim.fn.mode(1)
+     return (Util.I18n.get("modemap",raw) or "").." "..raw
+    end),
    },
   },
   lualine_b={
    "branch",
    "diff",
+   {"filename"},
+   {"filesize"},
+   {when("OptionSet",nil,function() return vim.bo.filetype end)},
   },
   lualine_c={
-   {"filename",path=3},
-   "filesize",
-   {function () return vim.bo.encoding end},
-   {function () return vim.bo.fileformat end},
-   {function () return vim.bo.filetype end},
-   {function() return vim.bo.buftype end},
   },
-  lualine_x={},
+  lualine_x={
+   {when({"BufEnter"},nil,function()
+    local t=vim.b.file_subtype
+    if not t then
+     local info=vim.uv.fs_stat(vim.api.nvim_buf_get_name(0))
+     t=info and info.type or "temp"
+     vim.b.file_subtype=t
+    end
+    return t
+   end)},
+   {when("OptionSet",nil,function() return vim.bo.fileencoding end)},
+   {when("OptionSet",nil,function() return vim.bo.encoding end)},
+   {when("OptionSet",nil,function() return vim.bo.fileformat end)},
+   {when("OptionSet",nil,function() return vim.bo.buftype end)},
+   {when("OptionSet",nil,function() return vim.bo.commentstring:gsub("%%","%%%%") end)},
+   {when("OptionSet",nil,function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end)},
+   {when("OptionSet",nil,function()
+    return vim.o.foldenable and ("%s:%d"):format(vim.bo.foldmethod,vim.bo.foldlevel) or ""
+   end)},
+   {when("OptionSet",nil,function() return vim.wo.wrap and "wrap" or "nowrap" end)},
+  },
   lualine_y={
-   {
-    [1]="diagnostics",
-    symbols=require("hc-nvim.rsc").sign[Config.ui.sign],
-   },
+   {"diagnostics",symbols=require("hc-nvim.rsc").sign[Config.ui.sign]},
    --- Lsp
    {
     when("LspAttach",nil,function()
@@ -100,8 +114,6 @@ return {
      return ""
     end),
    },
-   {function() return ("%s: %s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.softtabstop,vim.bo.tabstop) end},
-   {function () return vim.o.foldenable and ("%s: %d"):format(vim.o.foldmethod,vim.o.foldlevel) or "nofold" end},
    --- Marks
    {
     function()
@@ -118,29 +130,33 @@ return {
   },
   lualine_z={
    --- Search
-   {
-    [1]="searchcount",
-    cond=function() return vim.v.hlsearch==1 end,
-   },
+   {"searchcount",cond=function() return vim.v.hlsearch==1 end},
    --- Current buf win tab
-   function()
+   {when({"TabEnter","BufEnter","WinEnter"},nil,function()
     return vim.api.nvim_get_current_tabpage()
      .."|"..vim.api.nvim_get_current_win()
      .."|"..vim.api.nvim_get_current_buf()
-   end,
+   end)},
    --- Position
-   "progress",
-   "location",
+   {when({"CursorMoved","CursorMovedI"},nil,function()
+    local fn=vim.fn
+    return ("%s:%s|%s:%s"):format(
+     fn.line("."),
+     fn.line("$"),
+     fn.col("."),
+     fn.col("$")
+    )
+   end)},
   },
  },
  tabline={
   lualine_a={},
   lualine_b={
-   {"buffers",show_filename_only=true},
+   {"buffers"},
   },
   lualine_c={},
   lualine_x={
-   {"windows",show_filename_only=true},
+   {"windows"},
   },
   lualine_y={},
   lualine_z={"tabs"},

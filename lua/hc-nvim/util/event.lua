@@ -3,19 +3,22 @@ local Util=require("hc-nvim.util")
 ---@field event string
 ---@field pattern string[]?
 
+--- User LazyDone -> {event="User",pattern={"LazyDone"}}
+--- BufEnter *.lua,*.txt -> {event="BufEnter",pattern={"*.lua","*.txt"}}
 ---@param event string|EventSpec
----@return EventSpec
-local function to_event_spec(event)
+---@return EventSpec?
+local function parse_event(event)
+ if Util.is_empty(event) then
+  return
+ end
  if type(event)=="string" then
-  local pos=event:lower():find(" ")
+  local pos=event:find(" ")
   if pos then
-   event={event=event:sub(1,pos-1),pattern=vim.split(event:sub(pos+1),",%s+")}
+   local e,p=Util.split_at(event,pos)
+   event={event=e,pattern=vim.split(p,",")}
   else
    event={event=event}
   end
- end
- if event.pattern then
-  event.pattern=Util.totable(event.pattern)
  end
  return event
 end
@@ -37,13 +40,16 @@ end
 ---@param event string|EventSpec|string[]|EventSpec[]
 ---@return EventSpec[]
 function Event.parse(event)
- if type(event)=="string" or Util.is_list(event)==false then
+ if type(event)=="string"
+ or type(event)=="table" and event[1]==nil
+ then
   event={event}
  end
- for i,v in ipairs(event) do
-  event[i]=to_event_spec(v)
+ local ret={}
+ for _,v in ipairs(event) do
+  table.insert(ret,parse_event(v) or nil)
  end
- return event
+ return ret
 end
 ---@param spec string|EventSpec
 function Event:add(spec)

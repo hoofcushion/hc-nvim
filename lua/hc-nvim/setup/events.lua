@@ -29,32 +29,11 @@ function M.LazyLoad(name)
   }
  )
 end
-M.DirEnter=M.Create("DirEnter","BufEnter",{
- trigger=function(ev)
-  local stat=vim.uv.fs_stat(ev.file)
-  return stat~=nil and stat.type=="directory"
- end,
-})
-M.FileEnter=M.Create("FileEnter","BufEnter",{
- trigger=function(ev)
-  return ev.file~=""
- end,
-})
-M.FileWinEnter=M.Create("FileWinEnter","BufWinEnter",{
- trigger=function(ev)
-  return ev.file~=""
- end,
-})
 M.NeoConfig=M.Create("NeoConfig","BufEnter",{
  trigger=function(ev)
   if Util.is_profile(ev.file) then
    return true
   end
- end,
-})
-M.LeaveDashBoard=M.Create("LeaveDashBoard","BufWipeOut",{
- trigger=function(ev)
-  return ev.buf==1
  end,
 })
 -- local t=vim.uv.new_timer()

@@ -4,20 +4,19 @@ if Config.platform.is_vscode and not Config.server.vscode then
 end
 local Util=require("hc-nvim.util")
 if Config.server.auto_setup then
- Util.auto(function()
-  Util.track("server setup")
-  local Handler=require("hc-nvim.setup.server.handler")
-  local specs=Config.server.list
-  for _,spec in ipairs(specs) do
-   Handler.load(spec)
-  end
-  Util.track()
- end)
+ vim.api.nvim_create_autocmd("FileType",{
+  callback=function()
+   local Handler=require("hc-nvim.setup.server.handler")
+   local specs=Config.server.list
+   for _,spec in ipairs(specs) do
+    Handler.load(spec)
+   end
+  end,
+ })
 end
 vim.api.nvim_create_autocmd("LspAttach",{
  once=true,
  callback=function()
-  Util.track("server attach")
   ---@param cap lsp.Methods
   local function has_cap(cap)
    return function()
@@ -30,7 +29,7 @@ vim.api.nvim_create_autocmd("LspAttach",{
    {name=NS.lsp_declaration,            rhs=vim.lsp.buf.declaration,                                                  cond=has_cap("textDocument/declaration")},
    {name=NS.lsp_definition,             rhs=vim.lsp.buf.definition,                                                   cond=has_cap("textDocument/definition")},
    {name=NS.lsp_document_symbols,       rhs=vim.lsp.buf.document_symbol,                                              cond=has_cap("textDocument/documentSymbol")},
-   {name=NS.lsp_formatting,             rhs=require("hc-nvim.setup.server.format"),                                      cond=has_cap("textDocument/formatting")},
+   {name=NS.lsp_formatting,             rhs=require("hc-nvim.setup.server.format"),                                   cond=has_cap("textDocument/formatting")},
    {name=NS.lsp_hover,                  rhs=vim.lsp.buf.hover,                                                        cond=has_cap("textDocument/hover")},
    {name=NS.lsp_implementation,         rhs=vim.lsp.buf.implementation,                                               cond=has_cap("textDocument/implementation")},
    {name=NS.lsp_incoming_calls,         rhs=vim.lsp.buf.incoming_calls,                                               cond=has_cap("callHierarchy/incomingCalls")},
@@ -54,6 +53,5 @@ vim.api.nvim_create_autocmd("LspAttach",{
    end,
   })
   lspMaps:create(true)
-  Util.track()
  end,
 })
