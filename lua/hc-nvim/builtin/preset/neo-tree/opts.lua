@@ -81,7 +81,7 @@ return {
    ["<space>"]=false,
    ["O"]={"open_external",desc="Open file externally"},
    ["P"]={"toggle_preview",config={use_float=false}},
-   ["T"]={"trash",desc="Trash file"},
+   ["T"]=vim.fn.executable("trash")==1 and {"trash",desc="Trash file"} or nil,
    ["Y"]={"yank_filename",desc="Copy filename"},
    ["h"]="close_node",
    ["l"]="open",

@@ -1,4 +1,3 @@
-local NS=require("hc-nvim.namespace")
 local Util=require("hc-nvim.util")
 return {
  {

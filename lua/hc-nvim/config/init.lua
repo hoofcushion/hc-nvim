@@ -61,8 +61,10 @@ M.ui={
   dynamic=(function()
    local is_width={vertical=true,width=true}
    ---@param direction "horizontal"|"vertical"|"width"|"height"
-   return function(self,direction)
-    local factor=self[direction]
+   return function(self,direction,factor)
+    if factor==nil then
+     factor=self[direction]
+    end
     if factor==nil then
      error("Direction invalid: "..tostring(direction))
     end

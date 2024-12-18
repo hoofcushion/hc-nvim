@@ -1,4 +1,3 @@
-local NS=require("hc-nvim.namespace")
 return {
  language="en",
  country="US",

@@ -1,8 +1,6 @@
-require("noice.view")
 local Config=require("hc-nvim.config")
 return {
  cmdline={
-  enabled=true,
   view="cmdline",
  },
  redirect={

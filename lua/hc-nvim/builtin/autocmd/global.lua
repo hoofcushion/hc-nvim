@@ -7,12 +7,10 @@ end
 vim.api.nvim_create_autocmd("TermOpen",{
  group=augroup("ternimal_auto_insert"),
  callback=function(event)
-  local id=vim.api.nvim_create_autocmd("BufEnter",{
+  local id=vim.api.nvim_create_autocmd("TermEnter",{
    buffer=event.buf,
    callback=function(_)
-    vim.schedule(function ()
-     vim.cmd.startinsert()
-    end)
+    vim.cmd.startinsert()
    end,
   })
   vim.api.nvim_create_autocmd("BufDelete",{
