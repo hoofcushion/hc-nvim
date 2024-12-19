@@ -10,6 +10,7 @@ return {
   relativenumber=true, -- Display relative line numbers
   wrap=false,          -- Disable line wrap
   signcolumn="auto",
+  jumpoptions="stack",
 
   --- UI ---
   termguicolors=true, -- Use color

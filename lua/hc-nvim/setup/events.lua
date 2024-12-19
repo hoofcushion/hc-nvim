@@ -36,6 +36,11 @@ M.NeoConfig=M.Create("NeoConfig","BufEnter",{
   end
  end,
 })
+M.File=M.Create("File",{"VimEnter","BufAdd"},{
+ trigger=function (ev)
+  return vim.uv.fs_stat(ev.file)~=nil
+ end
+})
 -- local t=vim.uv.new_timer()
 -- local cb=function()
 --  vim.schedule(function()
