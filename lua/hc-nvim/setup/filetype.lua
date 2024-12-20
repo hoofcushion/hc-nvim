@@ -17,20 +17,24 @@ function FileType.add(ftspec)
   FileType.add(v)
  end
 end
-vim.api.nvim_create_autocmd({"VimEnter","BufAdd"},{
- callback=function(ev)
-  for _,v in ipairs(FileType.detectors) do
-   local ft=v(ev)
-   if ft then
-    vim.bo[ev.buf].filetype=ft
-    return
-   end
+function FileType.check(s)
+ for _,v in ipairs(FileType.detectors) do
+  local ft=v(s)
+  if ft then
+   vim.bo[s.buf].filetype=ft
+   return
   end
- end,
-})
+ end
+end
 for modname in Util.iter_mod({
  "hc-nvim.builtin.filetype",
  "hc-nvim.user.filetype",
 }) do
  FileType.add(require(modname))
 end
+vim.schedule(function()
+ FileType.check({buf=1,file=vim.api.nvim_buf_get_name(1)})
+ vim.api.nvim_create_autocmd("BufAdd",{
+  callback=FileType.check,
+ })
+end)
