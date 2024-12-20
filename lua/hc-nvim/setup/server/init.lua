@@ -5,12 +5,16 @@ end
 local Util=require("hc-nvim.util")
 if Config.server.auto_setup then
  vim.api.nvim_create_autocmd("FileType",{
-  callback=function()
+  callback=function(ev)
+   if vim.bo[ev.buf].buftype~="" then
+    return
+   end
    local Handler=require("hc-nvim.setup.server.handler")
    local specs=Config.server.list
    for _,spec in ipairs(specs) do
     Handler.load(spec)
    end
+   return true
   end,
  })
 end
