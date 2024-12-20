@@ -1,7 +1,7 @@
 ---@module "lazy"
 
 local Events=require("hc-nvim.setup.events")
-local Enter={Events.File,"BufWritePre"}
+local Enter={Events.File,"BufNewFile","SessionLoadPost"}
 ---@type LazySpec|{
 --- auto: boolean?,
 ---}
