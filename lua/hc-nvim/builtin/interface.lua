@@ -148,12 +148,12 @@ return {
 },
  {
   override={tags="LuaSnip"},
-  {name=NS.luasnip_expand,lhs="<c-,>",mode="i"},
+  {name=NS.luasnip_expand,lhs="<c-g><tab>",mode="i"},
   {
    override={mode={"s","i"}},
-   {name=NS.luasnip_jump_prev,    lhs="<c-;>"},
-   {name=NS.luasnip_jump_next,    lhs="<c-'>"},
-   {name=NS.luasnip_change_choice,lhs="<c-/>"},
+   {name=NS.luasnip_jump_prev,    lhs="<c-g>p"},
+   {name=NS.luasnip_jump_next,    lhs="<c-g>n"},
+   {name=NS.luasnip_change_choice,lhs="<c-g>c"},
   },
  },{
  override={tags={"lsp","symbol-usage"}},
@@ -164,11 +164,11 @@ return {
  {
   override={mode="i"},
   {name=NS.fittencode_accept_all_suggestions,lhs="<c-g>a"},
+  {name=NS.fittencode_accept_line,           lhs="<c-g>d"},
   {name=NS.fittencode_accept_word,           lhs="<c-g>w"},
-  {name=NS.fittencode_accept_line,           lhs="<c-g>l"},
-  {name=NS.fittencode_triggering_completion, lhs="<c-g>A"},
+  {name=NS.fittencode_revoke_line,           lhs="<c-g>D"},
   {name=NS.fittencode_revoke_word,           lhs="<c-g>W"},
-  {name=NS.fittencode_revoke_line,           lhs="<c-g>L"},
+  {name=NS.fittencode_triggering_completion, lhs="<c-g>A"},
  },
  {
   override={mode={"n","x"}},
