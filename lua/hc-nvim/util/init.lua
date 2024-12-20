@@ -496,15 +496,18 @@ function Util.try(fn,catch)
   end
  end)
 end
+function Util.fileexist(file)
+ return vim.uv.fs_stat(file)~=nil
+end
 --- Run callback immediately if no arg passing to neovim when launch
 --- Else it runs when entering first buf
 function Util.auto(callback)
  if vim.fn.argc()~=0 then
   Util.try(callback)
  else
-  vim.api.nvim_create_autocmd("BufAdd",{
+  vim.api.nvim_create_autocmd({"VimEnter","BufAdd"},{
    callback=function(ev)
-    if Util.is_editable() then
+    if Util.fileexist(ev.file)~=nil then
      Util.try(callback)
      return true
     end
