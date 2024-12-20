@@ -1,30 +1,5 @@
 local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
-local cache={}
---- PERF:
---- Update value of function when specific event happens
---- Greatly improve lualine speed.
----@generic F
----@param event vim.api.keyset.create_autocmd.events|vim.api.keyset.create_autocmd.events[]
----@param func F
----@return F
-local function when(event,pattern,func)
- if cache[func]==nil then
-  vim.api.nvim_create_autocmd(event,{
-   pattern=pattern,
-   callback=function()
-    cache[func]=true
-   end,
-  })
-  cache[func]=true
- end
- return function()
-  if cache[func]==true then
-   cache[func]=Util.packlen(func())
-  end
-  return Util.unpacklen(cache[func])
- end
-end
 return {
  options={
   component_separators={left="",right=""},
@@ -71,12 +46,12 @@ return {
    "diff",
    {"filename"},
    {"filesize"},
-   {when("OptionSet",nil,function() return vim.bo.filetype end)},
+   {Util.when("OptionSet",nil,function() return vim.bo.filetype end)},
   },
   lualine_c={
   },
   lualine_x={
-   {when({"BufEnter"},nil,function()
+   {Util.when({"BufEnter"},nil,function()
     local t=vim.b.file_subtype
     if not t then
      local info=vim.uv.fs_stat(vim.api.nvim_buf_get_name(0))
@@ -85,22 +60,22 @@ return {
     end
     return t
    end)},
-   {when("OptionSet",nil,function() return vim.bo.fileencoding end)},
-   {when("OptionSet",nil,function() return vim.bo.encoding end)},
-   {when("OptionSet",nil,function() return vim.bo.fileformat end)},
-   {when("OptionSet",nil,function() return vim.bo.buftype end)},
-   {when("OptionSet",nil,function() return vim.bo.commentstring:gsub("%%","%%%%") end)},
-   {when("OptionSet",nil,function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end)},
-   {when("OptionSet",nil,function()
+   {Util.when("OptionSet",nil,function() return vim.bo.fileencoding end)},
+   {Util.when("OptionSet",nil,function() return vim.bo.encoding end)},
+   {Util.when("OptionSet",nil,function() return vim.bo.fileformat end)},
+   {Util.when("OptionSet",nil,function() return vim.bo.buftype end)},
+   {Util.when("OptionSet",nil,function() return vim.bo.commentstring:gsub("%%","%%%%") end)},
+   {Util.when("OptionSet",nil,function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end)},
+   {Util.when("OptionSet",nil,function()
     return vim.o.foldenable and ("%s:%d"):format(vim.bo.foldmethod,vim.bo.foldlevel) or ""
    end)},
-   {when("OptionSet",nil,function() return vim.wo.wrap and "wrap" or "nowrap" end)},
+   {Util.when("OptionSet",nil,function() return vim.wo.wrap and "wrap" or "nowrap" end)},
   },
   lualine_y={
    {"diagnostics",symbols=require("hc-nvim.rsc").sign[Config.ui.sign]},
    --- Lsp
    {
-    when("LspAttach",nil,function()
+    Util.when("LspAttach",nil,function()
      local clients=vim.lsp.get_clients({bufnr=0})
      if next(clients)~=nil then
       local ret={}
@@ -132,13 +107,13 @@ return {
    --- Search
    {"searchcount",cond=function() return vim.v.hlsearch==1 end},
    --- Current buf win tab
-   {when({"TabEnter","BufEnter","WinEnter"},nil,function()
+   {Util.when({"TabEnter","BufEnter","WinEnter"},nil,function()
     return vim.api.nvim_get_current_tabpage()
      .."|"..vim.api.nvim_get_current_win()
      .."|"..vim.api.nvim_get_current_buf()
    end)},
    --- Position
-   {when({"CursorMoved","CursorMovedI"},nil,function()
+   {Util.when({"CursorMoved","CursorMovedI"},nil,function()
     local fn=vim.fn
     return ("%s:%s|%s:%s"):format(
      fn.line("."),
