@@ -523,6 +523,10 @@ local function deepcopy(orig)
  for k,v in pairs(orig) do
   ret[deepcopy(k)]=deepcopy(v)
  end
+ local mt=getmetatable(orig)
+ if mt~=nil then
+  setmetatable(ret,deepcopy(mt))
+ end
  return ret
 end
 ---@generic T
@@ -531,27 +535,27 @@ end
 function Util.deepcopy(orig)
  return deepcopy(orig)
 end
---- Rawset key-value for the root __index of tbl
-local function deepset(tbl,key,val)
- rawset(tbl,key,val)
- if tbl[key]==nil then
-  return
- end
+function Util.get_super(tbl)
  local mt=getmetatable(tbl)
- if mt==nil or mt.__index==nil then
+ return mt and type(mt.__index)=="table" and mt.__index or nil
+end
+local function deepset(s)
+ if type(s.t)=="function" then
+  error("table __index expected")
+ end
+ if rawget(s.t,s.k)==s.orig then
+  rawset(s.t,s.k,s.v)
   return
  end
- local super=mt.__index
- if type(super)~="table" then
-  error("cannot deep set value for non-table __index")
- end
- deepset(super,key,val)
+ s.t=Util.get_super(s.t)
+ deepset(s)
 end
+--- deepset key value at exact matched super table
 ---@param tbl table
 ---@param key any
 ---@param val any
 function Util.deepset(tbl,key,val)
- deepset(tbl,key,val)
+ deepset({orig=tbl[key],t=tbl,k=key,v=val})
 end
 --- Return true if input is truthy value, otherwise return false
 ---@param val any
