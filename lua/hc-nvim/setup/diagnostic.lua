@@ -1,4 +1,5 @@
 vim.api.nvim_create_autocmd("VimEnter",{
+ once=true,
  callback=function()
   local Config=require("hc-nvim.config")
   local sign=require("hc-nvim.rsc").sign[Config.ui.sign]
