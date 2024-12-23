@@ -3,7 +3,10 @@
 - [ ] remove unnecessary function
 - [ ] shrink codebase (under 10k)
 - [ ] improve project structure
-- [ ] split hc-func to sub plugins
+- [ ] split module
+ - [ ] hc-func -> hc-xxx...
+ - [ ] hc-nvim.util.keymod -> hc-keymod
+ - [ ] config builtin util... -> hc-core
 
 ## Done:
 
