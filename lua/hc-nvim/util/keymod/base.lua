@@ -8,9 +8,11 @@
 local function tokey_fn(any)
  return type(any)=="function"
   and any
-  or function()
+  or (type(any)=="string" or any==nil)
+  and function()
    return any or ""
   end
+  or error("string or function expected, got: "..tostring(any))
 end
 local M={}
 ---@param lhs keymod.key|nil
