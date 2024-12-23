@@ -88,7 +88,7 @@ function Util.packlen(...)
  return {n=select("#",...),...}
 end
 function Util.unpacklen(t)
- return unpack(t,1,t.n)
+ return Util.unpack(t,1,t.n)
 end
 function Util.ok_or_nil(ok,...)
  if ok then
@@ -97,6 +97,14 @@ function Util.ok_or_nil(ok,...)
 end
 function Util.nilpcall(...)
  return Util.ok_or_nil(pcall(...))
+end
+Util.unpack=unpack or table.unpack
+--- Save vararg to t then return it
+function Util.redirect(t,...)
+ for i=1,select("#",...) do
+  t[i]=select(i,...)
+ end
+ return ...
 end
 --- Like require but return nil instead error when failed
 Util.prequire=Util.lua_ls_alias(require,function(modname)
@@ -175,6 +183,12 @@ function Util.format_time(second,max,min)
  local number=second/(10^(places*3))
  return Util.number_fill(Util.number_sub(number,3,3),"0",3,3)..unit
 end
+---@param name string?
+function Util.track(name)
+ Util.try(function()
+  require("lazy.util").track(name)
+ end)
+end
 --- ---
 --- Modes
 --- ---
@@ -201,13 +215,67 @@ local function pipe(obj)
 end
 Util.pipe=pipe
 --- ---
+--- File
+--- ---
+function Util.fileexist(file)
+ return vim.uv.fs_stat(file)~=nil
+end
+local _pattern={
+ vim.fn.stdpath("config") --[[@as string]],
+ vim.fn.stdpath("data") --[[@as string]],
+}
+function Util.is_profile(file)
+ file=string.lower(file)
+ for _,v in ipairs(_pattern) do
+  if Util.startswith(file,string.lower(v)) then
+   return true
+  end
+ end
+end
+function Util.get_size(id)
+ if type(id)=="number" then
+  return vim.api.nvim_buf_get_offset(id,vim.api.nvim_buf_line_count(id))
+ else
+  local info=vim.uv.fs_stat(id)
+  return info~=nil and info.size or nil
+ end
+end
+--- ---
 --- Project
 --- ---
----@param name string?
-function Util.track(name)
- Util.try(function()
-  require("lazy.util").track(name)
+function Util.trace(msg)
+ vim.notify(msg,vim.log.levels.TRACE)
+end
+function Util.debug(msg)
+ vim.notify(msg,vim.log.levels.DEBUG)
+end
+function Util.info(msg)
+ vim.notify(msg,vim.log.levels.INFO)
+end
+function Util.warn(msg)
+ vim.notify(msg,vim.log.levels.WARN)
+end
+function Util.error(msg)
+ vim.notify(msg,vim.log.levels.ERROR)
+end
+function Util.off(msg)
+ vim.notify(msg,vim.log.levels.OFF)
+end
+function Util.try(fn,catch)
+ if catch==nil then
+  catch=Util.error
+ end
+ xpcall(fn,function(ok,err)
+  if not ok then
+   catch(err)
+  end
  end)
+end
+function Util.batch(fn,...)
+ for i=1,select("#",...) do
+  local ret=fn(select(i,...))
+  if ret then return ret end
+ end
 end
 ---@param stack integer?
 function Util.get_source(stack)
@@ -219,19 +287,13 @@ Util.paths={
  Util.root_path,
  vim.fn.stdpath("config"),
 }
-function Util.batch(fn,...)
- for i=1,select("#",...) do
-  local ret=fn(select(i,...))
-  if ret then return ret end
- end
-end
 do
  local opts={paths=Util.paths,rtp=false}
- local function find(modname)
+ local function _find_local_mod(modname)
   return vim.loader.find(modname,opts)[1]
  end
  function Util.find_local_mod(...)
-  return Util.batch(find,...)
+  return Util.batch(_find_local_mod,...)
  end
 end
 --- Similar to `require`, but slightly faster
@@ -245,22 +307,30 @@ function Util.local_require(modname)
  end
  return nil
 end
-local function find_mod(modname)
- return vim.loader.find(modname)[1]
+do
+ local function _find_file(modname)
+  return vim.loader.find(modname,{patterns={""}})[1]
+ end
+ function Util.find_file(...)
+  return Util.batch(_find_file,...)
+ end
 end
-function Util.find_mod(...)
- return Util.batch(find_mod,...)
+do
+ local function _find_mod(modname)
+  return vim.loader.find(modname)[1]
+ end
+ function Util.find_mod(...)
+  return Util.batch(_find_mod,...)
+ end
 end
---- Get all mod starts in giving prefix
----@param modnames string|string[]
-function Util.iter_mod(modnames)
- return coroutine.wrap(function()
+do
+ local function _iter_mod(modnames)
   for _,modname in Util.pipairs(modnames) do
    local match=Util.find_mod(modname)
    if match then
     coroutine.yield(match.modname,match.modpath)
    end
-   local dir=vim.loader.find(modname,{patterns={""}})[1]
+   local dir=Util.find_file(modname)
    if dir then
     for name in vim.fs.dir(dir.modpath) do
      local mod=Util.find_mod(modname.."."..Util.trimsuffix(name,".lua"))
@@ -270,11 +340,22 @@ function Util.iter_mod(modnames)
     end
    end
   end
- end)
+ end
+ --- Get all mod starts in giving prefix
+ ---@param modnames string|string[]
+ function Util.iter_mod(modnames)
+  return coroutine.wrap(_iter_mod),modnames
+ end
 end
 --- ---
 --- Type check
 --- ---
+function Util.validate(x,t,o)
+ if type(x)==t or (o==true and x==nil) then
+  return true
+ end
+ error(("Expect %s, got %s"):format(t,type(x)))
+end
 function Util.is_integer(x)
  return type(x)=="number" and math.floor(x)==x
 end
@@ -300,14 +381,6 @@ function Util.is_empty(x)
  local check=empty_check[type(x)]
  return check and check(x) or false
 end
-function Util.is_truthy(x)
- return x==true
-  or (x~=nil and x~=false)
-  or x~=x -- NaN is truthy
-end
-function Util.is_falsy(x)
- return x==false or x==nil
-end
 ---@param tbl table
 ---@return boolean
 function Util.is_list(tbl)
@@ -321,14 +394,38 @@ function Util.is_list(tbl)
  return true
 end
 ---@param tbl table
+---@return boolean
 function Util.is_fat_table(tbl)
  return next(tbl)~=nil
 end
-function Util.validate(x,t)
- if type(x)==t then
-  return true
+--- Like totable but return nil if input is a `empty table` or `nil`
+---@return table?
+function Util.to_fat_table(any)
+ if type(any)~="table" then
+  if any~=nil then
+   return {any}
+  end
+  return
  end
- error(("Expect %s, got %s"):format(t,type(x)))
+ if next(any)~=nil then
+  return any
+ end
+end
+--- Return true if input is truthy value, otherwise return false
+---@param val any
+---@return boolean
+function Util.toboolean(val)
+ return val~=nil and val~=false
+end
+--- Return a table with one element if input is not a table, otherwise return the input table.
+---@generic T
+---@param any T
+---@return T[]
+function Util.totable(any)
+ if type(any)~="table" then
+  return {any}
+ end
+ return any
 end
 --- ---
 --- Table
@@ -355,12 +452,21 @@ function Util.tbl_check(t,k,e)
  return ret
 end
 --- Clear a table.
-function Util.tbl_clear(tbl)
- for k in pairs(tbl) do
-  tbl[k]=nil
+if jit then
+ local _tbl_clear=require("table.clear")
+ function Util.tbl_clear(tbl)
+  _tbl_clear(tbl)
+  setmetatable(tbl,nil)
+  return tbl
  end
- setmetatable(tbl,nil)
- return tbl
+else
+ function Util.tbl_clear(tbl)
+  for k in pairs(tbl) do
+   tbl[k]=nil
+  end
+  setmetatable(tbl,nil)
+  return tbl
+ end
 end
 ---@generic T
 ---@param dst T
@@ -442,98 +548,55 @@ local function prefer(repl,orig)
   return repl
  end
 end
---- Override a value recursively
---- Use cache to check loop
-local function override(dst,src,cache)
- if cache[dst] or cache[src] then
+do
+ --- Override a value recursively
+ --- Use cache to check loop
+ local function _override(dst,src,cache)
+  if cache[dst] or cache[src] then
+   return dst
+  end
+  local has_prefer=prefer(dst,src)
+  if has_prefer~=nil then
+   return has_prefer
+  end
+  cache[dst]=true
+  cache[src]=true
+  for k,v in pairs(src) do
+   dst[k]=_override(dst[k],v,cache)
+  end
   return dst
  end
- local has_prefer=prefer(dst,src)
- if has_prefer~=nil then
-  return has_prefer
+ --- Use src's elements to override dst
+ --- Return dst
+ ---@generic T
+ ---@param dst T
+ ---@param src T
+ ---@return T
+ function Util.override(dst,src)
+  return _override(dst,src,{})
  end
- cache[dst]=true
- cache[src]=true
- for k,v in pairs(src) do
-  dst[k]=override(dst[k],v,cache)
- end
- return dst
 end
---- Use src's elements to override dst
---- Return dst
----@generic T
----@param dst T
----@param src T
----@return T
-function Util.override(dst,src)
- return override(dst,src,{})
-end
-function Util.trace(msg)
- vim.notify(msg,vim.log.levels.TRACE)
-end
-function Util.debug(msg)
- vim.notify(msg,vim.log.levels.DEBUG)
-end
-function Util.info(msg)
- vim.notify(msg,vim.log.levels.INFO)
-end
-function Util.warn(msg)
- vim.notify(msg,vim.log.levels.WARN)
-end
-function Util.error(msg)
- vim.notify(msg,vim.log.levels.ERROR)
-end
-function Util.off(msg)
- vim.notify(msg,vim.log.levels.OFF)
-end
-function Util.try(fn,catch)
- if catch==nil then
-  catch=Util.error
- end
- xpcall(fn,function(ok,err)
-  if not ok then
-   catch(err)
+do
+ local function _deepcopy(orig)
+  if type(orig)~="table" then
+   return orig
   end
- end)
-end
-function Util.fileexist(file)
- return vim.uv.fs_stat(file)~=nil
-end
---- Run callback immediately if no arg passing to neovim when launch
---- Else it runs when entering first buf
-function Util.auto(callback)
- if vim.fn.argc()~=0 then
-  Util.try(callback)
- else
-  vim.api.nvim_create_autocmd({"VimEnter","BufAdd"},{
-   callback=function(ev)
-    if Util.fileexist(ev.file)~=nil then
-     Util.try(callback)
-     return true
-    end
-   end,
-  })
+  local ret={}
+  for k,v in pairs(orig) do
+   ret[_deepcopy(k)]=_deepcopy(v)
+  end
+  local mt=getmetatable(orig)
+  if mt~=nil then
+   setmetatable(ret,_deepcopy(mt))
+  end
+  return ret
  end
-end
-local function deepcopy(orig)
- if type(orig)~="table" then
-  return orig
+ ---@generic T
+ ---@param orig T
+ ---@return T
+ function Util.deepcopy(orig)
+  return _deepcopy(orig)
  end
- local ret={}
- for k,v in pairs(orig) do
-  ret[deepcopy(k)]=deepcopy(v)
- end
- local mt=getmetatable(orig)
- if mt~=nil then
-  setmetatable(ret,deepcopy(mt))
- end
- return ret
-end
----@generic T
----@param orig T
----@return T
-function Util.deepcopy(orig)
- return deepcopy(orig)
 end
 function Util.get_super(tbl)
  local mt=getmetatable(tbl)
@@ -556,35 +619,6 @@ end
 ---@param val any
 function Util.deepset(tbl,key,val)
  deepset({orig=tbl[key],t=tbl,k=key,v=val})
-end
---- Return true if input is truthy value, otherwise return false
----@param val any
----@return boolean
-function Util.toboolean(val)
- return val~=nil and val~=false
-end
---- Return a table with one element if input is not a table, otherwise return the input table.
----@generic T
----@param any T
----@return T[]
-function Util.totable(any)
- if type(any)~="table" then
-  return {any}
- end
- return any
-end
---- Like totable but return nil if input is a `empty table` or `nil`
----@return table?
-function Util.to_fat_table(any)
- if type(any)~="table" then
-  if any~=nil then
-   return {any}
-  end
-  return
- end
- if next(any)~=nil then
-  return any
- end
 end
 ---@param ... string
 ---@return string
@@ -652,26 +686,6 @@ function Util.startswith(str,fix)
  if #fix>#str then return false end
  return str:sub(1,#fix)==fix
 end
-local pattern={
- vim.fn.stdpath("config") --[[@as string]],
- vim.fn.stdpath("data") --[[@as string]],
-}
-function Util.is_profile(file)
- file=string.lower(file)
- for _,v in ipairs(pattern) do
-  if Util.startswith(file,string.lower(v)) then
-   return true
-  end
- end
-end
-function Util.get_size(id)
- if type(id)=="number" then
-  return vim.api.nvim_buf_get_offset(id,vim.api.nvim_buf_line_count(id))
- else
-  local info=vim.uv.fs_stat(id)
-  return info~=nil and info.size or nil
- end
-end
 ---@param str string
 ---@param fix string
 function Util.endswith(str,fix)
@@ -730,7 +744,7 @@ end
 ---@param val any
 function Util.tbl_set(tbl,keys,val)
  if type(keys)=="string" then
-  keys=vim.split(keys,".",{plain=true,trimempty=true})
+  keys=Util.split(keys,".",{plain=true,trimempty=true})
  end
  local e=#keys
  for i=1,e-1 do
@@ -859,7 +873,9 @@ local function gsplit(str,sep,opts)
  if type(opts)=="boolean" then
   plain=opts
  else
-  vim.validate({s={str,"s"},sep={sep,"s"},opts={opts,"t",true}})
+  Util.validate(str,"string")
+  Util.validate(sep,"string")
+  Util.validate(opts,"table",true)
   opts=opts or {}
   plain,trimempty=opts.plain,opts.trimempty
  end
@@ -900,5 +916,45 @@ function Util.split_by(str,sep,plain)
   return str:sub(1,pos-1),str:sub(pos+1)
  end
  return str
+end
+local _when_cache={}
+--- PERF:
+--- Update value of function when specific event happens
+--- Greatly improve lualine speed.
+---@generic F
+---@param event vim.api.keyset.create_autocmd.events|vim.api.keyset.create_autocmd.events[]
+---@param func F
+---@return F
+function Util.when(event,pattern,func)
+ if _when_cache[func]==nil then
+  vim.api.nvim_create_autocmd(event,{
+   pattern=pattern,
+   callback=function()
+    _when_cache[func]=true
+   end,
+  })
+  _when_cache[func]=true
+ end
+ return function()
+  if _when_cache[func]==true then
+   _when_cache[func]=Util.packlen(func())
+  end
+  return Util.unpacklen(_when_cache[func])
+ end
+end
+function Util.clock()
+ return vim.uv.hrtime()/1e9
+end
+function Util.throttle(fn)
+ local u={last=0,ret={},fn=fn}
+ return function(...)
+  local now=Util.clock()
+  if now-u.last>=0.1 then
+   u.last=now
+   u.ret={}
+   return Util.redirect(u.ret,u.fn(...))
+  end
+  return Util.unpack(u.ret)
+ end
 end
 return Util

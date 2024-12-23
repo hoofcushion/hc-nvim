@@ -75,7 +75,7 @@ local function get_group_id(group)
   return group
  end
  if group==nil then
-  group="Unnamed: "..tostring(os.clock())
+  group="Unnamed: "..tostring(Util.clock())
  end
  return vim.api.nvim_create_augroup(group,{clear=true})
 end
