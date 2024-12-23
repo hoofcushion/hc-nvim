@@ -50,7 +50,6 @@ return {
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
- {"dstein64/vim-startuptime"},
  {"folke/zen-mode.nvim"},
  {"glepnir/dbsession.nvim"},
  {"nvim-neo-tree/neo-tree.nvim",      ft="directory"},
@@ -59,6 +58,10 @@ return {
  {"nvim-pack/nvim-spectre"},
  {"s1n7ax/nvim-window-picker"},
  {"smoka7/multicursors.nvim"},
+ --- Profiller
+ {"dstein64/vim-startuptime"},
+ {"stevearc/profile.nvim"},
+
 
  --- Completions
  {"L3MON4D3/LuaSnip",                 event="InsertEnter"},
