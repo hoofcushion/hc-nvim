@@ -137,17 +137,6 @@ local priority=2^10
 local Preset={}
 function Preset.apply(specs)
  return Util.Lazy.foreach(specs,function(spec)
-  -- add priority
-  if spec.priority==nil then
-   spec.priority=priority
-   priority=priority-1
-  end
-  if spec.auto==true then
-   spec.lazy=vim.fn.argc()==0
-  end
-  if not (vim.g.vscode and spec.vscode) then
-   spec.enabled=false
-  end
   -- get preset
   local name=Util.Lazy.getname(spec)
   local modname=Util.Lazy.normname(name)
@@ -164,6 +153,17 @@ function Preset.apply(specs)
   if spec.dependencies~=nil then
    spec={spec,spec.dependencies}
    spec.dependencies=nil
+  end
+  -- add priority
+  if spec.priority==nil then
+   spec.priority=priority
+   priority=priority-1
+  end
+  if spec.auto==true then
+   spec.lazy=vim.fn.argc()==0
+  end
+  if vim.g.vscode and spec.vscode==false then
+   spec.enabled=false
   end
  end)
 end
