@@ -145,7 +145,7 @@ function Preset.apply(specs)
   if spec.auto==true then
    spec.lazy=vim.fn.argc()==0
   end
-  if spec.vscode and not vim.g.vscode then
+  if not (vim.g.vscode and spec.vscode) then
    spec.enabled=false
   end
   -- get preset
