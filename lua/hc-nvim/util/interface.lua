@@ -39,6 +39,13 @@ end
 ---@param opts vim.keymap.set.Opts
 ---@param fallback boolean?
 function Keymap.set(buffer,mode,lhs,rhs,opts,fallback)
+ if opts.expr==true and opts.replace_keycodes==nil then
+  opts.replace_keycodes=true
+ end
+ if opts.remap~=nil then
+  opts.remap=nil
+  opts.noremap=not opts.remap
+ end
  for _,l in Util.pipairs(lhs) do
   for _,m in Util.pipairs(mode) do
    local r=rhs
@@ -149,38 +156,46 @@ function Mapping.new(spec)
  obj.lazykey=spec.lazykey
  obj.name=spec.name
  obj.priority=spec.priority
- local tags=Util.to_fat_table(spec.tags)
- if tags then
+ obj.fallback=spec.fallback
+
+ if not Util.is_empty(spec.tags) then
+  local tags=Util.to_fat_table(spec.tags)
   obj.tags=Util.tbl_to_set(tags)
  end
- ---
- obj.key_as_lhs=spec.key_as_lhs
- obj.index=spec.index~=nil and Util.concat(spec.prefix,spec.index,spec.suffix) or nil
- obj.value=spec.value
- ---
- obj.fallback=spec.fallback
- obj.mode=Util.to_fat_table(spec.mode)
- local lhs={}
- for _,l in Util.pipairs(spec.lhs) do
-  table.insert(lhs,Util.concat(spec.prefix,l,spec.suffix))
+ 
+ if spec.index then
+  obj.key_as_lhs=spec.key_as_lhs
+  obj.index=spec.index~=nil and Util.concat(spec.prefix,spec.index,spec.suffix) or nil
+  obj.value=spec.value
  end
- obj.lhs=Util.to_fat_table(lhs)
- obj.rhs=spec.rhs or spec.cmd and ("<cmd>"..spec.cmd.."<cr>")
- local opts=Util.tbl_extend({},Mapping.opts,spec.opts)
- if opts.expr==true and opts.replace_keycodes==nil then
-  opts.replace_keycodes=true
+
+ if spec.mode then
+  obj.mode=Util.to_fat_table(spec.mode)
  end
- if opts.remap~=nil then
-  opts.remap=nil
-  opts.noremap=not opts.remap
+
+ if spec.lhs then
+  local lhs={}
+  for _,l in Util.pipairs(spec.lhs) do
+   table.insert(lhs,Util.concat(spec.prefix,l,spec.suffix))
+  end
+  obj.lhs=Util.to_fat_table(lhs)
  end
- opts.desc=Util.I18n.get("mapdesc",obj.name) or spec.desc or (tostring(obj.rhs))
- obj.opts=opts
- ---
- obj.event=Util.to_fat_table(spec.event)
- obj.pattern=Util.to_fat_table(spec.pattern)
- obj.buffer=Util.toboolean(spec.buffer)
- obj.once=Util.toboolean(spec.once)
+
+ if spec.rhs or spec.cmd then
+  obj.rhs=spec.rhs or spec.cmd and ("<cmd>"..spec.cmd.."<cr>")
+ end
+
+ obj.opts=spec.opts and Util.tbl_extend({},Mapping.opts,spec.opts) or Util.deepcopy(Mapping.opts)
+ local desc=spec.desc or Util.I18n.get("mapdesc",obj.name) or (tostring(obj.rhs))
+ obj.opts.desc=desc
+
+ if spec.event or spec.pattern then
+  obj.event=Util.to_fat_table(spec.event)
+  obj.pattern=Util.to_fat_table(spec.pattern)
+  obj.buffer=spec.buffer
+  obj.once=spec.once
+ end
+
  return obj
 end
 function Mapping:is_autocmd()
@@ -366,7 +381,10 @@ end
 ---@param mapspec mapspec
 function Interface:add(mapspec)
  local mappings=self.mappings
+ local s=Util.clock()
  local mapping=Mapping.new(mapspec)
+ local e=Util.clock()
+ a=(a or 0)+(e-s)
  --- override
  local name=mapping.name
  if name then

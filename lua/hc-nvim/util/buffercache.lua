@@ -33,21 +33,13 @@ local function readfile(path)
   return data
  end
 end
-local function tbl_check(t,k,e)
- local r=t[k]
- if r==nil then
-  r=e()
-  t[k]=r
- end
- return r
-end
 local buffer=require("string.buffer")
 local BufferCache={
  hashes={}, ---@type table<string,string>
  paths={}, ---@type table<string,string>
  encode=buffer.encode,
  decode=buffer.decode,
- path=vim.fs.joinpath(vim.fn.stdpath("cache"),"luabin"),
+ path=vim.fs.joinpath(vim.fn.stdpath("cache"),"buffercache"),
  enabled=true,
 }
 function BufferCache.setup()
@@ -58,22 +50,15 @@ function BufferCache.turn(bool)
 end
 ---@alias BufferHash uv.fs_stat.result
 ---@alias BufferCacheEntry {hash:BufferHash,data:string}
----@param path string
----@return uv.fs_stat.result|false
-function BufferCache.get_hash(path)
- return tbl_check(BufferCache.hashes,path,function()
-  return uv.fs_stat(path) or false
- end)
-end
 ---@param name string
 ---@return string
 function BufferCache.get_path(name)
- return tbl_check(BufferCache.paths,name,function()
-  return vim.fs.joinpath(
-   BufferCache.path,
-   vim.uri_encode(name,"rfc2396")
-  )
- end)
+ local ret=BufferCache.paths[name]
+ if ret==nil then
+  ret=vim.fs.joinpath(BufferCache.path,vim.uri_encode(name,"rfc2396"))
+  BufferCache.paths[name]=ret
+ end
+ return ret
 end
 ---@generic T
 ---@param expr fun():T
@@ -82,35 +67,35 @@ function BufferCache.load(name,path,expr)
  if BufferCache.enabled==false then
   return expr()
  end
- local ret
+ return BufferCache.loadfile(name,path,expr)
+end
+---@generic T
+---@param expr fun():T
+---@return T
+function BufferCache.loadfile(name,path,expr)
  if path==nil then
   path=debug.getinfo(expr).source:sub(2)
  end
  local stat=uv.fs_stat(path)
- if stat then
-  if name==nil then
-   local info=debug.getinfo(expr)
-   name=info.source..info.currentline
-  end
-  local hash=BufferCache.readhash(name)
-  if hash~=nil and uv_stat_eq(hash,stat) then
-   local data=BufferCache.readdata(name)
-   if data~=nil then
-    ret=data
-   end
-  else
-   ret=expr()
-   BufferCache.write(name,{
-    hash=stat,
-    data=ret,
-   })
-  end
- else
-  ret=expr()
+ if not stat then
+  return expr()
  end
+ if name==nil then
+  local info=debug.getinfo(expr)
+  name=info.source..info.currentline
+ end
+ local hash=BufferCache.read(BufferCache.get_path(name)..".hash")
+ if type(hash)=="table" and uv_stat_eq(hash,stat) then
+  return BufferCache.read(BufferCache.get_path(name)..".data")
+ end
+ local ret=expr()
+ BufferCache.write(name,{
+  hash=stat,
+  data=ret,
+ })
  return ret
 end
-function BufferCache.loadmod(modname)
+function BufferCache.require(modname)
  local info=vim.loader.find(modname)[1]
  if info then
   return BufferCache.load("module-"..info.modname,info.modpath,function()
@@ -126,17 +111,7 @@ function BufferCache.write(name,entry)
  writefile(path..".hash",BufferCache.encode(entry.hash))
  writefile(path..".data",BufferCache.encode(entry.data))
 end
----@param name string module name or filename
-function BufferCache.readhash(name)
- local path=BufferCache.get_path(name)..".hash"
- local content=readfile(path)
- if content then
-  return BufferCache.decode(content) --[[@as uv.fs_stat.result]]
- end
-end
----@param name string module name or filename
-function BufferCache.readdata(name)
- local path=BufferCache.get_path(name)..".data"
+function BufferCache.read(path)
  local content=readfile(path)
  if content then
   return BufferCache.decode(content)

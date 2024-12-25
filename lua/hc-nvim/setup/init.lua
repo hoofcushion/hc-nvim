@@ -8,6 +8,7 @@ require=Util.lua_ls_alias(raw,function(modname)
  end
  return raw(modname)
 end)
+Util.BufferCache.setup()
 local modules={
  "i18n",
  "option",
