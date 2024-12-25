@@ -53,28 +53,28 @@ local builtin_types={
  ["thread"]=true,
 }
 local special_types={
- any=function ()
+ any=function()
   return true
  end,
- ["true"]=function (x)
+ ["true"]=function(x)
   return x==true
  end,
- ["false"]=function (x)
+ ["false"]=function(x)
   return x==false
  end,
- integer=function (x)
+ integer=function(x)
   return type(x)=="number" and math.floor(x)==x
  end,
- decimal=function (x)
+ decimal=function(x)
   return type(x)=="number" and math.floor(x)~=x
  end,
- nan=function (x)
+ nan=function(x)
   return x~=x
  end,
- ["truthy"]=function (x)
+ ["truthy"]=function(x)
   return not not x
  end,
- ["falsy"]=function (x)
+ ["falsy"]=function(x)
   return not x
  end,
 }
@@ -93,22 +93,56 @@ local Type={
  data=nil,
 }
 function Type.def(attr,data)
+ if not data then
+  data=attr
+  local t=type(data)
+  if t=="string" then
+   attr="or"
+  elseif t=="table" then
+   if data.attr and data.data then
+    data=Type.def(data)
+    attr="or"
+   else
+    attr="recur"
+   end
+  end
+ end
  local obj=setmetatable({},{__index=Type})
  obj.attr=attr
  obj.data=data
  return obj
 end
-function Type:check(x)
+local IS_NIL=setmetatable({},{__tostring="Nil"})
+local IS_NAN=setmetatable({},{__tostring="NaN"})
+local IS_RET=setmetatable({},{__tostring="Ret"})
+local function pindex(t,k)
+ return t[k]
+end
+function Type:check(...)
  if self.attr=="or" then
   for _,v in ipairs(self.data) do
-   if type_check(x,v) then
+   if type_check(...,v) then
     return true
    end
   end
   return false
  elseif self.attr=="and" then
   for _,v in ipairs(self.data) do
-   if not type_check(x,v) then
+   if not type_check(...,v) then
+    return false
+   end
+  end
+  return true
+ elseif self.attr=="enum" then
+  if pindex(self.data,...) then
+   return true
+  end
+  return false
+ elseif self.attr=="dynamic" then
+  return self.data.test(...)
+ elseif self.attr=="tuple" then
+  for i=1,select("#",...) do
+   if not type_check(select(i,...),self.data[i]) then
     return false
    end
   end
@@ -117,6 +151,11 @@ function Type:check(x)
 end
 print(Type.def("or",{"integer","decimal"}):check(1))
 print(Type.def("or",{"integer","decimal"}):check(""))
+print(Type.def("enum",{1,2}):check(2))
+print(Type.def("enum",{1,2}):check(3))
+print(Type.def("dynamic",{test=function(x) return x==3 end}):check(3))
+print(Type.def("tuple",{"integer","integer"}):check(1,""))
+print(Type.def("tuple",{"integer","integer"}):check(1,3))
 function Type:assert()
 end
 function Type:wrap()
