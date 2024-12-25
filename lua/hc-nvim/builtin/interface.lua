@@ -353,7 +353,7 @@ return {
  {name=NS.noice_telescope,lhs="<leader>nt"},
  {name=NS.noice_disable,  lhs="<leader>nd"},
  {name=NS.noice_enable,   lhs="<leader>na"},
- {name=NS.noice_redirect, lhs="<c-cr>",   mode="c"},
+ {name=NS.noice_redirect, lhs="<c-s>",   mode="c"},
  {
   override={mode={"n","i","s"},fallback=true},
   {name=NS.noice_scroll_up,  lhs="<c-f>"},
