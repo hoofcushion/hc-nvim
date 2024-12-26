@@ -144,6 +144,10 @@ function Preset.apply(specs)
   for k,v in Util.ppairs(preset.base) do
    spec[k]=v
   end
+  if vim.g.vscode and spec.vscode==false then
+   spec.enabled=false
+   return
+  end
   for field,getter in pairs(PresetGetter) do
    local orig=spec[field]
    spec[field]=function(plugin)
@@ -161,9 +165,6 @@ function Preset.apply(specs)
   end
   if spec.auto==true then
    spec.lazy=vim.fn.argc()==0
-  end
-  if vim.g.vscode and spec.vscode==false then
-   spec.enabled=false
   end
  end)
 end
