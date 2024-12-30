@@ -271,9 +271,9 @@ function RangeMark:swap(rhs)
  local vreg1=lhs:yank()
  local vreg2=rhs:yank()
  local vhit1=lhs:get_height()
- local vhit2=rhs:height()
+ local vhit2=rhs:get_height()
  local vlen1=lhs:get_width()
- local vlen2=rhs:len()
+ local vlen2=rhs:get_width()
  lhs:put(vreg2)
  local vmode=rhs.vmode
  if
