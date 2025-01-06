@@ -1,15 +1,15 @@
 ---@module "lazy"
 
 local Events=require("hc-nvim.setup.events")
-local Enter={Events.File,"BufNewFile","SessionLoadPost"}
+local Enter={Events.File,"BufReadPost","BufNewFile","SessionLoadPost"}
 ---@type LazySpec|{
 --- auto: boolean?,
 ---}
 return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
- {"folke/tokyonight.nvim",            lazy=false},
- {"nvimdev/dashboard-nvim",           lazy=false,                     cond=vim.fn.argc()==0},
- {"folke/noice.nvim",                 lazy=false},
+ {"folke/tokyonight.nvim",            event="VimEnter"},
+ {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},
+ {"folke/noice.nvim",                 event=Enter},
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
@@ -18,8 +18,8 @@ return {
  {"folke/which-key.nvim",             event="SafeState"},
 
  --- Information
- {"nvim-lualine/lualine.nvim",        event=Enter,                    auto=true},
- {"Bekaboo/dropbar.nvim",             event=Enter,                    auto=true},
+ {"nvim-lualine/lualine.nvim",        event=Enter},
+ {"Bekaboo/dropbar.nvim",             event=Enter},
  {"nvim-ufo",                         event=Enter},
  {"ldelossa/buffertag",               event=Enter},
  {"chentoast/marks.nvim",             event=Enter},
@@ -91,7 +91,7 @@ return {
  {"folke/todo-comments.nvim",                   event=Enter},
  {"nfrid/due.nvim",                             event=Enter},
  {"lukas-reineke/indent-blankline.nvim",        event=Enter},
- {"hiphish/rainbow-delimiters.nvim",            event=Enter,                         auto=true},
+ {"hiphish/rainbow-delimiters.nvim",            event=Enter},
 
  --- AI
  -- {"zbirenbaum/copilot.lua"},

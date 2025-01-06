@@ -6,6 +6,10 @@ if  Config.performance.plugin.load_cooldown==0 then
 end
 local Loader=require("lazy.core.loader")
 local invalid_events={
+ ["sourcecmd"]=true,
+ ["sourcepost"]=true,
+ ["sourcepre"]=true,
+ ["vimenter"]=true,
  ["cmdlineenter"]=true,
  ["insertenter"]=true,
  ["user"]=true,
