@@ -4,8 +4,10 @@ return (function(opts)
    v.enabled=vim.g.vscode==nil
   end
  end
+ return opts
 end)({
  rainbowcursor={
+  enabled=true,
   throttle=5,
   autocmd={
    loopover=360,
