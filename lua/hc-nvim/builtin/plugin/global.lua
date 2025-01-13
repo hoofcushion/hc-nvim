@@ -9,7 +9,7 @@ return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",            event="VimEnter"},
  {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},
- {"folke/noice.nvim",                 event=Enter},
+ {"folke/noice.nvim",                 event="VimEnter"},
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
