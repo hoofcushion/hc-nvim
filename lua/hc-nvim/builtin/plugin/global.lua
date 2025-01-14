@@ -91,7 +91,8 @@ return {
  {"folke/todo-comments.nvim",                   event=Enter},
  {"nfrid/due.nvim",                             event=Enter},
  {"lukas-reineke/indent-blankline.nvim",        event=Enter},
- {"hiphish/rainbow-delimiters.nvim",            event=Enter},
+ -- This werid plugin can't load at "BufEnter"
+ {"hiphish/rainbow-delimiters.nvim",            event=Events.FileAdd},
 
  --- AI
  -- {"zbirenbaum/copilot.lua"},
