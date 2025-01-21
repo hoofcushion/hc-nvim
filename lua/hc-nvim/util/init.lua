@@ -101,9 +101,12 @@ end
 Util.unpack=unpack or table.unpack
 --- Save vararg to t then return it
 function Util.redirect(t,...)
- for i=1,select("#",...) do
+ t=Util.eval(t)
+ local n=select("#",...)
+ for i=1,n do
   t[i]=select(i,...)
  end
+ t.n=n
  return ...
 end
 --- Like require but return nil instead error when failed
@@ -135,12 +138,6 @@ function Util.number_sub(number,int,dec)
  local percentile=10^(dec)
  frac=math.floor(frac*(percentile))/percentile
  return whole+frac
-end
-function Util.number_get_whole(number)
- return math.floor(number)
-end
-function Util.number_get_frac(number)
- return number-Util.number_get_whole(number)
 end
 function Util.number_split(number)
  local whole=math.floor(number)
@@ -185,9 +182,7 @@ function Util.format_time(second,max,min)
 end
 ---@param name string?
 function Util.track(name)
- Util.try(function()
-  require("lazy.util").track(name)
- end)
+ require("lazy.util").track(name)
 end
 --- ---
 --- Modes
@@ -260,16 +255,6 @@ function Util.error(msg)
 end
 function Util.off(msg)
  vim.notify(msg,vim.log.levels.OFF)
-end
-function Util.try(fn,catch)
- if catch==nil then
-  catch=Util.error
- end
- xpcall(fn,function(ok,err)
-  if not ok then
-   catch(err)
-  end
- end)
 end
 function Util.batch(fn,...)
  for i=1,select("#",...) do
@@ -354,7 +339,22 @@ function Util.validate(x,t,o)
  if type(x)==t or (o==true and x==nil) then
   return true
  end
- error(("Expect %s, got %s"):format(t,type(x)))
+ error(("Expect %s%s, got %s"):format(t,o and "?" or "",type(x)))
+end
+function Util.type(x)
+ if type(x)=="number" then
+  if x~=x then
+   return "nan"
+  end
+  if math.abs(x)=="inf" then
+   return "inf"
+  end
+  return math.floor(x)==x and "integer" or "float"
+ end
+ if type(x)=="table" then
+  return Util.is_list(x) and "list" or "dict"
+ end
+ return type(x)
 end
 function Util.is_integer(x)
  return type(x)=="number" and math.floor(x)==x
@@ -555,9 +555,9 @@ do
   if cache[dst] or cache[src] then
    return dst
   end
-  local has_prefer=prefer(dst,src)
-  if has_prefer~=nil then
-   return has_prefer
+  local prefered=prefer(dst,src)
+  if prefered~=nil then
+   return prefered
   end
   cache[dst]=true
   cache[src]=true
@@ -731,7 +731,7 @@ end
 ---@param keys nonil[]|string
 function Util.tbl_get(tbl,keys)
  if type(keys)=="string" then
-  keys=vim.split(keys,".",{plain=true,trimempty=true})
+  keys=Util.split(keys,".",{plain=true,trimempty=true})
  end
  local e=#keys
  for i=1,e do
@@ -757,9 +757,6 @@ function Util.tbl_newindex(tbl,...)
  local e=select("#",...)
  for i=1,e-2 do
   local v=select(i,...)
-  if v==nil then
-   error(string.format("invalid index at %d",i))
-  end
   tbl=Util.tbl_check(tbl,v)
  end
  tbl[select(e-1,...)]=select(e,...)
@@ -768,9 +765,6 @@ function Util.tbl_index(tbl,...)
  local e=select("#",...)
  for i=1,e-1 do
   local v=select(i,...)
-  if v==nil then
-   error(string.format("invalid index at %d",i))
-  end
   tbl=Util.tbl_check(tbl,v)
  end
  return tbl[select(e,...)]
@@ -873,9 +867,9 @@ local function gsplit(str,sep,opts)
  if type(opts)=="boolean" then
   plain=opts
  else
-  Util.validate(str,"string")
-  Util.validate(sep,"string")
-  Util.validate(opts,"table",true)
+  Util.validate(str, "string")
+  Util.validate(sep, "string")
+  Util.validate(opts,"table", true)
   opts=opts or {}
   plain,trimempty=opts.plain,opts.trimempty
  end
@@ -917,39 +911,45 @@ function Util.split_by(str,sep,plain)
  end
  return str
 end
-local _when_cache={}
 --- PERF:
 --- Update value of function when specific event happens
 --- Greatly improve lualine speed.
 ---@generic F
----@param event vim.api.keyset.create_autocmd.events|vim.api.keyset.create_autocmd.events[]
----@param func F
+---@param opts {func:F,event:string|string[],pattern:string?,filter:(fun(data):boolean)}
 ---@return F
-function Util.when(event,pattern,func)
- if _when_cache[func]==nil then
-  vim.api.nvim_create_autocmd(event,{
-   pattern=pattern,
-   callback=function()
-    _when_cache[func]=true
-   end,
-  })
-  _when_cache[func]=true
- end
+function Util.when(opts)
+ local needupdate=true
+ local cache={}
+ vim.api.nvim_create_autocmd(opts.event,{
+  pattern=opts.pattern,
+  callback=function(data)
+   if opts.filter==nil or opts.filter(data) then
+    needupdate=true
+   end
+  end,
+ })
  return function()
-  if _when_cache[func]==true then
-   _when_cache[func]=Util.packlen(func())
+  if needupdate then
+   needupdate=false
+   cache={}
+   return Util.redirect(cache,opts.func())
   end
-  return Util.unpacklen(_when_cache[func])
+  return Util.unpacklen(cache)
  end
 end
 function Util.clock()
  return vim.uv.hrtime()/1e9
 end
-function Util.throttle(fn)
- local u={last=0,ret={},fn=fn}
+function Util.throttle(delay,fn)
+ local u={
+  last=0,
+  ret={},
+  fn=fn,
+  delay=delay,
+ }
  return function(...)
   local now=Util.clock()
-  if now-u.last>=0.1 then
+  if now-u.last>=u.delay then
    u.last=now
    u.ret={}
    return Util.redirect(u.ret,u.fn(...))

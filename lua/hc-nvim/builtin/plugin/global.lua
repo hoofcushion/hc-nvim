@@ -7,7 +7,7 @@ local Enter={Events.File,"BufReadPost","BufNewFile","SessionLoadPost"}
 ---}
 return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
- {"folke/tokyonight.nvim",            event="VimEnter"},
+ {"folke/tokyonight.nvim",            lazy=false},
  {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},
  {"folke/noice.nvim",                 event="VimEnter"},
  {"rcarriga/nvim-notify"},

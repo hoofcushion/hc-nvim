@@ -46,48 +46,75 @@ return {
    "diff",
    {"filename"},
    {"filesize"},
-   {Util.when("OptionSet",nil,function() return vim.bo.filetype end)},
+   {Util.when({event="OptionSet",pattern="filetype",func=function() return vim.bo.filetype end})},
   },
   lualine_c={
   },
   lualine_x={
-   {Util.when({"BufEnter"},nil,function()
-    local t=vim.b.file_subtype
-    if not t then
-     local info=vim.uv.fs_stat(vim.api.nvim_buf_get_name(0))
-     t=info and info.type or "temp"
-     vim.b.file_subtype=t
-    end
-    return t
-   end)},
-   {Util.when("OptionSet",nil,function() return vim.bo.fileencoding end)},
-   {Util.when("OptionSet",nil,function() return vim.bo.encoding end)},
-   {Util.when("OptionSet",nil,function() return vim.bo.fileformat end)},
-   {Util.when("OptionSet",nil,function() return vim.bo.buftype end)},
-   {Util.when("OptionSet",nil,function() return vim.bo.commentstring:gsub("%%","%%%%") end)},
-   {Util.when("OptionSet",nil,function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end)},
-   {Util.when("OptionSet",nil,function()
-    return vim.o.foldenable and ("%s:%d"):format(vim.bo.foldmethod,vim.bo.foldlevel) or ""
-   end)},
-   {Util.when("OptionSet",nil,function() return vim.wo.wrap and "wrap" or "nowrap" end)},
+   {Util.when({
+    event={"BufReadPost","BufNewFile"},
+    func=function()
+     return vim.uv.fs_stat(vim.api.nvim_buf_get_name(0)).type
+    end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="fileencoding",
+    func=function() return vim.bo.fileencoding end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="fileformat",
+    func=function() return vim.bo.fileformat end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="buftype",
+    func=function() return vim.bo.buftype end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="commentstring",
+    func=function() return vim.bo.commentstring:gsub("%%","%%%%") end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="expandtab",
+    func=function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="foldenable,foldmethod,foldlevel",
+    func=function()
+     return vim.o.foldenable and ("%s:%d"):format(vim.wo.foldmethod,vim.wo.foldlevel) or ""
+    end,
+   })},
+   {Util.when({
+    event="OptionSet",
+    pattern="wrap",
+    func=function() return vim.wo.wrap and "wrap" or "nowrap" end,
+   })},
   },
   lualine_y={
    {"diagnostics",symbols=require("hc-nvim.rsc").sign[Config.ui.sign]},
    --- Lsp
    {
-    Util.when("LspAttach",nil,function()
-     local clients=vim.lsp.get_clients({bufnr=0})
-     if next(clients)~=nil then
-      local ret={}
-      for _,v in ipairs(clients) do
-       table.insert(ret,("%s:%d"):format(v.name,v.id))
+    Util.when({
+     event="LspAttach",
+     func=function()
+      local clients=vim.lsp.get_clients({bufnr=0})
+      if next(clients)~=nil then
+       local ret={}
+       for _,v in ipairs(clients) do
+        table.insert(ret,("%s:%d"):format(v.name,v.id))
+       end
+       if next(ret)~=nil then
+        return table.concat(ret," ")
+       end
       end
-      if next(ret)~=nil then
-       return table.concat(ret," ")
-      end
-     end
-     return ""
-    end),
+      return ""
+     end,
+    }),
    },
    --- Marks
    {
@@ -107,21 +134,22 @@ return {
    --- Search
    {"searchcount",cond=function() return vim.v.hlsearch==1 end},
    --- Current buf win tab
-   {Util.when({"TabEnter","BufEnter","WinEnter"},nil,function()
-    return vim.api.nvim_get_current_tabpage()
-     .."|"..vim.api.nvim_get_current_win()
-     .."|"..vim.api.nvim_get_current_buf()
-   end)},
+   {Util.when({
+    event={"TabEnter","BufEnter","WinEnter"},
+    func=function()
+     return vim.api.nvim_get_current_tabpage()
+      .."|"..vim.api.nvim_get_current_win()
+      .."|"..vim.api.nvim_get_current_buf()
+    end,
+   })},
    --- Position
-   {Util.when({"CursorMoved","CursorMovedI"},nil,function()
-    local fn=vim.fn
-    return ("%s:%s|%s:%s"):format(
-     fn.line("."),
-     fn.line("$"),
-     fn.col("."),
-     fn.col("$")
-    )
-   end)},
+   {Util.when({
+    event={"CursorMoved","CursorMovedI"},
+    func=function()
+     local fn=vim.fn
+     return ("%s:%s|%s:%s"):format(fn.line("."),fn.line("$"),fn.col("."),fn.col("$"))
+    end,
+   })},
   },
  },
  tabline={
