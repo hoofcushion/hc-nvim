@@ -113,6 +113,7 @@ return {
 
  --- LSP tools
  {"Wansmer/symbol-usage.nvim",                  event="LspAttach"},
+ {"SmiteshP/nvim-navbuddy",                     event="LspAttach"},
  {"folke/lazydev.nvim",                         event=Events.NeoConfig},
 
  --- Treesitter

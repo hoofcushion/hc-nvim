@@ -105,6 +105,9 @@ return {
  override={tags="nvim-lspconfig"},
  {name=NS.nvim_lspconfig_lspinfo,lhs="<leader>lI",desc="Lspinfo"},
 },{
+ override={tags="nvim-navbuddy"},
+ {name=NS.nvim_navbuddy_open,lhs="<leader>ln",desc="Navbuddy"},
+},{
  override={tags="yanky"},
  {name=NS.yanky_put_after,                    lhs="p",   mode={"n","x"}},
  {name=NS.yanky_put_before,                   lhs="P",   mode={"n","x"}},
@@ -353,7 +356,7 @@ return {
  {name=NS.noice_telescope,lhs="<leader>nt"},
  {name=NS.noice_disable,  lhs="<leader>nd"},
  {name=NS.noice_enable,   lhs="<leader>na"},
- {name=NS.noice_redirect, lhs="<c-s>",   mode="c"},
+ {name=NS.noice_redirect, lhs="<c-s>",    mode="c"},
  {
   override={mode={"n","i","s"},fallback=true},
   {name=NS.noice_scroll_up,  lhs="<c-f>"},

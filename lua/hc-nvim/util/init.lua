@@ -74,7 +74,7 @@ end
 
 --- ---
 --- Meta
---- ---
+---@ ---
 ---@generic T
 ---@param _ T
 ---@return T
@@ -100,6 +100,10 @@ function Util.nilpcall(...)
 end
 Util.unpack=unpack or table.unpack
 --- Save vararg to t then return it
+---@generic T
+---@param t table|fun():table
+---@param ... T
+---@return T
 function Util.redirect(t,...)
  t=Util.eval(t)
  local n=select("#",...)
@@ -915,7 +919,12 @@ end
 --- Update value of function when specific event happens
 --- Greatly improve lualine speed.
 ---@generic F
----@param opts {func:F,event:string|string[],pattern:string?,filter:(fun(data):boolean)}
+---@param opts {
+--- event:string|string[],
+--- filter:(fun(data):boolean),
+--- func:F,
+--- pattern:string?,
+---}
 ---@return F
 function Util.when(opts)
  local needupdate=true
@@ -956,5 +965,15 @@ function Util.throttle(delay,fn)
   end
   return Util.unpack(u.ret)
  end
+end
+function Util.inserter(t)
+ return {
+  t=t,
+  i=#t,
+  _=function(self,v)
+   self.i=self.i+1
+   self.t[self.i]=v
+  end,
+ }
 end
 return Util

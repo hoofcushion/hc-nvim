@@ -339,7 +339,7 @@ return {
    [NS.telescope_builtin_filetypes]                    ="FileTypes",
    [NS.telescope_builtin_find_files]                   ="Find files",
    [NS.telescope_builtin_git_bcommits]                 ="Bcommits",
-   [NS.telescope_builtin_git_bcommits_range]           ="Bcommits_range",
+   [NS.telescope_builtin_git_bcommits_range]           ="Bcommits range",
    [NS.telescope_builtin_git_branches]                 ="Branches",
    [NS.telescope_builtin_git_commits]                  ="Commits",
    [NS.telescope_builtin_git_files]                    ="Files",
@@ -378,6 +378,8 @@ return {
    [NS.telescope_builtin_tagstack]                     ="Tagstack",
    [NS.telescope_builtin_treesitter]                   ="Treesitter",
    [NS.telescope_builtin_vim_options]                  ="Options",
+   [NS.nvim_lspconfig_lspinfo]                         ="LSP info",
+   [NS.nvim_navbuddy_open]                             ="LSP navigator",
   },
  },
 }

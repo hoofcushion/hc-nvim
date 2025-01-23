@@ -378,6 +378,8 @@ return {
    [NS.telescope_builtin_tagstack]                     ="标签栈",
    [NS.telescope_builtin_treesitter]                   ="语法树",
    [NS.telescope_builtin_vim_options]                  ="选项",
+   [NS.nvim_lspconfig_lspinfo]                         ="LSP 信息",
+   [NS.nvim_navbuddy_open]                             ="LSP 导航",
   },
  },
 }
