@@ -82,10 +82,3 @@ vim.api.nvim_create_autocmd({"BufWritePre"},{
   vim.fn.mkdir(vim.fn.fnamemodify(event.match,":p:h"),"p")
  end,
 })
-vim.api.nvim_create_autocmd({"FileType"},{
- group=augroup("bigfile"),
- pattern="bigfile",
- callback=function(ev)
-  vim.bo[ev.buf].syntax=vim.filetype.match({buf=ev.buf}) or ""
- end,
-})

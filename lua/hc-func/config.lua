@@ -1,6 +1,5 @@
 local Util=require("hc-nvim.util")
 local Validate=require("hc-nvim.util.validate")
-local function empty_fn() end
 ---@class HCFunc.options
 local default_options={
  cursorword={

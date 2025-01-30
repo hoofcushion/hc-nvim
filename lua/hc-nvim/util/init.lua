@@ -16,6 +16,7 @@ local Util=require("hc-nvim.util.lazy_tab").create({
  Keymod      ="hc-nvim.util.keymod",
  Lazy        ="hc-nvim.util.lazy",
  LazyTab     ="hc-nvim.util.lazy_tab",
+ LinkedList  ="hc-nvim.util.linked_list",
  LocalEnv    ="hc-nvim.util.local_env",
  ModTree     ="hc-nvim.util.mod_tree",
  Option      ="hc-nvim.util.option",
@@ -47,6 +48,7 @@ if false then
   Keymod      =require("hc-nvim.util.keymod"),
   Lazy        =require("hc-nvim.util.lazy"),
   LazyTab     =require("hc-nvim.util.lazy_tab"),
+  LinkedList  =require("hc-nvim.util.linked_list"),
   LocalEnv    =require("hc-nvim.util.local_env"),
   ModTree     =require("hc-nvim.util.mod_tree"),
   Option      =require("hc-nvim.util.option"),
@@ -654,8 +656,8 @@ function Util.to_set(...)
  return ret
 end
 ---@generic T
----@param tbl {[any]:T}
----@return {[T]:true}
+---@param tbl T[]
+---@return table<T,true>
 function Util.tbl_to_set(tbl)
  local ret={}
  for _,v in pairs(tbl) do

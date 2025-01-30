@@ -135,6 +135,7 @@ M.server={
   {name="yaml-language-server",setup="yamlls"},
   {name="zk"},
   {name="zls"},
+  {name="llm-ls"},
   --- null-ls
   {name="cbfmt"},
   {name="prettier"},

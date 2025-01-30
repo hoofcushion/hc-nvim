@@ -46,22 +46,22 @@ function Keymap.set(buffer,mode,lhs,rhs,opts,fallback)
   opts.remap=nil
   opts.noremap=not opts.remap
  end
- for _,l in Util.pipairs(lhs) do
-  for _,m in Util.pipairs(mode) do
-   local r=rhs
-   if type(r)=="function" then
-    opts.callback=r
-    r=""
+ for _,_lhs in Util.pipairs(lhs) do
+  for _,_mode in Util.pipairs(mode) do
+   local _rhs=rhs
+   if type(_rhs)=="function" then
+    opts.callback=_rhs
+    _rhs=""
    end
    if opts.callback then
     if opts.expr then
-     mkp(buffer,m,l,r,opts)
+     mkp(buffer,_mode,_lhs,_rhs,opts)
     end
     if fallback then
-     mkfb(buffer,m,l,r,opts)
+     mkfb(buffer,_mode,_lhs,_rhs,opts)
     end
    end
-   set(buffer,m,l,r,opts)
+   set(buffer,_mode,_lhs,_rhs,opts)
   end
  end
 end
@@ -157,22 +157,18 @@ function Mapping.new(spec)
  obj.name=spec.name
  obj.priority=spec.priority
  obj.fallback=spec.fallback
-
  if not Util.is_empty(spec.tags) then
   local tags=Util.to_fat_table(spec.tags)
   obj.tags=Util.tbl_to_set(tags)
  end
- 
  if spec.index then
   obj.key_as_lhs=spec.key_as_lhs
   obj.index=spec.index~=nil and Util.concat(spec.prefix,spec.index,spec.suffix) or nil
   obj.value=spec.value
  end
-
  if spec.mode then
   obj.mode=Util.to_fat_table(spec.mode)
  end
-
  if spec.lhs then
   local lhs={}
   for _,l in Util.pipairs(spec.lhs) do
@@ -180,22 +176,18 @@ function Mapping.new(spec)
   end
   obj.lhs=Util.to_fat_table(lhs)
  end
-
  if spec.rhs or spec.cmd then
   obj.rhs=spec.rhs or spec.cmd and ("<cmd>"..spec.cmd.."<cr>")
  end
-
  obj.opts=spec.opts and Util.tbl_extend({},Mapping.opts,spec.opts) or Util.deepcopy(Mapping.opts)
  local desc=spec.desc or Util.I18n.get("mapdesc",obj.name) or (tostring(obj.rhs))
  obj.opts.desc=desc
-
  if spec.event or spec.pattern then
   obj.event=Util.to_fat_table(spec.event)
   obj.pattern=Util.to_fat_table(spec.pattern)
   obj.buffer=spec.buffer
   obj.once=spec.once
  end
-
  return obj
 end
 function Mapping:is_autocmd()
