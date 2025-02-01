@@ -206,6 +206,10 @@ function Util.get_vmode()
  end
  return vmode
 end
+function Util.is_visualmode()
+ local vmode=vim.api.nvim_get_mode().mode:sub(1,1)
+ return is_visualmode[vmode]==true
+end
 local function pipe(obj)
  return function(fn,...)
   if fn==nil then
@@ -352,7 +356,7 @@ function Util.type(x)
   if x~=x then
    return "nan"
   end
-  if math.abs(x)=="inf" then
+  if tostring(math.abs(x))=="inf" then
    return "inf"
   end
   return math.floor(x)==x and "integer" or "float"
@@ -361,12 +365,6 @@ function Util.type(x)
   return Util.is_list(x) and "list" or "dict"
  end
  return type(x)
-end
-function Util.is_integer(x)
- return type(x)=="number" and math.floor(x)==x
-end
-function Util.is_decimal(x)
- return type(x)=="number" and math.floor(x)~=x
 end
 local empty_check={
  number=function(x)
@@ -452,8 +450,6 @@ function Util.tbl_check(t,k,e)
  if ret==nil then
   ret=e==nil and {} or e(t,k)
   t[k]=ret
- elseif type(ret)~="table" then
-  error("Expected table at key '"..tostring(k).."' but got '"..type(ret).."'")
  end
  return ret
 end
@@ -735,15 +731,18 @@ function Util.fillsuffix(str,len,suffix)
 end
 ---@param tbl table
 ---@param keys nonil[]|string
-function Util.tbl_get(tbl,keys)
+function Util.tbl_get(tbl,keys,expr)
  if type(keys)=="string" then
   keys=Util.split(keys,".",{plain=true,trimempty=true})
  end
  local e=#keys
- for i=1,e do
+ for i=1,e-1 do
   tbl=Util.tbl_check(tbl,keys[i])
  end
- return tbl
+ if expr then
+  return Util.tbl_check(tbl,keys[e],expr)
+ end
+ return tbl[keys[e]]
 end
 ---@param tbl table
 ---@param keys nonil[]|string
@@ -758,22 +757,6 @@ function Util.tbl_set(tbl,keys,val)
  end
  tbl[keys[e]]=val
  return tbl
-end
-function Util.tbl_newindex(tbl,...)
- local e=select("#",...)
- for i=1,e-2 do
-  local v=select(i,...)
-  tbl=Util.tbl_check(tbl,v)
- end
- tbl[select(e-1,...)]=select(e,...)
-end
-function Util.tbl_index(tbl,...)
- local e=select("#",...)
- for i=1,e-1 do
-  local v=select(i,...)
-  tbl=Util.tbl_check(tbl,v)
- end
- return tbl[select(e,...)]
 end
 --- ---
 --- Iterators.
@@ -848,25 +831,25 @@ local function _gsplit(s)
   s.i=s.i+1
   return s.str:sub(i,i)
  end
+ if s.trimempty and s.i>s.len then
+  return
+ end
  -- normal split using string.find
- local j,k=string.find(s.str,s.sep,s.i,s.plain)
- if j==nil then
-  if s.trimempty and s.i>s.len then
-   return
-  end
+ local _i,_e=string.find(s.str,s.sep,s.i,s.plain)
+ if _i==nil then
   s.done=true
   return s.str:sub(s.i)
  end
  --- simply skip this iteration
- if s.trimempty and k==1 then
+ if s.trimempty and _e==1 then
   s.i=s.i+1
   return _gsplit(s)
  end
  -- string.find("a|c","|") returns (2,2)
  -- so use previous i and e-1 gives "a"
  local i=s.i
- s.i=k+1
- return s.str:sub(i,k-1)
+ s.i=_e+1
+ return s.str:sub(i,_e-1)
 end
 local function gsplit(str,sep,opts)
  local plain,trimempty

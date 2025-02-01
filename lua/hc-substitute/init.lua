@@ -5,6 +5,9 @@ local api=vim.api
 local fn=vim.fn
 local Util=require("hc-nvim.util")
 local RangeMark=Util.RangeMark
+local function feedkeys(keys,mode)
+ vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys,true,false,true),mode,false)
+end
 --- ---
 --- OpFunc imp.
 --- ---
@@ -22,7 +25,7 @@ end
 --- Set opfunc then start operator mode with a initial motion
 function OpFunc.start(opfunc,motion,...)
  OpFunc.set(opfunc,{...})
- vim.fn.feedkeys("g@"..(motion or ""),"n")
+ feedkeys("g@"..(motion or ""),"n")
 end
 local Options={}
 ---@class Substitute.options
@@ -183,7 +186,7 @@ end
 ---@param opts Substitute.options.paste?
 function M.paste_visual(opts)
  M.paste(RangeMark:get_selection(),opts)
- vim.fn.feedkeys("<esc>","nx")
+ feedkeys("<esc>","nx")
 end
 local exchange_ns=api.nvim_create_namespace("hc-substitute-exchange")
 ---@type RangeMark?
@@ -259,7 +262,7 @@ end
 function M.exchange_visual(opts)
  local ok=M.exchange(RangeMark:get_selection(),opts)
  if ok then
-  vim.fn.feedkeys("<esc>","nx")
+  feedkeys("<esc>","nx")
  end
 end
 ---@param mark RangeMark
@@ -267,7 +270,7 @@ function M.substitute(mark)
  local pattern=table.concat(mark:yank().regcontents,"\\n")
  pattern="\\V"..fn.escape(pattern,"/\\")
  local cmd=string.format(":s/%s/",pattern)
- vim.fn.feedkeys(cmd,"nx")
+ feedkeys(cmd,"nx")
 end
 ---@param vmode visualmode
 function M.substitute_opfunc(vmode)

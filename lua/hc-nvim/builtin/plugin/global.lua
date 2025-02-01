@@ -10,6 +10,7 @@ return {
  {"folke/tokyonight.nvim",            lazy=false},
  {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},
  {"folke/noice.nvim",                 event="VimEnter"},
+ {"nvim-lualine/lualine.nvim",        event="VimEnter"},
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
@@ -18,7 +19,6 @@ return {
  {"folke/which-key.nvim",             event="SafeState"},
 
  --- Information
- {"nvim-lualine/lualine.nvim",        event=Enter},
  {"Bekaboo/dropbar.nvim",             event=Enter},
  {"nvim-ufo",                         event=Enter},
  {"ldelossa/buffertag",               event=Enter},

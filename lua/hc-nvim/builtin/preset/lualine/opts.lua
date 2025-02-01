@@ -37,7 +37,7 @@ return {
     icons_enabled=true,
     fmt=Util.Cache.create(function()
      local raw=vim.fn.mode(1)
-     return (Util.I18n.get("modemap",raw) or "").." "..raw
+     return table.concat({Util.I18n.get({"modemap",raw}),raw}," ")
     end),
    },
   },
@@ -142,12 +142,33 @@ return {
       .."|"..vim.api.nvim_get_current_buf()
     end,
    })},
-   --- Position
+   --- VRange
+   {Util.when({
+    event={"CursorMoved","ModeChanged"},
+    func=function()
+     if Util.is_visualmode() then
+      local fn=vim.fn
+      local cl=fn.line(".")
+      local cc=fn.virtcol(".")
+      local vl=fn.line("v")
+      local vc=fn.virtcol("v")
+      return ("%s:%s|%s:%s|%s:%s"):format(
+       vl,vc,cl,cc,math.abs(vl-cl)+1,math.abs(vc-cc)+1
+      )
+     end
+     return ""
+    end,
+   })},
+   --- Line and column progreass
    {Util.when({
     event={"CursorMoved","CursorMovedI"},
     func=function()
      local fn=vim.fn
-     return ("%s:%s|%s:%s"):format(fn.line("."),fn.line("$"),fn.col("."),fn.col("$"))
+     local cl=fn.line(".")
+     local cc=fn.virtcol(".")
+     local el=fn.line("$")
+     local ec=fn.virtcol("$")
+     return ("%s/%s %s/%s"):format(cl,el,cc,ec)
     end,
    })},
   },

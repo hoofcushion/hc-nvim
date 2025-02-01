@@ -180,7 +180,7 @@ function Mapping.new(spec)
   obj.rhs=spec.rhs or spec.cmd and ("<cmd>"..spec.cmd.."<cr>")
  end
  obj.opts=spec.opts and Util.tbl_extend({},Mapping.opts,spec.opts) or Util.deepcopy(Mapping.opts)
- local desc=spec.desc or Util.I18n.get("mapdesc",obj.name) or (tostring(obj.rhs))
+ local desc=spec.desc or (obj.name and Util.I18n.get({"mapdesc",obj.name}) or (tostring(obj.rhs)))
  obj.opts.desc=desc
  if spec.event or spec.pattern then
   obj.event=Util.to_fat_table(spec.event)
@@ -393,7 +393,7 @@ function Interface:add(mapspec)
  if mapping.tags then
   local index=self.index
   for tag in pairs(mapping.tags) do
-   Util.tbl_newindex(index,tag,key,mapping)
+   Util.tbl_set(index,{tag,key},mapping)
   end
  end
  return mapping

@@ -23,7 +23,7 @@ function Translation.new()
 end
 function Translation:get()
  for _,locale in ipairs(Config.locale.fallbacks) do
-  local ret=Util.tbl_index(self.map,locale.language,locale.country)
+  local ret=Util.tbl_get(self.map,{locale.language,locale.country})
   if ret then
    return ret
   end
@@ -61,8 +61,8 @@ function I18n.load(spec)
   spec.translations
  )
 end
-function I18n.get(...)
- local trans=Util.tbl_index(I18n.map,...)
+function I18n.get(keys)
+ local trans=Util.tbl_get(I18n.map,keys)
  if trans then
   return trans:get()
  end
