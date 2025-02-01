@@ -147,13 +147,14 @@ return {
     event={"CursorMoved","ModeChanged"},
     func=function()
      if Util.is_visualmode() then
+      local vmode=Util.get_vmode()
       local fn=vim.fn
       local cl=fn.line(".")
       local cc=fn.virtcol(".")
       local vl=fn.line("v")
       local vc=fn.virtcol("v")
       return ("%s:%s|%s:%s|%s:%s"):format(
-       vl,vc,cl,cc,math.abs(vl-cl)+1,math.abs(vc-cc)+1
+       vl,vc,cl,cc,math.abs(vl-cl)+1,vmode == "V" and "$" or math.abs(vc-cc)+1
       )
      end
      return ""
