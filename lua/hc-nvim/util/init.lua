@@ -862,16 +862,11 @@ local function gsplit(str,sep,opts)
   opts=opts or {}
   plain,trimempty=opts.plain,opts.trimempty
  end
- return _gsplit,
-  {
-   str=str,
-   sep=sep,
-   i=1,
-   len=#str,
-   plain=plain,
-   trimempty=trimempty,
-   done=false,
-  }
+ local s={str=str,sep=sep,i=1,len=#str,plain=plain,trimempty=trimempty,done=false}
+ --- match vim.gsplit's function signature
+ return function()
+  return _gsplit(s)
+ end
 end
 local function split(str,sep,opts)
  local list={}
