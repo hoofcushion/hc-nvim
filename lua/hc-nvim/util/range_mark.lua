@@ -132,6 +132,7 @@ function RangeMark:get_line(line,height)
   "V"
  )
 end
+--- return new pos with a offset by `line` and `column`
 ---@param line integer
 ---@param column integer
 ---@return position
@@ -157,6 +158,7 @@ function RangeMark:get_height()
 end
 ---
 --- Reset the width of the RangeMark.
+--- Starting point at left-top
 ---@param width integer
 function RangeMark:set_width(width)
  local left,right=self.cursor_s,self.cursor_e
@@ -170,6 +172,9 @@ function RangeMark:set_width(width)
  local finish=self.finish
  finish[2]=newcol
 end
+---
+--- Reset the height of the RangeMark.
+--- Starting point at left-top
 function RangeMark:set_height(height)
  local up,down=self.cursor_s,self.cursor_e
  if up[1]>down[1] then
@@ -184,7 +189,6 @@ function RangeMark:set_size(height,width)
  self:set_height(height)
  self:set_width(width)
 end
----
 --- Move the RangeMark by `line` and `column`.
 function RangeMark:move(line,column)
  local start=self.start
@@ -301,31 +305,31 @@ function RangeMark:highlight(hl_group,hl_opts,ns)
  local s=self:get_pos("start",0,0)
  local e=self:get_pos("finish",0,0)
  if self.vmode=="" then
-  local sc,ec=s[2],e[2]
-  for l=s[1],e[1] do
-   local line=vim.api.nvim_buf_get_lines(self.bufnr,l,l+1,true)[1]
+  local start_col,end_col=s[2],e[2]
+  for linenr=s[1],e[1] do
+   local line=vim.api.nvim_buf_get_lines(self.bufnr,linenr,linenr+1,true)[1]
    local len=#line
-   local end_row=(ec>=len and l+1 or l)
-   local end_col=(ec>=len and 0 or ec+1)
-   vim.api.nvim_buf_set_extmark(self.bufnr,ns,l,sc,{
+   local ext_end_row=(end_col>=len and linenr+1 or linenr)
+   local ext_end_col=(end_col>=len and 0 or end_col+1)
+   vim.api.nvim_buf_set_extmark(self.bufnr,ns,linenr,start_col,{
     hl_group=hl_group,
-    end_row=end_row,
-    end_col=end_col,
+    end_row=ext_end_row,
+    end_col=ext_end_col,
     priority=vim.highlight.priorities.user,
     strict=false,
    })
-   if ec>len then
-    local blank_s=math.min(ec,len)
-    local blank_width=sc-blank_s
-    local blank_e = blank_s+blank_width
-    local block_width = ec-blank_e
-    vim.api.nvim_buf_set_extmark(self.bufnr,ns,l,blank_s,{
+   if end_col>len then
+    local blank_start=math.min(end_col,len)
+    local blank_width=start_col-blank_start
+    local block_start=blank_start+math.max(blank_width,0)
+    local block_width=end_col-block_start+1
+    vim.api.nvim_buf_set_extmark(self.bufnr,ns,linenr,blank_start,{
      priority=vim.highlight.priorities.user,
      strict=false,
      virt_text_pos="overlay",
      virt_text={
       {(" "):rep(blank_width)},
-      {(" "):rep(block_width+1+math.min(blank_width,0)),         hl_group},
+      {(" "):rep(block_width),hl_group},
      },
     })
    end
@@ -341,6 +345,14 @@ function RangeMark:exchange(rhs)
  if lhs:is_overlap(rhs) then
   vim.notify(
    "The two selection is overlap, try another region.",
+   vim.log.levels.WARN,
+   {title="RangeMark"}
+  )
+  return false
+ end
+ if lhs:get_height()~=rhs:get_height() then
+  vim.notify(
+   "The height of two selection doesn't match, try another region",
    vim.log.levels.WARN,
    {title="RangeMark"}
   )

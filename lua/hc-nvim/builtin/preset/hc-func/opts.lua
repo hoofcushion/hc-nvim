@@ -13,7 +13,7 @@ end)({
    loopover=360,
   },
   timer={
-   enabled=false,
+   enabled=true,
    loopover=360,
   },
  },

@@ -57,38 +57,43 @@ return {
      return vim.uv.fs_stat(vim.api.nvim_buf_get_name(0)).type
     end,
    })},
-   {Util.when({
-    event="OptionSet",
-    pattern="fileencoding",
-    func=function() return vim.bo.fileencoding end,
-   })},
-   {Util.when({
-    event="OptionSet",
-    pattern="fileformat",
-    func=function() return vim.bo.fileformat end,
-   })},
-   {Util.when({
-    event="OptionSet",
-    pattern="buftype",
-    func=function() return vim.bo.buftype end,
-   })},
-   {Util.when({
-    event="OptionSet",
-    pattern="commentstring",
-    func=function() return vim.bo.commentstring:gsub("%%","%%%%") end,
-   })},
-   {Util.when({
-    event="OptionSet",
-    pattern="expandtab",
-    func=function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end,
-   })},
-   {Util.when({
-    event="OptionSet",
-    pattern="foldenable,foldmethod,foldlevel",
-    func=function()
-     return vim.o.foldenable and ("%s:%d"):format(vim.wo.foldmethod,vim.wo.foldlevel) or ""
+   {
+    function() return vim.bo.fileencoding end,
+    cond=function() return vim.bo.buftype=="" end,
+   },
+   {
+    function() return vim.bo.fileformat end,
+    cond=function() return vim.bo.buftype=="" end,
+   },
+   {
+    function() return vim.bo.buftype end,
+   },
+   {
+    function() return vim.bo.commentstring:gsub("%%","%%%%") end,
+    cond=function() return vim.bo.buftype=="" end,
+   },
+   {
+    Util.when({
+     event="OptionSet",
+     pattern="expandtab",
+     func=function() return ("%s:%s/%s"):format(vim.bo.expandtab and "space" or "tab",vim.bo.shiftwidth,vim.bo.tabstop) end,
+    }),
+    cond=function()
+     return vim.bo.buftype==""
     end,
-   })},
+   },
+   {
+    Util.when({
+     event="OptionSet",
+     pattern="foldenable,foldmethod,foldlevel",
+     func=function()
+      return vim.o.foldenable and ("%s:%d"):format(vim.wo.foldmethod,vim.wo.foldlevel) or ""
+     end,
+    }),
+    cond=function()
+     return vim.bo.buftype==""
+    end,
+   },
    {Util.when({
     event="OptionSet",
     pattern="wrap",
@@ -100,7 +105,7 @@ return {
    --- Lsp
    {
     Util.when({
-     event="LspAttach",
+     event={"LspAttach"},
      func=function()
       local clients=vim.lsp.get_clients({bufnr=0})
       if next(clients)~=nil then
@@ -115,6 +120,9 @@ return {
       return ""
      end,
     }),
+    cond=function()
+     return vim.bo.buftype==""
+    end,
    },
    --- Marks
    {
@@ -154,7 +162,7 @@ return {
       local vl=fn.line("v")
       local vc=fn.virtcol("v")
       return ("%s:%s|%s:%s|%s:%s"):format(
-       vl,vc,cl,cc,math.abs(vl-cl)+1,vmode == "V" and "$" or math.abs(vc-cc)+1
+       vl,vc,cl,cc,math.abs(vl-cl)+1,vmode=="V" and "$" or math.abs(vc-cc)+1
       )
      end
      return ""
