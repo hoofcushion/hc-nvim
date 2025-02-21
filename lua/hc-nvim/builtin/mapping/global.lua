@@ -158,8 +158,9 @@ return {
     name=NS.global_motion_j,
     rhs=(function()
      local hold=Util.Keymod.Hold.create("j",function()
-      -- scroll 10% of the window
-      return tostring(math.max(1,math.floor(vim.o.lines/10))).."j"
+      -- scroll 10% of the buffer, and rounding to the window height
+      return tostring(math.max(1,math.floor(math.min(vim.o.lines,vim.fn.line("$"))/10)))
+       .."j"
      end)
      local inblank=Util.Keymod.InBlank.create(nil,"^")
      return Util.Keymod.Base.create(
@@ -175,8 +176,9 @@ return {
     name=NS.global_motion_k,
     rhs=(function()
      local hold=Util.Keymod.Hold.create("k",function()
-      -- scroll 10% of the window
-      return tostring(math.max(1,math.floor(vim.o.lines/10))).."k"
+      -- scroll 10% of the buffer, and rounding to the window height
+      return tostring(math.max(1,math.floor(math.min(vim.o.lines,vim.fn.line("$"))/10)))
+       .."k"
      end)
      local inblank=Util.Keymod.InBlank.create(nil,"^")
      return Util.Keymod.Base.create(
@@ -191,16 +193,18 @@ return {
    {
     name=NS.global_motion_h,
     rhs=Util.Keymod.Hold.create("h",function()
-     -- move 10% of the line
-     return tostring(math.max(1,math.floor(vim.fn.col("$")/10))).."h"
-    end)
+     -- move 10% of the line, and rounding to the window width
+     return tostring(math.max(1,math.floor(math.min(vim.o.columns,vim.fn.col("$"))/10)))
+      .."h"
+    end),
    },
    {
     name=NS.global_motion_l,
     rhs=Util.Keymod.Hold.create("l",function()
-     -- move 10% of the line
-     return tostring(math.max(1,math.floor(vim.fn.col("$")/10))).."l"
-    end)
+     -- move 10% of the line, and rounding to the window width
+     return tostring(math.max(1,math.floor(math.min(vim.o.columns,vim.fn.col("$"))/10)))
+      .."l"
+    end),
    },
   },
  },
