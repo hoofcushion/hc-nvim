@@ -44,13 +44,13 @@ return {
   {
    {name=NS.global_cmd_nohlsearch,      lhs="<esc>"},
    {name=NS.global_cmd_write,           lhs="<c-s>"},
-   {name=NS.global_escape_terminal,     lhs="<esc>",      mode="t"},
-   {name=NS.global_auto_escape_terminal,lhs="<bs>",       mode="t"},
-   {name=NS.global_delete_right,        lhs="<c-l>",      mode="i"},
+   {name=NS.global_escape_terminal,     lhs="<esc>",                           mode="t"},
+   {name=NS.global_auto_escape_terminal,lhs="<bs>",                            mode="t"},
+   {name=NS.global_delete_right,        lhs="<c-l>",                           mode="i"},
    {name=NS.global_normal_q,            lhs="ge"},
    {name=NS.global_normal_Q,            lhs="gE"},
-   {name=NS.global_edit_break_points,   lhs={",",".",";"},mode="i"},
-   {name=NS.global_visual_indent,       lhs={"<",">"},    mode="x"},
+   {name=NS.global_edit_break_points,   lhs=vim.split(",.;+-=[]{}()#^*&<>",""),mode="i"},
+   {name=NS.global_visual_indent,       lhs={"<",">"},                         mode="x"},
   },
   {
    override={mode={"n","x","o"}},

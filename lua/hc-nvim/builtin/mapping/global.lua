@@ -158,8 +158,13 @@ return {
     name=NS.global_motion_j,
     rhs=(function()
      local hold=Util.Keymod.Hold.create("j",function()
-      -- scroll 10% of the buffer, and rounding to the window height
-      return tostring(math.max(1,math.floor(math.min(vim.o.lines,vim.fn.line("$"))/10)))
+      -- scroll 10% of the buffer, and rounding to the window-buffer height
+      local win_lineend=vim.fn.line("w$")-vim.fn.line("w0")
+      local lineend=vim.fn.line("$")
+      local line=math.min(lineend,win_lineend)-1
+      local step=math.max(1,line/10)
+      step=math.floor(step)
+      return tostring(step)
        .."j"
      end)
      local inblank=Util.Keymod.InBlank.create(nil,"^")
@@ -176,8 +181,13 @@ return {
     name=NS.global_motion_k,
     rhs=(function()
      local hold=Util.Keymod.Hold.create("k",function()
-      -- scroll 10% of the buffer, and rounding to the window height
-      return tostring(math.max(1,math.floor(math.min(vim.o.lines,vim.fn.line("$"))/10)))
+      -- scroll 10% of the buffer, and rounding to the window-buffer height
+      local win_lineend=vim.fn.line("w$")-vim.fn.line("w0")
+      local lineend=vim.fn.line("$")
+      local line=math.min(lineend,win_lineend)-1
+      local step=math.max(1,line/10)
+      step=math.floor(step)
+      return tostring(step)
        .."k"
      end)
      local inblank=Util.Keymod.InBlank.create(nil,"^")
@@ -193,16 +203,26 @@ return {
    {
     name=NS.global_motion_h,
     rhs=Util.Keymod.Hold.create("h",function()
-     -- move 10% of the line, and rounding to the window width
-     return tostring(math.max(1,math.floor(math.min(vim.o.columns,vim.fn.col("$"))/10)))
+     -- move 10% of the line, and rounding to the window-buffer width
+     local offset=vim.fn.wincol()-vim.fn.col(".")
+     local win_colend=vim.fn.getwininfo(vim.fn.win_getid())[1].width-offset
+     local colend=vim.fn.col("$")
+     local col=math.min(win_colend,colend)-1
+     local step=math.max(1,col/10)
+     step=math.floor(step)
+     return tostring(step)
       .."h"
     end),
    },
    {
     name=NS.global_motion_l,
     rhs=Util.Keymod.Hold.create("l",function()
-     -- move 10% of the line, and rounding to the window width
-     return tostring(math.max(1,math.floor(math.min(vim.o.columns,vim.fn.col("$"))/10)))
+     -- move 10% of the line, and rounding to the window-buffer width
+     local offset=vim.fn.wincol()-vim.fn.col(".")
+     local colend=vim.fn.getwininfo(vim.fn.win_getid())[1].width-offset
+     local col=math.min(colend,vim.fn.col("$"))-1
+     local step=math.max(1,math.floor(col/10))
+     return tostring(step)
       .."l"
     end),
    },
