@@ -96,8 +96,8 @@ return {
 
  --- AI
  -- {"zbirenbaum/copilot.lua"},
- -- {"luozhiya/fittencode.nvim",                   event="InsertEnter"},
- {"huggingface/llm.nvim",                       event="InsertEnter"},
+ {"luozhiya/fittencode.nvim",                   event="InsertEnter"},
+ -- {"huggingface/llm.nvim",                       event="InsertEnter"},
 
  --- Git
  {"sindrets/diffview.nvim"},
