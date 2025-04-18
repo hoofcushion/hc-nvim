@@ -1,4 +1,4 @@
----@type mapspec
+
 return {
  {
   override={tags="global"},

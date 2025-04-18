@@ -1,7 +1,6 @@
 ---@module "lazy"
 
 local Events=require("hc-nvim.setup.events")
-local Enter={Events.File,"BufReadPost","BufNewFile","SessionLoadPost"}
 ---@type LazySpec|{
 --- auto: boolean?,
 ---}
@@ -11,6 +10,7 @@ return {
  {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},
  {"folke/noice.nvim",                 event="VimEnter"},
  {"nvim-lualine/lualine.nvim",        event="VimEnter"},
+
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
@@ -19,11 +19,11 @@ return {
  {"folke/which-key.nvim",             event="SafeState"},
 
  --- Information
- {"Bekaboo/dropbar.nvim",             event=Enter},
- {"nvim-ufo",                         event=Enter},
- {"ldelossa/buffertag",               event=Enter},
- {"chentoast/marks.nvim",             event=Enter},
- {"rainbowhxch/beacon.nvim",          event=Enter},
+ {"Bekaboo/dropbar.nvim",             event="VimEnter"},
+ {"nvim-ufo",                         event="VimEnter"},
+ {"ldelossa/buffertag",               event="VimEnter"},
+ {"chentoast/marks.nvim",             event="VimEnter"},
+ {"rainbowhxch/beacon.nvim",          event="VimEnter"},
 
  {"smjonas/live-command.nvim",        event="CmdlineEnter"},
  {"nacro90/numb.nvim",                event="CmdlineEnter"},
@@ -46,7 +46,7 @@ return {
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",              event=Enter,                    main="hc-func",      virtual=true},
+ {"hoofcushion/hc-func",              event="VimEnter",                    main="hc-func",      virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -86,11 +86,11 @@ return {
 
 
  --- Highlighter
- {"NvChad/nvim-colorizer.lua",                  event=Enter},
- {"echasnovski/mini.trailspace",                event=Enter,                         virtual=true},
- {"folke/todo-comments.nvim",                   event=Enter},
- {"nfrid/due.nvim",                             event=Enter},
- {"lukas-reineke/indent-blankline.nvim",        event=Enter},
+ {"NvChad/nvim-colorizer.lua",                  event="VimEnter"},
+ {"echasnovski/mini.trailspace",                event="VimEnter",                         virtual=true},
+ {"folke/todo-comments.nvim",                   event="VimEnter"},
+ {"nfrid/due.nvim",                             event="VimEnter"},
+ {"lukas-reineke/indent-blankline.nvim",        event="VimEnter"},
  -- This werid plugin can't load at "BufEnter"
  {"hiphish/rainbow-delimiters.nvim",            event=Events.FileAdd},
 
@@ -105,7 +105,7 @@ return {
  {"NeogitOrg/neogit"},
  {"kdheepak/lazygit.nvim"},
 
- --- Manager, LSP, Formatter, DAP, Linter
+ --- LSP etc.
  {"williamboman/mason.nvim"},
  {"WhoIsSethDaniel/mason-tool-installer.nvim"},
  {"mfussenegger/nvim-dap"},
@@ -115,12 +115,14 @@ return {
  --- LSP tools
  {"Wansmer/symbol-usage.nvim",                  event="LspAttach"},
  {"SmiteshP/nvim-navbuddy",                     event="LspAttach"},
+
+ -- Neovim develop
  {"folke/lazydev.nvim",                         event=Events.NeoConfig},
 
  --- Treesitter
- {"nvim-treesitter/nvim-treesitter",            event=Enter},
- {"nvim-treesitter/nvim-treesitter-context",    event=Enter},
- {"andymass/vim-matchup",                       event=Enter},
+ {"nvim-treesitter/nvim-treesitter",            event="FileType"},
+ {"nvim-treesitter/nvim-treesitter-context",    event="FileType"},
+ {"andymass/vim-matchup",                       event="FileType"},
  {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
  {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
  {"RRethy/nvim-treesitter-endwise",             event="InsertEnter"},

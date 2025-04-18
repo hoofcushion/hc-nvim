@@ -373,10 +373,7 @@ end
 ---@param mapspec mapspec
 function Interface:add(mapspec)
  local mappings=self.mappings
- local s=Util.clock()
  local mapping=Mapping.new(mapspec)
- local e=Util.clock()
- a=(a or 0)+(e-s)
  --- override
  local name=mapping.name
  if name then
