@@ -20,7 +20,7 @@ return {
 
  --- Information
  {"Bekaboo/dropbar.nvim",             event="VimEnter"},
- {"nvim-ufo",                         event="VimEnter"},
+ {"kevinhwang91/nvim-ufo",            event="VimEnter"},
  {"ldelossa/buffertag",               event="VimEnter"},
  {"chentoast/marks.nvim",             event="VimEnter"},
  {"rainbowhxch/beacon.nvim",          event="VimEnter"},
@@ -46,7 +46,7 @@ return {
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",              event="VimEnter",                    main="hc-func",      virtual=true},
+ {"hoofcushion/hc-func",              event="VimEnter",               main="hc-func",      virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -87,7 +87,7 @@ return {
 
  --- Highlighter
  {"NvChad/nvim-colorizer.lua",                  event="VimEnter"},
- {"echasnovski/mini.trailspace",                event="VimEnter",                         virtual=true},
+ {"echasnovski/mini.trailspace",                event="VimEnter",                    virtual=true},
  {"folke/todo-comments.nvim",                   event="VimEnter"},
  {"nfrid/due.nvim",                             event="VimEnter"},
  {"lukas-reineke/indent-blankline.nvim",        event="VimEnter"},

@@ -889,7 +889,7 @@ function Util.split_at(str,pos)
  return str:sub(1,pos-1),str:sub(pos+1)
 end
 function Util.split_by(str,sep,plain)
- local pos=str:find(sep,plain)
+ local pos=str:find(sep,nil,plain)
  if pos then
   return str:sub(1,pos-1),str:sub(pos+1)
  end
