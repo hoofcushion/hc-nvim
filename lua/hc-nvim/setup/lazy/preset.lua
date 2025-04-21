@@ -90,7 +90,7 @@ local PresetGetter={
   local val
   ---@diagnostic disable-next-line: missing-fields
   val=Plugin._values(plugin,{[field]=orig},field,false)
-  val=Util.Event.parse(val)
+  val=Util.Event._events_normalize(val) or {}
   if orig==nil and next(val)==nil then
    val=nil
   end

@@ -1,50 +1,54 @@
 local Util=require("hc-nvim.util")
 local M={}
-function M.Create(name,events,opts)
- return Util.Event.new(events):create_user_event(name,opts)
-end
---- Take a list of events and trigger a new event when all of them happen.
----@param events string|EventSpec|(string|EventSpec)[]
-function M.AllHappen(events)
- return Util.Event.new(events):all_happen()
-end
-function M.Sequence(events)
- return Util.Event.new(events):sequence()
-end
 function M.RootPattern(pattern)
- return M.Create(
-  "RootPattern: "..table.concat(Util.totable(pattern),", "),
-  {"BufRead"},
-  {trigger=function() return vim.fs.root(0,pattern)~=nil end}
- )
+ return Util.Event.create({
+  name="RootPattern: "..table.concat(Util.totable(pattern),", "),
+  any={
+   event="BufRead",
+   cond=function()
+    return vim.fs.root(0,pattern)~=nil
+   end,
+  },
+ })
 end
 function M.LazyLoad(name)
- return M.Create(
-  "LazyLoad "..name,
-  "User LazyLoad",
-  {
-   trigger=function(ev)
+ return Util.Event.create({
+  name="LazyLoad"..name,
+  any={
+   event="User",
+   pattern="LazyLoad",
+   cond=function(ev)
     return ev.data==name
    end,
-  }
- )
+  },
+ })
 end
-M.NeoConfig=M.Create("NeoConfig","BufEnter",{
- trigger=function(ev)
-  if Util.is_profile(ev.file) then
-   return true
-  end
- end,
+M.NeoConfig=Util.Event.create({
+ name="NeoConfig",
+ any={
+  event={"VimEnter","BufEnter","BufAdd"},
+  cond=function(ev)
+   return Util.is_profile(ev.file)
+  end,
+ },
 })
-M.File=M.Create("File",{"VimEnter","BufEnter","BufAdd"},{
- trigger=function (ev)
-  return vim.uv.fs_stat(ev.file)~=nil
- end
+M.File=Util.Event.create({
+ name="File",
+ any={
+  event={"VimEnter","BufEnter","BufAdd"},
+  cond=function(ev)
+   return vim.uv.fs_stat(ev.file)~=nil
+  end,
+ },
 })
-M.FileAdd=M.Create("FileAdd",{"BufAdd"},{
- trigger=function (ev)
-  return vim.uv.fs_stat(ev.file)~=nil
- end
+M.FileAdd=Util.Event.create({
+ name="FileAdd",
+ any={
+  event="BufAdd",
+  cond=function(ev)
+   return vim.uv.fs_stat(ev.file)~=nil
+  end,
+ },
 })
 -- local t=vim.uv.new_timer()
 -- local cb=function()

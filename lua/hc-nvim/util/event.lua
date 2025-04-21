@@ -1,187 +1,243 @@
-local Util=require("hc-nvim.util")
----@class EventSpec
----@field event string
----@field pattern string[]?
+---
+--- complex event control
+--- all means *all* event happens
+--- any means *any* of the event happens
+--- wait means when all conditions are met, *wait* for a while, then trigger the event
 
---- User LazyDone -> {event="User",pattern={"LazyDone"}}
---- BufEnter *.lua,*.txt -> {event="BufEnter",pattern={"*.lua","*.txt"}}
----@param event string|EventSpec
----@return EventSpec?
-local function parse_event(event)
- if Util.is_empty(event) then
-  return
- end
+if false then
+ ---@class event_t
+ local _event_t={
+  event="filetype",
+  pattern="*.lua", ---@type string|string[]
+  cond=function() return true end, ---@type (fun(ev:vim.api.keyset.create_autocmd.callback_args):boolean?)
+ }
+ ---@class step_opt
+ local _step_opt={
+  wait=0, ---@type integer?
+  delay=5, ---@type integer?
+  group="", ---@type string|integer?
+  name="", ---@type string
+  callback=function() end, ---@type (fun(ev:vim.api.keyset.create_autocmd.callback_args):boolean?)?
+  once=nil, ---@type boolean?
+ }
+ ---@class step_t:step_opt
+ local _step_t={
+  all={}, ---@type event_t[]?
+  any={}, ---@type event_t[]?
+ }
+ ---@class steps_t:step_opt
+ local _steps_t={
+  steps={}, ---@type step_t[]
+ }
+end
+local Event={}
+---@param event string|event_t
+---@return event_t
+function Event._event_normalize(event)
  if type(event)=="string" then
-  local pos=event:find(" ")
-  if pos then
-   local e,p=Util.split_at(event,pos)
-   event={event=e,pattern=vim.split(p,",")}
-  else
-   event={event=event}
-  end
+  local _=vim.split(event," ")
+  local event_t={
+   event=_[1],
+   pattern=_[2] and _[2]~="" and vim.split(_[2],",") or nil,
+  }
+  return event_t
  end
  return event
 end
----@class Event
----@field specs EventSpec[]
-local Event={
- specs={},
-}
----@param events string|EventSpec|(string|EventSpec)[]?
----@return Event
-function Event.new(events)
- local obj=Util.Class.new(Event)
- obj.specs={}
- if events then
-  obj:extend(events)
+---@param events string|string[]|event_t|event_t[]
+---@return event_t[]?
+function Event._events_normalize(events)
+ -- string
+ if type(events)=="string" then
+  local event_t=Event._event_normalize(events)
+  return {event_t}
  end
- return obj
-end
----@param event string|EventSpec|string[]|EventSpec[]
----@return EventSpec[]
-function Event.parse(event)
- if type(event)=="string"
- or type(event)=="table" and event[1]==nil
- then
-  event={event}
- end
- local ret={}
- for _,v in ipairs(event) do
-  table.insert(ret,parse_event(v) or nil)
- end
- return ret
-end
----@param spec string|EventSpec
-function Event:add(spec)
- table.insert(self.specs,spec)
-end
----@param events string|EventSpec|(string|EventSpec)[]
-function Event:extend(events)
- for _,spec in ipairs(Event.parse(events)) do
-  self:add(spec)
- end
-end
-local function stack_callback(callback,any,id)
- return function(ev)
-  local done=callback(ev)
-  if done and any then
-   vim.api.nvim_del_augroup_by_id(id)
-  end
-  return done
- end
-end
-local function get_group_id(group)
- if type(group)=="number" then
-  return group
- end
- if group==nil then
-  group="Unnamed: "..tostring(Util.clock())
- end
- return vim.api.nvim_create_augroup(group,{clear=true})
-end
-function Event:create_autocmd(opts,any)
- opts=opts~=nil and vim.deepcopy(opts) or {}
- if any then
-  local id=get_group_id(opts.group)
-  opts.group=id
-  opts.callback=stack_callback(opts.callback,any,id)
- end
- for event,pattern in self:pairs() do
-  opts.pattern=pattern
-  vim.api.nvim_create_autocmd(event,opts)
- end
-end
-function Event:lazyevents()
- return vim.deepcopy(self.specs)
-end
-function Event:pairs()
- local i=0
- local specs=self.specs
- return function()
-  i=i+1
-  local spec=specs[i]
-  if spec then
-   return spec.event,spec.pattern
-  end
- end
-end
-function Event:getname(group)
- local cat={}
- for event,pattern in self:pairs() do
-  local name=event
-  if pattern then
-   name=name.." "..table.concat(pattern,", ")
-  end
-  table.insert(cat,name)
- end
- local ret=table.concat(cat,"; ")
- if group then
-  ret=("%s: %s"):format(group,ret)
- end
- return ret
-end
----@param name string
----@param opts {clear:boolean,once:boolean,trigger:fun(ev):boolean?}
----@return EventSpec
-function Event:create_user_event(name,opts)
- if opts==nil then
-  opts={}
- end
- if opts.trigger==nil then
-  opts.trigger=function(_) return true end
- end
- local id=get_group_id(name)
- self:create_autocmd({
-  group=id,
-  callback=function(event)
-   local ok=opts.trigger(event)
-   if ok then
-    vim.api.nvim_exec_autocmds("User",{pattern=name})
-    if opts.clear then
-     vim.api.nvim_del_augroup_by_id(id)
-    end
+ if type(events)=="table" then
+  -- list
+  if events[1]~=nil then
+   local event_list={}
+   for _,event in ipairs(events) do
+    table.insert(event_list,Event._event_normalize(event))
    end
-   if ok and opts.once then
-    return true
-   end
-  end,
- })
- return {event="User",pattern=name}
+   return event_list
+  elseif next(events)~=nil then
+   -- event_t
+   return {events}
+  end
+ end
 end
----@param specs EventSpec[]
----@param name string
-local function sequence(specs,name)
- local spec=table.remove(specs,1)
- if spec==nil then
-  vim.api.nvim_exec_autocmds("User",{pattern=name})
+---@param step_t step_t
+function Event._step_normalize(step_t)
+ step_t=step_t or {}
+ step_t.name=step_t.name or tostring({})
+ local group=step_t.group
+ if type(group)=="string" then
+  step_t.group=vim.api.nvim_create_augroup(group,{clear=true})
+ end
+ if step_t.all then
+  step_t.all=Event._events_normalize(step_t.all)
+ end
+ if step_t.any then
+  step_t.any=Event._events_normalize(step_t.any)
+ end
+ return step_t
+end
+---@param steps_t steps_t
+function Event.steps_t_normalize(steps_t)
+ steps_t=steps_t or {}
+ steps_t.steps=steps_t.steps or {}
+ steps_t.name=steps_t.name or tostring({})
+ local group=steps_t.group
+ if type(group)=="string" then
+  steps_t.group=vim.api.nvim_create_augroup(group,{clear=true})
+ end
+ for i,v in ipairs(steps_t) do
+  steps_t[i]=Event._step_normalize(v)
+ end
+ return steps_t
+end
+---@param step_t step_t
+function Event.create(step_t)
+ step_t=Event._step_normalize(step_t)
+ if step_t.delay then
+  vim.defer_fn(function()
+                local _step_t=vim.deepcopy(step_t)
+                _step_t.delay=nil
+                Event.create(_step_t)
+               end,step_t.delay)
   return
  end
- Event.new(spec):create_autocmd({
-  once=true,
-  callback=function()
-   sequence(specs,name)
-  end,
- })
-end
----@return EventSpec
-function Event:sequence()
- local name=self:getname("Sequence")
- sequence(vim.deepcopy(self.specs),name)
- return {event="User",pattern=name}
-end
-function Event:all_happen(opts)
- opts=opts or {}
- local name=self:getname("AllHappen")
- local done={}
- for event in self:pairs() do
-  done[event]=true
- end
- opts.trigger=function(ev)
-  done[ev.event]=nil
-  if next(done)==nil then
-   return true
+ local rests=0
+ -- any
+ if step_t.any then
+  rests=rests+1
+  local ids={}
+  for _,v in ipairs(step_t.any) do
+   local id=vim.api.nvim_create_autocmd(v.event,{
+    group=step_t.group,
+    pattern=v.pattern,
+    callback=function(ev)
+     if type(v.cond)~="function" or v.cond(ev) then
+      rests=rests-1
+      if rests<=0 then
+       vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
+      end
+      -- clear all ids
+      for _,id in ipairs(ids) do
+       vim.api.nvim_del_autocmd(id)
+      end
+      return true
+     end
+    end,
+   })
+   table.insert(ids,id)
   end
  end
- return self:create_user_event(name,opts)
+ -- all
+ if step_t.all then
+  rests=rests+#step_t.all
+  for _,v in ipairs(step_t.all) do
+   vim.api.nvim_create_autocmd(v.event,{
+    group=step_t.group,
+    pattern=v.pattern,
+    callback=function(ev)
+     if type(v.cond)~="function" or v.cond(ev) then
+      rests=rests-1
+      if rests<=0 then
+       vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
+      end
+      return true
+     end
+    end,
+   })
+  end
+ end
+ vim.api.nvim_create_autocmd("User",{
+  group=step_t.group,
+  pattern=step_t.name,
+  callback=function(ev)
+   if step_t.callback then
+    if step_t.wait then
+     vim.defer_fn(function()
+                   step_t.callback(ev)
+                  end,step_t.wait)
+    else
+     step_t.callback(ev)
+    end
+   end
+   if not step_t.once then
+    Event.create(step_t)
+   end
+   return true
+  end,
+ })
+ return {event="User",pattern=step_t.name}
 end
+---@param steps_t steps_t
+function Event.sequence(steps_t)
+ steps_t=Event.steps_t_normalize(steps_t)
+ -- Handle delay if specified
+ if steps_t.delay then
+  vim.defer_fn(function()
+                local _steps=vim.deepcopy(steps_t)
+                _steps.delay=nil
+                Event.sequence(_steps)
+               end,steps_t.delay)
+  return
+ end
+ local i,e=1,#steps_t.steps
+ -- Function to process the next step
+ local function process_next_step()
+  local step=vim.deepcopy(steps_t.steps[i])
+  local callback=step.callback
+  step.group=steps_t.group
+  step.once=true
+  step.callback=function(ev)
+   if type(callback)=="function" then
+    callback(ev)
+   end
+   i=i+1
+   if i>e then
+    if steps_t.callback then
+     if steps_t.wait then
+      vim.defer_fn(function()
+                    steps_t.callback(ev)
+                   end,steps_t.wait)
+     else
+      steps_t.callback(ev)
+     end
+    end
+    if not steps_t.once then
+     Event.sequence(steps_t)
+    end
+   else
+    process_next_step()
+   end
+   return true
+  end
+  -- Create the current step
+  Event.create(step)
+ end
+ -- Start processing the first step
+ process_next_step()
+end
+-- local event2=Eventx.sequence({
+--  steps={
+--   {
+--    delay=1000,
+--    any={"cursormoved","cursormovedi"},
+--    name="composite",
+--    callback=function() print(1) end,
+--   },
+--   {
+--    delay=1000,
+--    any={"cursormoved","cursormovedi"},
+--    name="composite",
+--    callback=function() print(2) end,
+--   },
+--  },
+--  group="Sequence",
+--  name="Sequence",
+--  once=false,
+-- })
 return Event
