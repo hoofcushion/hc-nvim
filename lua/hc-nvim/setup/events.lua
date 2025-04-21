@@ -4,9 +4,9 @@ function M.RootPattern(pattern)
  return Util.Event.create({
   name="RootPattern: "..table.concat(Util.totable(pattern),", "),
   any={
-   event="BufRead",
-   cond=function()
-    return vim.fs.root(0,pattern)~=nil
+   event="BufEnter",
+   cond=function(ev)
+    return ev.file~="" and vim.fs.root(0,pattern)~=nil
    end,
   },
  })
@@ -37,7 +37,7 @@ M.File=Util.Event.create({
  any={
   event={"VimEnter","BufEnter","BufAdd"},
   cond=function(ev)
-   return vim.uv.fs_stat(ev.file)~=nil
+   return ev.file~=""
   end,
  },
 })
@@ -46,7 +46,7 @@ M.FileAdd=Util.Event.create({
  any={
   event="BufAdd",
   cond=function(ev)
-   return vim.uv.fs_stat(ev.file)~=nil
+   return ev.file~=""
   end,
  },
 })

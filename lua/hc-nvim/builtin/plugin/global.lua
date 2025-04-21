@@ -19,11 +19,11 @@ return {
  {"folke/which-key.nvim",             event="SafeState"},
 
  --- Information
- {"Bekaboo/dropbar.nvim",             event="VimEnter"},
- {"kevinhwang91/nvim-ufo",            event="VimEnter"},
- {"ldelossa/buffertag",               event="VimEnter"},
- {"chentoast/marks.nvim",             event="VimEnter"},
- {"rainbowhxch/beacon.nvim",          event="VimEnter"},
+ {"Bekaboo/dropbar.nvim",             event=Events.File},
+ {"kevinhwang91/nvim-ufo",            event=Events.File},
+ {"ldelossa/buffertag",               event=Events.File},
+ {"chentoast/marks.nvim",             event=Events.File},
+ {"rainbowhxch/beacon.nvim",          event=Events.File},
 
  {"smjonas/live-command.nvim",        event="CmdlineEnter"},
  {"nacro90/numb.nvim",                event="CmdlineEnter"},
@@ -46,7 +46,7 @@ return {
  {"gbprod/yanky.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",              event="VimEnter",               main="hc-func",      virtual=true},
+ {"hoofcushion/hc-func",              event=Events.File,              main="hc-func",      virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -86,13 +86,13 @@ return {
 
 
  --- Highlighter
- {"NvChad/nvim-colorizer.lua",                  event="VimEnter"},
- {"echasnovski/mini.trailspace",                event="VimEnter",                    virtual=true},
- {"folke/todo-comments.nvim",                   event="VimEnter"},
- {"nfrid/due.nvim",                             event="VimEnter"},
- {"lukas-reineke/indent-blankline.nvim",        event="VimEnter"},
+ {"NvChad/nvim-colorizer.lua",                  event=Events.File},
+ {"echasnovski/mini.trailspace",                event=Events.File,                   virtual=true},
+ {"folke/todo-comments.nvim",                   event=Events.File},
+ {"nfrid/due.nvim",                             event=Events.File},
+ {"lukas-reineke/indent-blankline.nvim",        event=Events.File},
  -- This werid plugin can't load at "BufEnter"
- {"hiphish/rainbow-delimiters.nvim",            event=Events.FileAdd},
+ {"hiphish/rainbow-delimiters.nvim",            event=Events.File},
 
  --- AI
  -- {"zbirenbaum/copilot.lua"},

@@ -86,7 +86,7 @@ end
 ---@field override mapspec?
 ---@field [integer] mapspec?
 local Mapspec={
- wkspec={}, ---@type table
+ wkspec={}, ---@type table?
  ---
  cond=nil, ---@type nil|function|boolean
  fallback=nil, ---@type nil|boolean
@@ -159,7 +159,9 @@ function Mapping.new(spec)
  obj.fallback=spec.fallback
  if not Util.is_empty(spec.tags) then
   local tags=Util.to_fat_table(spec.tags)
-  obj.tags=Util.tbl_to_set(tags)
+  if tags then
+   obj.tags=Util.tbl_to_set(tags)
+  end
  end
  if spec.index then
   obj.key_as_lhs=spec.key_as_lhs
