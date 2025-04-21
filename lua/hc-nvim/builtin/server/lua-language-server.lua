@@ -524,7 +524,7 @@ local default_settings={
   userThirdParty={},
  },
 }
----@type table<string,lua-language-server.configs>
+---@type table<string,lua-language-server.configs|{}>
 local Settings={}
 Settings.normal={
  completion={
@@ -635,20 +635,17 @@ Settings.neovim=Util.tbl_extend({},Settings.normal,{
  },
  workspace={
   library={
-   vim.env.VIMRUNTIME,
+   vim.fs.normalize(vim.fs.joinpath(vim.env.VIMRUNTIME,"lua","vim")),
    "${3rd}/luv/library",
    "${3rd}/busted/library",
   },
  },
 })
-local function get_config()
- if Util.is_profile(vim.fn.getcwd()) then
+local function get_config(cwd)
+ if Util.is_profile(cwd) then
   return Settings.neovim
  end
  return Settings.normal
-end
-local function set_config(client,config)
- client.config.settings.Lua=config
 end
 local M={}
 M.cmd={
@@ -662,11 +659,18 @@ M.settings={
  Lua=Settings.normal,
 }
 M.on_init=function(client)
- set_config(client,get_config())
- vim.api.nvim_create_autocmd({"DirChanged","SessionLoadPost"},{
-  callback=function()
-   set_config(client,get_config())
-  end,
+ local cur_dir=vim.fn.getcwd()
+ local last_dir
+ local function setconfig()
+  cur_dir=vim.fn.getcwd()
+  if cur_dir~=last_dir then
+   client.config.settings.Lua=get_config(cur_dir)
+   last_dir=cur_dir
+  end
+ end
+ vim.api.nvim_create_autocmd("BufRead",{
+  callback=setconfig,
  })
+ setconfig()
 end
 return M

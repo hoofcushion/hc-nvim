@@ -104,20 +104,6 @@ end
 for k,v in pairs(SetupMaker) do
  SetupMaker[k]=Util.Cache.create(v)
 end
-local function lazy_setup(filetypes,setup)
- if filetypes~=nil
- and next(filetypes)~=nil
- and not vim.tbl_contains(filetypes,vim.bo.filetype)
- then
-  vim.api.nvim_create_autocmd("FileType",{
-   once=true,
-   pattern=filetypes,
-   callback=setup,
-  })
- else
-  setup()
- end
-end
 local ConfigTab=Util.Cache.table(function(modname)
  local info=Util.find_mod(
   ("hc-nvim.user.server.%s"):format(modname),
@@ -128,10 +114,11 @@ local ConfigTab=Util.Cache.table(function(modname)
  end
 end)
 local TypeTab=Util.Cache.table(function(name)
- return Presets.lsp(name) and "lsp"
+ local ret=Presets.lsp(name) and "lsp"
   or Presets.null_ls(name) and "null_ls"
   or Presets.dap(name) and "dap"
   or nil
+ return ret
 end)
 local Handler={}
 local setuped={}
@@ -143,10 +130,7 @@ function Handler.load(spec)
  setuped[setup_name]=true
  local ls_type=TypeTab[setup_name]
  if ls_type then
-  local preset=Presets[ls_type](setup_name)
-  lazy_setup(preset.filetypes,function()
-   SetupMaker[ls_type](setup_name)(ConfigTab[spec.name])
-  end)
+  SetupMaker[ls_type](setup_name)(ConfigTab[spec.name])
  end
 end
 return Handler

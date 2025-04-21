@@ -54,13 +54,13 @@ function LinkedList:tolist()
  end
  return list
 end
-local l=LinkedList.new(0)
-for i=1,9 do
- l:append(i)
-end
-l:truncate(8)
-l:remove(4)
-assert(table.concat(l:tolist(),"->")=="0->1->2->3->5->6->7")
+-- local l=LinkedList.new(0)
+-- for i=1,9 do
+--  l:append(i)
+-- end
+-- l:truncate(8)
+-- l:remove(4)
+-- assert(table.concat(l:tolist(),"->")=="0->1->2->3->5->6->7")
 -- local _mappings={}
 -- local mapping={}
 -- function mapping.add(mode,lhs,rhs,opts)
@@ -100,3 +100,4 @@ assert(table.concat(l:tolist(),"->")=="0->1->2->3->5->6->7")
 -- function mapping.set(mode,lhs,rhs,opts)
 --  mapping.add(mode,lhs,rhs,opts)
 -- end
+return LinkedList

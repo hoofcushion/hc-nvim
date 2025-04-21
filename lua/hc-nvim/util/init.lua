@@ -229,6 +229,9 @@ local _pattern={
  vim.fn.stdpath("config") --[[@as string]],
  vim.fn.stdpath("data") --[[@as string]],
 }
+--- Tells current file is or not part of  neovim profile
+---@param file string
+---@return boolean
 function Util.is_profile(file)
  file=string.lower(file)
  for _,v in ipairs(_pattern) do
@@ -236,6 +239,7 @@ function Util.is_profile(file)
    return true
   end
  end
+ return false
 end
 function Util.get_size(id)
  if type(id)=="number" then
