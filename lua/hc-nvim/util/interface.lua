@@ -1,13 +1,6 @@
 local api=vim.api
 local Util=require("hc-nvim.util")
---- custom mapping util
-local Keymap={}
----@param mode string
----@param lhs string
----@param rhs string
----@param opts vim.api.keyset.keymap
----@param buffer integer?
-local function set(buffer,mode,lhs,rhs,opts)
+local function _set(buffer,mode,lhs,rhs,opts)
  --- HACK: Work-around for nvim_buf_del_keymap
  rhs=rhs.."<ignore>"
  if buffer~=nil then
@@ -16,21 +9,12 @@ local function set(buffer,mode,lhs,rhs,opts)
  end
  api.nvim_set_keymap(mode,lhs,rhs,opts)
 end
-local function mkp(buffer,m,l,r,opts)
- local cb=opts.callback
- opts.callback=function()
-  return cb(l)
+local function _del(buffer,mode,lhs)
+ if buffer~=nil then
+  api.nvim_buf_del_keymap(buffer,mode,lhs)
+  return
  end
-end
-local function mkfb(buffer,m,l,r,opts)
- local keys=api.nvim_replace_termcodes(l,true,false,true)
- local cb=opts.callback
- opts.callback=function()
-  local ret=cb()
-  if not ret then
-   api.nvim_feedkeys(keys,"n",false)
-  end
- end
+ api.nvim_del_keymap(mode,lhs)
 end
 ---@param buffer integer?
 ---@param mode string|string[]
@@ -38,7 +22,7 @@ end
 ---@param rhs string|function
 ---@param opts vim.keymap.set.Opts
 ---@param fallback boolean?
-function Keymap.set(buffer,mode,lhs,rhs,opts,fallback)
+local function keymap_set(buffer,mode,lhs,rhs,opts,fallback)
  if opts.expr==true and opts.replace_keycodes==nil then
   opts.replace_keycodes=true
  end
@@ -53,32 +37,37 @@ function Keymap.set(buffer,mode,lhs,rhs,opts,fallback)
     opts.callback=_rhs
     _rhs=""
    end
-   if opts.callback then
+   local cb=opts.callback
+   if cb then
     if opts.expr then
-     mkp(buffer,_mode,_lhs,_rhs,opts)
+     local _cb=cb
+     cb=function()
+      return _cb(_lhs)
+     end
     end
     if fallback then
-     mkfb(buffer,_mode,_lhs,_rhs,opts)
+     local _cb=cb
+     local keys=api.nvim_replace_termcodes(_lhs,true,false,true)
+     cb=function()
+      local ret=_cb()
+      if not ret then
+       api.nvim_feedkeys(keys,"n",false)
+      end
+     end
     end
+    opts.callback=cb
    end
-   set(buffer,_mode,_lhs,_rhs,opts)
+   _set(buffer,_mode,_lhs,_rhs,opts)
   end
  end
-end
-local function del(buffer,mode,lhs)
- if buffer~=nil then
-  api.nvim_buf_del_keymap(buffer,mode,lhs)
-  return
- end
- api.nvim_del_keymap(mode,lhs)
 end
 ---@param buffer integer?
 ---@param mode string|string[]
 ---@param lhs string|string[]
-function Keymap.del(buffer,mode,lhs)
+local function keymap_del(buffer,mode,lhs)
  for _,l in Util.pipairs(lhs) do
   for _,m in Util.pipairs(mode) do
-   pcall(del,buffer,m,l)
+   pcall(_del,buffer,m,l)
   end
  end
 end
@@ -178,13 +167,15 @@ function Mapping.new(spec)
   end
   obj.lhs=Util.to_fat_table(lhs)
  end
- if spec.rhs or spec.cmd then
-  obj.rhs=spec.rhs or spec.cmd and ("<cmd>"..spec.cmd.."<cr>")
+ if spec.rhs then
+  obj.rhs=spec.rhs
+ elseif spec.cmd then
+  obj.rhs="<cmd>"..spec.cmd.."<cr>"
  end
  obj.opts=spec.opts and Util.tbl_extend({},Mapping.opts,spec.opts) or Util.deepcopy(Mapping.opts)
  local desc=spec.desc or (obj.name and Util.I18n.get({"mapdesc",obj.name}) or (tostring(obj.rhs)))
  obj.opts.desc=desc
- if spec.event or spec.pattern then
+ if spec.event then
   obj.event=Util.to_fat_table(spec.event)
   obj.pattern=Util.to_fat_table(spec.pattern)
   obj.buffer=spec.buffer
@@ -202,7 +193,7 @@ function Mapping:is_active()
  return self.autocmd_id~=nil or next(self.instances)~=nil
 end
 function Mapping:is_lazykey()
- return self.lazykey and vim.F.if_nil(self.name,self.index,self.value,self.tags)~=nil
+ return self.lazykey and (self.name~=nil or self.index~=nil or self.value~=nil or self.tags~=nil)
 end
 ---@param mapping Mapping
 function Mapping:override(mapping)
@@ -235,10 +226,6 @@ function Mapping:start(buffer)
     self:set(self.buffer and ev.buf or nil)
    end,
   })
-  --- WARN: Will trigger other filetype autocmds
-  if event=="FileType" and vim.bo.filetype~="" then
-   vim.bo.filetype=vim.bo.filetype
-  end
   return
  end
  self:set(buffer)
@@ -255,14 +242,18 @@ function Mapping:set(buffer)
   return
  end
  local lhs=self.lhs
- if lhs==nil then return end
+ if lhs==nil then
+  return
+ end
  local rhs=self.rhs
- if rhs==nil then return end
+ if rhs==nil then
+  return
+ end
  if buffer~=nil then
   if buffer==false then buffer=nil end
   if buffer==true then buffer=0 end
  end
- Keymap.set(
+ keymap_set(
   buffer,
   self.mode,
   lhs,
@@ -270,19 +261,15 @@ function Mapping:set(buffer)
   self.opts,
   self.fallback
  )
- self.instances[{}]={buffer,self.mode,lhs}
+ table.insert(self.instances,{buffer,self.mode,lhs})
 end
 function Mapping:del()
  if next(self.instances)==nil then
   return
  end
- for _,spec in pairs(self.instances) do
+ for _,spec in ipairs(self.instances) do
   local buffer,mode,lhs=spec[1],spec[2],spec[3]
-  Keymap.del(
-   buffer,
-   mode,
-   lhs
-  )
+  keymap_del(buffer,mode,lhs)
  end
  self.instances={}
 end
@@ -327,6 +314,7 @@ local Interface={
 }
 Interface.wkspec={}
 ---@param mapspecs mapspec?
+---@return KeymapInterface
 function Interface.new(mapspecs)
  local obj=Util.Class.new(Interface)
  obj.index={}
@@ -337,6 +325,7 @@ function Interface.new(mapspecs)
  return obj
 end
 ---@param tag any
+---@return KeymapInterface
 function Interface:export(tag)
  local obj=Interface.new()
  if tag then
@@ -380,7 +369,7 @@ function Interface:add(mapspec)
  local name=mapping.name
  if name then
   local exist=mappings[name]
-  if exist~=nil then
+  if exist then
    exist:override(mapping)
    mapping=exist
   end

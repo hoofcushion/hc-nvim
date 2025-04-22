@@ -7,11 +7,11 @@ local Events=require("hc-nvim.setup.events")
 return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",            lazy=false},
- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},
+ -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snakcs.nvim
  {"folke/noice.nvim",                 event="VimEnter"},
  {"nvim-lualine/lualine.nvim",        event="VimEnter"},
 
- {"rcarriga/nvim-notify"},
+ -- {"rcarriga/nvim-notify"}, -- replaced by snakcs.nvim
  {"stevearc/dressing.nvim"},
 
  {"echasnovski/mini.nvim"},
@@ -37,6 +37,7 @@ return {
  {"echasnovski/mini.ai",              virtual=true},
  {"echasnovski/mini.operators",       virtual=true},
  {"folke/flash.nvim"},
+ {"folke/snacks.nvim",                lazy=false},
 
  --- Edit
  {"hoofcushion/hc-substitute",        virtual=true},
@@ -50,7 +51,6 @@ return {
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
- {"folke/zen-mode.nvim"},
  {"glepnir/dbsession.nvim"},
  {"nvim-neo-tree/neo-tree.nvim",      ft="directory"},
  -- {"nvim-telescope/telescope-file-browser.nvim", lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},

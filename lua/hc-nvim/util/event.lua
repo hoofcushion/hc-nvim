@@ -97,6 +97,7 @@ function Event.steps_t_normalize(steps_t)
  return steps_t
 end
 ---@param step_t step_t
+---@return event_t
 function Event.create(step_t)
  step_t=Event._step_normalize(step_t)
  if step_t.delay then
@@ -105,7 +106,7 @@ function Event.create(step_t)
                 _step_t.delay=nil
                 Event.create(_step_t)
                end,step_t.delay)
-  return
+  return {event="User",pattern=step_t.name}
  end
  local rests=0
  -- any
@@ -174,6 +175,7 @@ function Event.create(step_t)
  return {event="User",pattern=step_t.name}
 end
 ---@param steps_t steps_t
+---@return event_t
 function Event.sequence(steps_t)
  steps_t=Event.steps_t_normalize(steps_t)
  -- Handle delay if specified
@@ -183,7 +185,7 @@ function Event.sequence(steps_t)
                 _steps.delay=nil
                 Event.sequence(_steps)
                end,steps_t.delay)
-  return
+  return {event="User",pattern=steps_t.name}
  end
  local i,e=1,#steps_t.steps
  -- Function to process the next step

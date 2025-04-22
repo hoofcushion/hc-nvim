@@ -1,6 +1,5 @@
 local Util=require("hc-nvim.util")
-local TaskSequence={
-}
+local TaskSequence={}
 if false then
  TaskSequence.timer=vim.uv.new_timer() or error()
 end

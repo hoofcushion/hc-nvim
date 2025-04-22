@@ -81,7 +81,7 @@ return {
   },
   lualine_c={
    "filesize",
-   {Util.when({event="OptionSet",pattern="filetype",func=function() return vim.bo.filetype end})},
+   {Util.when({event="OptionSet",func=function() return vim.bo.filetype end})},
    {Util.when({
     event={"BufReadPost","BufNewFile"},
     func=function()

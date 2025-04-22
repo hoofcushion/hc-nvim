@@ -1,7 +1,26 @@
-local Util=require("hc-nvim.util")
-return Util.pipe({})(function(x)
- if require("hc-nvim.config").locale.current.language=="zh" then
-  local headers={[[
+local Config=require("hc-nvim.config")
+local Rsc=require("hc-nvim.rsc")
+if vim.env.PROF then
+ -- example for lazy.nvim
+ -- change this to the correct path for your plugin manager
+ local snacks=vim.fn.stdpath("data").."/lazy/snacks.nvim"
+ vim.opt.rtp:append(snacks)
+ require("snacks.profiler").startup({
+  startup={
+   event="SafeState",
+  },
+ })
+end
+return {
+ bigfile={enabled=true},
+ bufdelete={enabled=true},
+ dashboard={
+  enabled=vim.fn.argc()==0,
+  preset={
+
+   header=(function()
+    if Config.locale.current.language=="zh" then
+     return ({[[
 ⣠⠀⠀⣶⠀⢠⡄⠀⣤⠀⠀⣶⠀⢰⡗⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⣶⡀⠀⠀⠀⣴⡗⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⢿⣄⠀⣿⢀⣸⡇⠀⢻⣆⣠⣿⣠⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠀⠀⢸⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⣿⠋⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⣠⣴⠶⠶⠿⠿⠿⠿⠿⠿⠿⠷⠂
 ⠈⠙⠛⣿⠛⠉⠀⠀⠀⠉⠙⣿⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⡾⠃⠀⠀⠸⠿⣶⣦⣤⣤⡀⠀⠀⠀⠀⠀⠲⠿⠿⣿⠿⠿⠿⠃⠀⠀⠀⢿⣆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⠏⠀⠀⢀⣀⣀⣀⣀⣀⣀⡀⠀⠀
@@ -34,13 +53,38 @@ return Util.pipe({})(function(x)
 ⠀⠀⠛⠀⠀⠈⣿⠀⠀⠸⠃⠀⠀⣼⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡆⠀⠀⠀⠀⠀⠀⠘⠛⠛⠛⠛⠛⠛⠛⠉⠉⠉⠉⠉⠙⠛⠛⠛
 ⠀⠀⠀⠀⠀⠀⠟⠀⠀⠀⠀⠀⠀⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-]]}
-  Util.tbl_deep_extend(x,{
-   config={
-    header=vim.split(headers[math.random(#headers)],"\n"),
-    footer={},
-   },
-  })
- end
- return x
-end)()
+]]})[math.random(1,2)]
+    end
+   end)(),
+
+  },
+  sections={
+   {section="header"},
+   {section="keys",gap=1},
+   {gap=1},
+   {icon=" ",title="Recent Files",section="recent_files",indent=1,padding=2},
+   {icon=" ",title="Projects",section="projects",indent=1,padding=2},
+   {section="startup"},
+  },
+ },
+ image={enabled=true},
+ input={enabled=true},
+ picker={enabled=true},
+ notifier={
+  enabled=true,
+  icons=Rsc.sign[Config.ui.sign],
+  style="minimal",
+  top_down=false,
+ },
+ profiler={enabled=true},
+ quickfile={enabled=true},
+ styles={
+  blame_line={border=Rsc.border[Config.ui.border]},
+  input={border=Rsc.border[Config.ui.border]},
+  notification={border=Rsc.border[Config.ui.border]},
+  notification_history={border=Rsc.border[Config.ui.border]},
+  scratch={border=Rsc.border[Config.ui.border]},
+  snacks_image={border=Rsc.border[Config.ui.border]},
+ },
+ words={enabled=true},
+}

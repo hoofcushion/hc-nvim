@@ -1,10 +1,8 @@
 --- Lazy load each util prevent loop require
 local Util=require("hc-nvim.util.lazy_tab").create({
  Autocmd     ="hc-nvim.util.autocmd",
- BufferCache ="hc-nvim.util.buffercache",
  Cache       ="hc-nvim.util.cache",
  Class       ="hc-nvim.util.class",
- Clock       ="hc-nvim.util.clock",
  Color       ="hc-nvim.util.color",
  Event       ="hc-nvim.util.event",
  Fallback    ="hc-nvim.util.fallback",
@@ -16,7 +14,6 @@ local Util=require("hc-nvim.util.lazy_tab").create({
  Keymod      ="hc-nvim.util.keymod",
  Lazy        ="hc-nvim.util.lazy",
  LazyTab     ="hc-nvim.util.lazy_tab",
- LinkedList  ="hc-nvim.util.linked_list",
  LocalEnv    ="hc-nvim.util.local_env",
  ModTree     ="hc-nvim.util.mod_tree",
  Option      ="hc-nvim.util.option",
@@ -27,16 +24,13 @@ local Util=require("hc-nvim.util.lazy_tab").create({
  TaskSequence="hc-nvim.util.task_sequence",
  TimeUsed    ="hc-nvim.util.time_used",
  Timer       ="hc-nvim.util.timer",
- UniqueList  ="hc-nvim.util.unique_list",
  Wrapper     ="hc-nvim.util.wrapper",
 })
 if false then
  Util={
   Autocmd     =require("hc-nvim.util.autocmd"),
-  BufferCache =require("hc-nvim.util.buffercache"),
   Cache       =require("hc-nvim.util.cache"),
   Class       =require("hc-nvim.util.class"),
-  Clock       =require("hc-nvim.util.clock"),
   Color       =require("hc-nvim.util.color"),
   Event       =require("hc-nvim.util.event"),
   Fallback    =require("hc-nvim.util.fallback"),
@@ -48,7 +42,6 @@ if false then
   Keymod      =require("hc-nvim.util.keymod"),
   Lazy        =require("hc-nvim.util.lazy"),
   LazyTab     =require("hc-nvim.util.lazy_tab"),
-  LinkedList  =require("hc-nvim.util.linked_list"),
   LocalEnv    =require("hc-nvim.util.local_env"),
   ModTree     =require("hc-nvim.util.mod_tree"),
   Option      =require("hc-nvim.util.option"),
@@ -59,7 +52,6 @@ if false then
   TaskSequence=require("hc-nvim.util.task_sequence"),
   TimeUsed    =require("hc-nvim.util.time_used"),
   Timer       =require("hc-nvim.util.timer"),
-  UniqueList  =require("hc-nvim.util.unique_list"),
   Wrapper     =require("hc-nvim.util.wrapper"),
  }
 end
