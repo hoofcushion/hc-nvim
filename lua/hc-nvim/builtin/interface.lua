@@ -1,4 +1,3 @@
-
 return {
  {
   override={tags="global"},
@@ -129,6 +128,17 @@ return {
  {name=NS.global_motion_b},
  {name=NS.global_motion_e},
  {name=NS.global_motion_w},
+},{
+
+ override={tags="dial"},
+ {name=NS.dial_increment,    lhs="<c-a>", mode="n"},
+ {name=NS.dial_decrement,    lhs="<c-x>", mode="n"},
+ {name=NS.dial_increment_g,  lhs="g<c-a>",mode="n"},
+ {name=NS.dial_decrement_g,  lhs="g<c-x>",mode="n"},
+ {name=NS.dial_increment_v,  lhs="<c-a>", mode="x"},
+ {name=NS.dial_decrement_v,  lhs="<c-x>", mode="x"},
+ {name=NS.dial_increment_v_g,lhs="g<c-a>",mode="x"},
+ {name=NS.dial_decrement_v_g,lhs="g<c-x>",mode="x"},
 },{
  override={tags="which-key"},
  {name=NS.which_key_window_mode,lhs="<leader><c-w>"},
@@ -374,7 +384,7 @@ return {
  {name=NS.numb_toggle,mode="n",lhs="<leader>op"},
 },{
  override={tags="wildfire"},
- {index="keymaps.init_selection",  value="<s-cr>"},
+ {index="keymaps.init_selection",  value="<cr>"},
  {index="keymaps.node_incremental",value="<cr>", lazykey=false},
  {index="keymaps.node_decremental",value="<esc>",lazykey=false},
 },{

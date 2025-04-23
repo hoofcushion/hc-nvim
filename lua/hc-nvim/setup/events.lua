@@ -50,6 +50,16 @@ M.FileAdd=Util.Event.create({
   end,
  },
 })
+M.Treesitter=Util.Event.create({
+ name="Treesitter",
+ any={
+  event="FileType",
+  cond=function(ev)
+   local M=require("nvim-treesitter.parsers")
+   return M.has_parser(M.get_buf_lang(ev.buf))
+  end,
+ },
+})
 -- local t=vim.uv.new_timer()
 -- local cb=function()
 --  vim.schedule(function()

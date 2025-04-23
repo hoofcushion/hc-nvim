@@ -37,7 +37,7 @@ return {
  {"echasnovski/mini.ai",              virtual=true},
  {"echasnovski/mini.operators",       virtual=true},
  {"folke/flash.nvim"},
- {"folke/snacks.nvim",                lazy=false,version="*"},
+ {"folke/snacks.nvim",                lazy=false,                     version="*"},
 
  --- Edit
  {"hoofcushion/hc-substitute",        virtual=true},
@@ -45,9 +45,10 @@ return {
  {"echasnovski/mini.surround",        virtual=true},
  {"numToStr/Comment.nvim"},
  {"gbprod/yanky.nvim"},
+ {"monaqa/dial.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",              event=Events.File,              main="hc-func",      virtual=true},
+ {"hoofcushion/hc-func",              event=Events.File,              main="hc-func",virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
@@ -60,7 +61,7 @@ return {
  {"smoka7/multicursors.nvim"},
  --- Profiller
  {"dstein64/vim-startuptime"},
- {"stevearc/profile.nvim"},
+ -- {"stevearc/profile.nvim"}, -- replaced by snacks.nvim
 
 
  --- Completions
@@ -120,12 +121,12 @@ return {
  {"folke/lazydev.nvim",                         event=Events.NeoConfig},
 
  --- Treesitter
- {"nvim-treesitter/nvim-treesitter",            event="FileType"},
- {"nvim-treesitter/nvim-treesitter-context",    event="FileType"},
- {"andymass/vim-matchup",                       event="FileType"},
+ {"nvim-treesitter/nvim-treesitter",            event=Events.Treesitter},
+ {"nvim-treesitter/nvim-treesitter-context",    event=Events.Treesitter},
+ {"andymass/vim-matchup",                       event=Events.Treesitter},
  {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
  {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
- {"RRethy/nvim-treesitter-endwise",             event="InsertEnter"},
+ {"RRethy/nvim-treesitter-endwise",             event=Events.Treesitter},
  {"Wansmer/binary-swap.nvim"},
  {"mizlan/iswap.nvim"},
  {"nvim-treesitter/nvim-treesitter-textobjects"},
@@ -139,6 +140,7 @@ return {
  --- Notebook
  {"zk-org/zk-nvim",                             event=Events.RootPattern(".zk")},
  {"MeanderingProgrammer/markdown.nvim",         ft="markdown"},
+ -- {"nvim-neorg/neorg",                           ft="norg",                           config=true},
 
  --- Libraries
  {"nvim-tree/nvim-web-devicons"},
