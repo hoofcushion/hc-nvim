@@ -7,11 +7,11 @@ local Events=require("hc-nvim.setup.events")
 return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",            lazy=false},
- -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snakcs.nvim
+ -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snacks.nvim
  {"folke/noice.nvim",                 event="VimEnter"},
  {"nvim-lualine/lualine.nvim",        event="VimEnter"},
 
- -- {"rcarriga/nvim-notify"}, -- replaced by snakcs.nvim
+ -- {"rcarriga/nvim-notify"}, -- replaced by snacks.nvim
  {"stevearc/dressing.nvim"},
 
  {"echasnovski/mini.nvim"},
@@ -37,7 +37,7 @@ return {
  {"echasnovski/mini.ai",              virtual=true},
  {"echasnovski/mini.operators",       virtual=true},
  {"folke/flash.nvim"},
- {"folke/snacks.nvim",                lazy=false},
+ {"folke/snacks.nvim",                lazy=false,version="*"},
 
  --- Edit
  {"hoofcushion/hc-substitute",        virtual=true},
@@ -90,7 +90,7 @@ return {
  {"echasnovski/mini.trailspace",                event=Events.File,                   virtual=true},
  {"folke/todo-comments.nvim",                   event=Events.File},
  {"nfrid/due.nvim",                             event=Events.File},
- {"lukas-reineke/indent-blankline.nvim",        event=Events.File},
+ -- {"lukas-reineke/indent-blankline.nvim",        event=Events.File}, -- replaced by snacks.nvim
  -- This werid plugin can't load at "BufEnter"
  {"hiphish/rainbow-delimiters.nvim",            event=Events.File},
 

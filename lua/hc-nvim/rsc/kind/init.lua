@@ -1,8 +1,8 @@
----@class KIND
+---@class Kind
 local Kind={}
 ---@generic kind
 ---@param kind kind
----@return kind|KIND
+---@return kind|Kind
 function Kind.new(kind)
  return setmetatable(kind,{__index=Kind})
 end
@@ -13,7 +13,7 @@ function Kind:suffix(suffix)
  end
  return Kind.new(ret)
 end
-function Kind:prifix(prefix)
+function Kind:prefix(prefix)
  local ret={}
  for name,icon in pairs(self) do
   ret[name]=prefix..icon
