@@ -7,6 +7,5 @@ return function()
  -- apply on active client
  for _,client in ipairs(vim.lsp.get_clients()) do
   client.capabilities=capabilities
-  client.server_capabilities.completionProvider=false
  end
 end
