@@ -218,16 +218,16 @@ function Util.fileexist(file)
  return vim.uv.fs_stat(file)~=nil
 end
 local _pattern={
- vim.fn.stdpath("config") --[[@as string]],
- vim.fn.stdpath("data") --[[@as string]],
+ vim.fs.normalize(vim.fn.stdpath("config")) --[[@as string]],
+ vim.fs.normalize(vim.fn.stdpath("data")) --[[@as string]],
 }
 --- Tells current file is or not part of  neovim profile
 ---@param file string
 ---@return boolean
 function Util.is_profile(file)
- file=string.lower(file)
+ file = vim.fs.normalize(file)
  for _,v in ipairs(_pattern) do
-  if Util.startswith(file,string.lower(v)) then
+  if Util.startswith(file,v) then
    return true
   end
  end

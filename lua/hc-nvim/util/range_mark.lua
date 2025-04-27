@@ -63,10 +63,14 @@ function RangeMark:new(start,finish,indexed,vmode,winid,bufnr)
  -- absolute start & finish
  local abs_s=Util.deepcopy(raw_s)
  local abs_e=Util.deepcopy(raw_e)
+ -- line_s after line_e
  if abs_s[1]>abs_e[1] then
-  abs_s[1],abs_e[1]=abs_e[1],abs_s[1]
+  abs_s,abs_e=abs_e,abs_s
  end
- if abs_s[2]>abs_e[2] then
+ -- same line and col_s after col_e
+ if  abs_s[1]==abs_e[1]
+ and abs_s[2]>abs_e[2]
+ then
   abs_s[2],abs_e[2]=abs_e[2],abs_s[2]
  end
  new.start=abs_s

@@ -28,7 +28,7 @@ M.NeoConfig=Util.Event.create({
  any={
   event={"VimEnter","BufEnter","BufAdd"},
   cond=function(ev)
-   return Util.is_profile(ev.file)
+   return Util.is_profile(vim.fs.normalize(ev.file))
   end,
  },
 })

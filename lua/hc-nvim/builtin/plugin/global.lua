@@ -6,27 +6,27 @@ local Events=require("hc-nvim.setup.events")
 ---}
 return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
- {"folke/tokyonight.nvim",            lazy=false},
+ {"folke/tokyonight.nvim",                      lazy=false},
  -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snacks.nvim
- {"folke/noice.nvim",                 event="VimEnter"},
- {"nvim-lualine/lualine.nvim",        event="VimEnter"},
+ {"folke/noice.nvim",                           event="VimEnter"},
+ {"nvim-lualine/lualine.nvim",                  event="VimEnter"},
 
  -- {"rcarriga/nvim-notify"}, -- replaced by snacks.nvim
  {"stevearc/dressing.nvim"},
 
  {"echasnovski/mini.nvim"},
 
- {"folke/which-key.nvim",             event="SafeState"},
+ {"folke/which-key.nvim",                       event="SafeState"},
 
  --- Information
- {"Bekaboo/dropbar.nvim",             event=Events.File},
- {"kevinhwang91/nvim-ufo",            event=Events.File},
- {"ldelossa/buffertag",               event=Events.File},
- {"chentoast/marks.nvim",             event=Events.File},
- {"rainbowhxch/beacon.nvim",          event=Events.File},
+ {"Bekaboo/dropbar.nvim",                       event=Events.File},
+ {"kevinhwang91/nvim-ufo",                      event=Events.File},
+ {"ldelossa/buffertag",                         event=Events.File},
+ {"chentoast/marks.nvim",                       event=Events.File},
+ {"rainbowhxch/beacon.nvim",                    event=Events.File},
 
- {"smjonas/live-command.nvim",        event="CmdlineEnter"},
- {"nacro90/numb.nvim",                event="CmdlineEnter"},
+ {"smjonas/live-command.nvim",                  event="CmdlineEnter"},
+ {"nacro90/numb.nvim",                          event="CmdlineEnter"},
 
  --- Searchers
  {"ibhagwan/fzf-lua"},
@@ -34,26 +34,26 @@ return {
 
  --- Motions
  {"chrisgrieser/nvim-spider"},
- {"echasnovski/mini.ai",              virtual=true},
- {"echasnovski/mini.operators",       virtual=true},
+ {"echasnovski/mini.ai",                        virtual=true},
+ {"echasnovski/mini.operators",                 virtual=true},
  {"folke/flash.nvim"},
- {"folke/snacks.nvim",                lazy=false,                     version="*"},
+ {"folke/snacks.nvim",                          lazy=false,                                          version="*"},
 
  --- Edit
- {"hoofcushion/hc-substitute",        virtual=true},
- {"echasnovski/mini.align",           virtual=true},
- {"echasnovski/mini.surround",        virtual=true},
+ {"hoofcushion/hc-substitute",                  virtual=true},
+ {"echasnovski/mini.align",                     virtual=true},
+ {"echasnovski/mini.surround",                  virtual=true},
  {"numToStr/Comment.nvim"},
  {"gbprod/yanky.nvim"},
  {"monaqa/dial.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",              event=Events.File,              main="hc-func",virtual=true},
+ {"hoofcushion/hc-func",                        event=Events.File,                                   main="hc-func",virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
  {"glepnir/dbsession.nvim"},
- {"nvim-neo-tree/neo-tree.nvim",      ft="directory"},
+ {"nvim-neo-tree/neo-tree.nvim",                ft="directory"},
  -- {"nvim-telescope/telescope-file-browser.nvim", lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
  -- {"nvim-tree/nvim-tree.lua",                    event=Events.DirEnter},
  {"nvim-pack/nvim-spectre"},
@@ -65,30 +65,24 @@ return {
 
 
  --- Completions
- {"L3MON4D3/LuaSnip",                 event="InsertEnter"},
- {"rafamadriz/friendly-snippets",     event=Events.LazyLoad("LuaSnip")},
+ {"L3MON4D3/LuaSnip",                           event="InsertEnter"},
+ {"rafamadriz/friendly-snippets",               event=Events.LazyLoad("LuaSnip")},
  -- {"hrsh7th/nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
- {
-  "iguanacucumber/magazine.nvim",
-  name="nvim-cmp",
-  event={"InsertEnter","CmdlineEnter"},
-  dependencies={
-   "dmitmel/cmp-cmdline-history",
-   "FelipeLema/cmp-async-path",
-   "hrsh7th/cmp-buffer",
-   "hrsh7th/cmp-cmdline",
-   "hrsh7th/cmp-nvim-lsp",
-   "petertriho/cmp-git",
-   "saadparwaiz1/cmp_luasnip",
-  },
- },
+ {"iguanacucumber/magazine.nvim",               event={"InsertEnter","CmdlineEnter"},                name="nvim-cmp"},
+ {"dmitmel/cmp-cmdline-history",                event={"CmdlineEnter"}},
+ {"FelipeLema/cmp-async-path",                  event=Events.File},
+ {"hrsh7th/cmp-buffer",                         event=Events.File},
+ {"hrsh7th/cmp-cmdline",                        event="CmdlineEnter"},
+ {"hrsh7th/cmp-nvim-lsp",                       event="LspAttach"},
+ {"petertriho/cmp-git",                         ftfiletype={"gitcommit","octo","NeogitCommitMessage"}},
+ {"saadparwaiz1/cmp_luasnip",                   event=Events.File},
  -- {"Saghen/blink.cmp",                           lazy=false},
 
 
 
  --- Highlighter
  {"NvChad/nvim-colorizer.lua",                  event=Events.File},
- {"echasnovski/mini.trailspace",                event=Events.File,                   virtual=true},
+ {"echasnovski/mini.trailspace",                event=Events.File,                                   virtual=true},
  {"folke/todo-comments.nvim",                   event=Events.File},
  {"nfrid/due.nvim",                             event=Events.File},
  -- {"lukas-reineke/indent-blankline.nvim",        event=Events.File}, -- replaced by snacks.nvim
@@ -110,7 +104,7 @@ return {
  {"williamboman/mason.nvim"},
  {"WhoIsSethDaniel/mason-tool-installer.nvim"},
  {"mfussenegger/nvim-dap"},
- {"neovim/nvim-lspconfig"},
+ {"neovim/nvim-lspconfig",                      lazy=false,                                          config=false},
  {"nvimtools/none-ls.nvim"},
 
  --- LSP tools

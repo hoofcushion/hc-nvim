@@ -41,7 +41,7 @@ local default_settings={
   ---| "None"
   ---| "Fallback"
   ---@type table<lua-language-server.GroupName, lua-language-server.FileStatus>
-  groupFileStatus --[[@enum (key) lua-language-server.GroupName]]={
+  groupFileStatus={
    -- ambiguity-1
    -- count-down-loop
    -- different-requires
@@ -136,7 +136,7 @@ local default_settings={
   ---@type lua-language-server.FileStatus
   libraryFiles="Opened",
   ---@type table<lua-language-server.DiagnosticName, lua-language-server.FileStatus>
-  neededFileStatus --[[@enum (key) lua-language-server.DiagnosticName]]={
+  neededFileStatus={
    ["ambiguity-1"]="Any",
    ["assign-type-mismatch"]="Opened",
    ["await-in-sync"]="None",
@@ -537,65 +537,65 @@ Settings.normal={
  },
  format={
   defaultConfig={
-   indent_style                                ="space",
-   indent_size                                 ="1",
-   tab_width                                   ="1",
-   quote_style                                 ="double",
-   call_arg_parentheses                        ="keep",
-   continuation_indent                         ="1",
-   max_line_length                             ="65535",
-   end_of_line                                 ="lf",
-   trailing_table_separator                    ="smart",
-   detect_end_of_line                          ="true",
-   insert_final_newline                        ="false",
-   space_around_table_field_list               ="false",
-   space_before_attribute                      ="true",
-   space_before_function_open_parenthesis      ="false",
-   space_before_function_call_open_parenthesis ="false",
-   space_before_closure_open_parenthesis       ="false",
-   space_before_function_call_single_arg       ="false",
-   space_before_open_square_bracket            ="false",
-   space_inside_function_call_parentheses      ="false",
+   indent_style="space",
+   indent_size="1",
+   tab_width="1",
+   quote_style="double",
+   call_arg_parentheses="keep",
+   continuation_indent="1",
+   max_line_length="65535",
+   end_of_line="lf",
+   trailing_table_separator="smart",
+   detect_end_of_line="true",
+   insert_final_newline="false",
+   space_around_table_field_list="false",
+   space_before_attribute="true",
+   space_before_function_open_parenthesis="false",
+   space_before_function_call_open_parenthesis="false",
+   space_before_closure_open_parenthesis="false",
+   space_before_function_call_single_arg="false",
+   space_before_open_square_bracket="false",
+   space_inside_function_call_parentheses="false",
    space_inside_function_param_list_parentheses="false",
-   space_inside_square_brackets                ="false",
-   space_around_table_append_operator          ="false",
-   ignore_spaces_inside_function_call          ="false",
-   space_before_inline_comment                 ="1",
-   space_around_logical_operator               ="false",
-   space_around_assign_operator                ="false",
-   space_around_math_operator                  ="false",
-   space_after_comma                           ="false",
-   space_after_comma_in_for_statement          ="false",
-   space_around_concat_operator                ="none",
-   align_call_args                             ="true",
-   align_function_params                       ="true",
-   align_continuous_assign_statement           ="true",
-   align_continuous_rect_table_field           ="true",
-   align_if_branch                             ="true",
-   align_array_table                           ="true",
-   never_indent_before_if_condition            ="false",
-   never_indent_comment_on_if_branch           ="false",
-   line_space_after_if_statement               ="fixed(1)",
-   line_space_after_do_statement               ="fixed(1)",
-   line_space_after_while_statement            ="fixed(1)",
-   line_space_after_repeat_statement           ="fixed(1)",
-   line_space_after_for_statement              ="fixed(1)",
-   line_space_after_local_or_assign_statement  ="fixed(1)",
-   line_space_after_expression_statement       ="fixed(1)",
-   line_space_after_comment                    ="max(2)",
-   line_space_after_function_statement         ="fixed(1)",
-   line_space_around_block                     ="fixed(1)",
-   break_all_list_when_line_exceed             ="false",
-   auto_collapse_lines                         ="false",
-   ignore_space_after_colon                    ="false",
-   remove_call_expression_list_finish_comma    ="true",
-   end_statement_with_semicolon                ="same_line",
-   table_separator_style                       ="Comma",
-   align_chain_expr                            ="Always",
-   align_continuous_similar_call_args          ="true",
-   align_continuous_inline_comment             ="true",
-   break_before_braces                         ="false",
-   keep_indents_on_empty_lines                 ="false",
+   space_inside_square_brackets="false",
+   space_around_table_append_operator="false",
+   ignore_spaces_inside_function_call="false",
+   space_before_inline_comment="1",
+   space_around_logical_operator="false",
+   space_around_assign_operator="false",
+   space_around_math_operator="false",
+   space_after_comma="false",
+   space_after_comma_in_for_statement="false",
+   space_around_concat_operator="none",
+   align_call_args="true",
+   align_function_params="true",
+   align_continuous_assign_statement="true",
+   align_continuous_rect_table_field="true",
+   align_if_branch="true",
+   align_array_table="true",
+   never_indent_before_if_condition="false",
+   never_indent_comment_on_if_branch="false",
+   line_space_after_if_statement="fixed(1)",
+   line_space_after_do_statement="fixed(1)",
+   line_space_after_while_statement="fixed(1)",
+   line_space_after_repeat_statement="fixed(1)",
+   line_space_after_for_statement="fixed(1)",
+   line_space_after_local_or_assign_statement="fixed(1)",
+   line_space_after_expression_statement="fixed(1)",
+   line_space_after_comment="max(2)",
+   line_space_after_function_statement="fixed(1)",
+   line_space_around_block="fixed(1)",
+   break_all_list_when_line_exceed="false",
+   auto_collapse_lines="false",
+   ignore_space_after_colon="false",
+   remove_call_expression_list_finish_comma="true",
+   end_statement_with_semicolon="same_line",
+   table_separator_style="Comma",
+   align_chain_expr="Always",
+   align_continuous_similar_call_args="true",
+   align_continuous_inline_comment="true",
+   break_before_braces="false",
+   keep_indents_on_empty_lines="false",
   },
  },
  codeLens={
@@ -621,8 +621,8 @@ Settings.normal={
   enable=true,
  },
 }
-local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
+local Util=require("hc-nvim.util")
 Settings.neovim=Util.tbl_extend({},Settings.normal,{
  runtime={
   version="LuaJIT",
@@ -634,8 +634,9 @@ Settings.neovim=Util.tbl_extend({},Settings.normal,{
   },
  },
  workspace={
+  checkThirdParty=false,
   library={
-   vim.fs.normalize(vim.fs.joinpath(vim.env.VIMRUNTIME,"lua","vim")),
+   vim.fs.joinpath(vim.env.VIMRUNTIME),
    "${3rd}/luv/library",
    "${3rd}/busted/library",
   },
@@ -647,18 +648,17 @@ local function get_config(cwd)
  end
  return Settings.normal
 end
-local M={}
-M.cmd={
- -- auto change language
+local config={}
+config.cmd=vim.list_extend(vim.lsp.config.lua_ls.cmd,{
  ("--locale=%s-%s"):format(
   Config.locale.current.language,
   Config.locale.current.country:lower()
  ),
-}
-M.settings={
+})
+config.settings={
  Lua=Settings.normal,
 }
-M.on_init=function(client)
+config.on_init=function(client)
  local cur_dir=vim.fn.getcwd()
  local last_dir
  local function setconfig()
@@ -673,4 +673,4 @@ M.on_init=function(client)
  })
  setconfig()
 end
-return M
+return config

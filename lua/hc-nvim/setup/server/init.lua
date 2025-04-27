@@ -4,9 +4,9 @@ if Config.platform.is_vscode and not Config.server.vscode then
 end
 local Util=require("hc-nvim.util")
 if Config.server.auto_setup then
- local event = require("hc-nvim.setup.events").File
+ local event=require("hc-nvim.setup.events").File
  vim.api.nvim_create_autocmd(event.event,{
-  pattern = event.pattern,
+  pattern=event.pattern,
   callback=function(ev)
    if vim.bo[ev.buf].buftype~="" then
     return

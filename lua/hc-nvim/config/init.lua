@@ -120,7 +120,7 @@ M.server={
  auto_setup=true,
  list={
   --- lspconfig
-  {name="ast-grep",            setup="ast_grep"},
+  -- {name="ast-grep",            setup="ast_grep"},
   {name="bash-language-server",setup="bashls"},
   {name="clangd"},
   {name="deno",                setup="denols"},

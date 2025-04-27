@@ -59,7 +59,16 @@ local opts={
   },
  },
  input={enabled=true},
- picker={enabled=true},
+ picker={
+  enabled=true,
+  -- set all layouts border
+  (function()
+   local layouts=require("snacks.picker.config.layouts")
+   for _,v in pairs(layouts) do
+    v.layout.border=Rsc.border[Config.ui.border]
+   end
+  end)(),
+ },
  notifier={
   enabled=true,
   icons=Rsc.sign[Config.ui.sign]:prefix(" "),
@@ -69,12 +78,12 @@ local opts={
  profiler={enabled=true},
  scope={enabled=true},
  styles={
-  blame_line={border=Rsc.border[Config.ui.border]},
-  input={border=Rsc.border[Config.ui.border]},
-  notification={border=Rsc.border[Config.ui.border]},
+  blame_line          ={border=Rsc.border[Config.ui.border]},
+  input               ={border=Rsc.border[Config.ui.border]},
+  notification        ={border=Rsc.border[Config.ui.border]},
   notification_history={border=Rsc.border[Config.ui.border]},
-  scratch={border=Rsc.border[Config.ui.border]},
-  snacks_image={border=Rsc.border[Config.ui.border]},
+  scratch             ={border=Rsc.border[Config.ui.border]},
+  snacks_image        ={border=Rsc.border[Config.ui.border]},
  },
 }
 if Config.platform.is_vscode then

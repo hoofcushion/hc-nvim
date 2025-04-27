@@ -32,6 +32,10 @@ local function format(opts)
    format_item=function(item) return item.name end,
   },
   function(choice)
+   -- escape
+   if choice==nil then
+    return
+   end
    local name=choice and choice.name or clients[1].name
    vim.b.lsp_format_choice=name
    vim.lsp.buf.format({name=name})
