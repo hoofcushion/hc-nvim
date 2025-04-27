@@ -164,6 +164,7 @@ return {
       local line=math.min(lineend,win_lineend)-1
       local step=math.max(1,line/10)
       step=math.floor(step)
+      step=math.max(3,step)
       return tostring(step)
        .."j"
      end)
@@ -187,6 +188,7 @@ return {
       local line=math.min(lineend,win_lineend)-1
       local step=math.max(1,line/10)
       step=math.floor(step)
+      step=math.max(3,step)
       return tostring(step)
        .."k"
      end)
@@ -210,6 +212,7 @@ return {
      local col=math.min(win_colend,colend)-1
      local step=math.max(1,col/10)
      step=math.floor(step)
+     step=math.max(3,step)
      return tostring(step)
       .."h"
     end),
@@ -222,6 +225,7 @@ return {
      local colend=vim.fn.getwininfo(vim.fn.win_getid())[1].width-offset
      local col=math.min(colend,vim.fn.col("$"))-1
      local step=math.max(1,math.floor(col/10))
+     step=math.max(3,step)
      return tostring(step)
       .."l"
     end),

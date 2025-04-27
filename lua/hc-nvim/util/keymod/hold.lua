@@ -2,11 +2,11 @@ local Base=require("hc-nvim.util.keymod.base")
 local function empty_f() end
 local function cache(fn)
  local c={}
- return function(x,...)
-  local fx=math.floor(x)
+ return function(x,e,...)
+  local fx=math.ceil(x/e/(1/50)) -- limit acceleration phrase
   local ret=c[fx]
   if ret==nil then
-   ret=fn(x,...)
+   ret=fn(x,e,...)
    c[fx]=ret
   end
   return ret
@@ -14,12 +14,12 @@ local function cache(fn)
 end
 ---@class hold_opts
 local default_opts={
- init_speed=25.0,
- max_speed=50.0,
- trigger=2,
- acceleration_ms=200,
- threshold_ms=100,
- timeout_ms=200,
+ init_speed=50.0,
+ max_speed=1000.0,
+ trigger=2, -- key repeat threshold
+ acceleration_ms=200, -- acceleration time to max_speed
+ threshold_ms=100, -- key repeat timeout when active
+ timeout_ms=200, -- key repeat timeout when inactive
  smooth=function(cur_time,end_time,init_speed,max_speed)
   local final=init_speed+(cur_time/end_time*(max_speed-init_speed))
   return final
@@ -39,7 +39,7 @@ function M.create(lhs,rhs,opts)
  opts=vim.tbl_deep_extend("force",default_opts,opts or {})
  local acceleration_ms=opts.acceleration_ms
  local max_interval_ms=1000/opts.max_speed
- local init_interval_ms=math.min(max_interval_ms,1000/opts.init_speed)
+ local init_interval_ms=math.max(max_interval_ms,1000/opts.init_speed)
  local clock=Clock.new(acceleration_ms)
  --- ---
  --- Throttle for rhs
