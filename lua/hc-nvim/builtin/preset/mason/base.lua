@@ -8,4 +8,8 @@ return {
   "MasonUninstall",
   "MasonUninstallAll",
  },
+ init=function()
+  local sep=vim.fn.has("win32") and ";" or ":"
+  vim.env.PATH=vim.env.PATH..sep..vim.fs.joinpath("data","mason","bin")
+ end,
 }

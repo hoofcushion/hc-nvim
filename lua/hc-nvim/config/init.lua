@@ -20,10 +20,8 @@ M.locale.fallbacks={
  M.locale.current,
  M.locale.default,
 }
-local uname=vim.uv.os_uname()
 M.platform={
- uname=uname,
- is_windows=uname.sysname:find("Windows",nil,true)~=nil,
+ is_windows=vim.fn.has("win32"),
  is_gui=vim.fn.has("gui_running"),
  is_vscode=vim.g.vscode==1,
  is_neovide=vim.g.neovide==1,

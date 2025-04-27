@@ -8,8 +8,8 @@ return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",                      lazy=false},
  -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snacks.nvim
- {"folke/noice.nvim",                           event="VimEnter"},
- {"nvim-lualine/lualine.nvim",                  event="VimEnter"},
+ {"folke/noice.nvim",                           event=Events.FileAdd},
+ {"nvim-lualine/lualine.nvim",                  event=Events.FileAdd},
 
  -- {"rcarriga/nvim-notify"}, -- replaced by snacks.nvim
  {"stevearc/dressing.nvim"},
@@ -137,5 +137,6 @@ return {
  -- {"nvim-neorg/neorg",                           ft="norg",                           config=true},
 
  --- Libraries
- {"nvim-tree/nvim-web-devicons"},
+ -- {"nvim-tree/nvim-web-devicons"},
+ {"echasnovski/mini.icon",                        virtual=true},
 }

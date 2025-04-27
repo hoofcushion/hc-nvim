@@ -3,6 +3,5 @@ return {
  config=true,
  dependencies={
   "plenary.nvim",
-  "williamboman/mason.nvim",
  },
 }
