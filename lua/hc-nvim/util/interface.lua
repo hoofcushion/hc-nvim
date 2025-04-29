@@ -344,8 +344,8 @@ function Interface.forspecs(mapspecs,func)
  end
  if mapspecs[1]~=nil then
   for _,mapspec in ipairs(mapspecs) do
-   if mapspec.override or mapspecs.override then
-    mapspec.override=Util.tbl_deep_extend({},mapspec.override,mapspecs.override)
+   if mapspecs.override then
+    mapspec.override=Util.tbl_deep_extend(mapspec.override or {},mapspecs.override)
    end
    Interface.forspecs(mapspec,func)
   end
