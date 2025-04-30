@@ -1,7 +1,10 @@
 return {
  main="null-ls",
- config=true,
  dependencies={
   "plenary.nvim",
  },
+ init=function(ev)
+  vim.opt.rtp:append(ev.dir)
+ end,
+ config=true,
 }

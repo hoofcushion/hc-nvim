@@ -9,6 +9,13 @@ return function(_,opts)
  local Source={
   max_item_count=25,
  }
+ local kinds=vim.lsp.protocol.CompletionItemKind
+ cmp.event:on("confirm_done",function(x)
+  local kind=x.entry.completion_item.kind
+  if kind==kinds.Function or kind==kinds.Method then
+   vim.fn.feedkeys("(")
+  end
+ end)
  function Source:new(name,properties)
   local source=vim.tbl_deep_extend("force",Source,properties)
   source.name=name

@@ -4,9 +4,10 @@ function M.RootPattern(pattern)
  return Util.Event.create({
   name="RootPattern: "..table.concat(Util.totable(pattern),", "),
   any={
-   event="BufEnter",
+   event={"VimEnter","BufEnter","BufAdd"},
+   calm=true,
    cond=function(ev)
-    return ev.file~="" and vim.fs.root(0,pattern)~=nil
+    return ev.file~="" and vim.fs.root(0,".git")==vim.fs.normalize(vim.fn.getcwd())
    end,
   },
  })

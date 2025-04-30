@@ -104,12 +104,12 @@ return {
  {"williamboman/mason.nvim"},
  {"WhoIsSethDaniel/mason-tool-installer.nvim"},
  {"mfussenegger/nvim-dap"},
- {"neovim/nvim-lspconfig",                      lazy=false,                                          config=false},
+ {"neovim/nvim-lspconfig"},
  {"nvimtools/none-ls.nvim"},
 
  --- LSP tools
  {"Wansmer/symbol-usage.nvim",                  event="LspAttach"},
- {"SmiteshP/nvim-navbuddy",                     event="LspAttach"},
+ {"SmiteshP/nvim-navbuddy"},
 
  -- Neovim develop
  {"folke/lazydev.nvim",                         event=Events.NeoConfig},
@@ -138,5 +138,5 @@ return {
 
  --- Libraries
  -- {"nvim-tree/nvim-web-devicons"},
- {"echasnovski/mini.icon",                        virtual=true},
+ {"echasnovski/mini.icon",                      virtual=true},
 }

@@ -19,6 +19,7 @@ if false then
   name="", ---@type string
   callback=function() end, ---@type (fun(ev:vim.api.keyset.create_autocmd.callback_args):boolean?)?
   once=nil, ---@type boolean?
+  calm=false, ---@type boolean?
  }
  ---@class step_t:step_opt
  local _step_t={
@@ -108,6 +109,15 @@ function Event.create(step_t)
                end,step_t.delay)
   return {event="User",pattern=step_t.name}
  end
+ local function exec(v)
+  if v.calm then
+   vim.schedule(function()
+    vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
+   end)
+  else
+   vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
+  end
+ end
  local rests=0
  -- any
  if step_t.any then
@@ -121,7 +131,7 @@ function Event.create(step_t)
      if type(v.cond)~="function" or v.cond(ev) then
       rests=rests-1
       if rests<=0 then
-       vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
+       exec(v)
       end
       -- clear all ids
       for _,id in ipairs(ids) do
@@ -145,7 +155,7 @@ function Event.create(step_t)
      if type(v.cond)~="function" or v.cond(ev) then
       rests=rests-1
       if rests<=0 then
-       vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
+       exec(v)
       end
       return true
      end

@@ -58,11 +58,16 @@ local SetupMaker={}
 function SetupMaker.lsp(name)
  return function(config)
   if config then
-   vim.lsp.config(name,config)
+   Clients.lsp.config(name,config)
   end
   Clients.lsp.enable(name)
+  config=Clients.lsp.config[name]
+  if vim.list_contains(config.filetypes,vim.bo.filetype) then
+   Clients.lsp.start(config)
+  end
  end
 end
+local setuped_null_ls=false
 --- setup server_configuration when filetype matches
 ---@param name string client name
 ---@return function
@@ -71,6 +76,10 @@ function SetupMaker.null_ls(name)
   local opts=Presets.null_ls(name)
   if opts==nil then
    return
+  end
+  if not setuped_null_ls then
+   Clients.null_ls.setup()
+   setuped_null_ls=true
   end
   for method,builtin in Util.rpairs(opts,all_methods) do
    if config~=nil and config[method]~=nil then

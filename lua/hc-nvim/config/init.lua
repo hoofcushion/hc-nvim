@@ -119,11 +119,11 @@ M.server={
  list={
   --- lspconfig
   -- {name="ast-grep",            setup="ast_grep"},
+  {name="lua-language-server", setup="lua_ls"},
   {name="bash-language-server",setup="bashls"},
   {name="clangd"},
   {name="deno",                setup="denols"},
   {name="json-lsp",            setup="jsonls"},
-  {name="lua-language-server", setup="lua_ls"},
   {name="marksman"},
   {name="pyright"},
   {name="rust-analyzer",       setup="rust_analyzer"},
