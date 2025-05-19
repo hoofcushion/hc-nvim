@@ -8,7 +8,7 @@ return {
  -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",                      lazy=false},
  -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snacks.nvim
- {"folke/noice.nvim",                           event=Events.File},
+ {"folke/noice.nvim",                           event={"CmdlineEnter",Events.File}},
  {"nvim-lualine/lualine.nvim",                  event=Events.File},
 
  -- {"rcarriga/nvim-notify"}, -- replaced by snacks.nvim
