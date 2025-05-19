@@ -25,6 +25,7 @@ local Util=require("hc-nvim.util.lazy_tab").create({
  TimeUsed    ="hc-nvim.util.time_used",
  Timer       ="hc-nvim.util.timer",
  Wrapper     ="hc-nvim.util.wrapper",
+ Validate    ="hc-nvim.util.validate",
 })
 if false then
  Util={
@@ -53,6 +54,7 @@ if false then
   TimeUsed    =require("hc-nvim.util.time_used"),
   Timer       =require("hc-nvim.util.timer"),
   Wrapper     =require("hc-nvim.util.wrapper"),
+  Validate    =require("hc-nvim.util.validate"),
  }
 end
 ---@alias nonil
@@ -225,7 +227,7 @@ local _pattern={
 ---@param file string
 ---@return boolean
 function Util.is_profile(file)
- file = vim.fs.normalize(file)
+ file=vim.fs.normalize(file)
  for _,v in ipairs(_pattern) do
   if Util.startswith(file,v) then
    return true
