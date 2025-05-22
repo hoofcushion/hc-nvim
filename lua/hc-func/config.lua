@@ -1,7 +1,8 @@
 local Util=require("hc-nvim.util")
 local Validate=require("hc-nvim.util.validate")
+local Config={}
 ---@class HCFunc.options
-local default_options={
+Config.default={
  cursorword={
   enabled=true,
   pattern=(function()
@@ -174,15 +175,14 @@ local valitab={
   enabled="boolean",
  },
 }
-local M={}
-local current_options=default_options
-M.options=Util.Reference.get(function() return current_options end)
-function M.fini()
- current_options=default_options
+Config.current=Config.default
+Config.options=Util.Reference.get(function() return Config.current end)
+function Config.fini()
+ Config.current=Config.default
 end
-function M.setup(opts)
- local new_options=vim.tbl_deep_extend("force",default_options,opts)
+function Config.setup(opts)
+ local new_options=vim.tbl_deep_extend("force",Config.current,opts)
  Validate.validate_assert("<hc-func.config>.options",new_options,valitab)
- current_options=new_options
+ Config.current=new_options
 end
-return M
+return Config

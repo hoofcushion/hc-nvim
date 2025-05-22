@@ -598,6 +598,23 @@ do
   return _deepcopy(orig)
  end
 end
+---@generic T
+---@param orig T
+---@return T
+function Util.copy(orig)
+ if type(orig)~="table" then
+  return orig
+ end
+ local ret={}
+ for k,v in pairs(orig) do
+  ret[k]=v
+ end
+ local mt=getmetatable(orig)
+ if mt~=nil then
+  setmetatable(ret,mt)
+ end
+ return ret
+end
 function Util.get_super(tbl)
  local mt=getmetatable(tbl)
  return mt and type(mt.__index)=="table" and mt.__index or nil
@@ -737,10 +754,13 @@ function Util.tbl_get(tbl,keys,expr)
  for i=1,e-1 do
   tbl=Util.tbl_check(tbl,keys[i])
  end
- if expr then
-  return Util.tbl_check(tbl,keys[e],expr)
+ local k=keys[e]
+ if k then
+  if expr then
+   return Util.tbl_check(tbl,keys[e],expr)
+  end
+  return tbl[keys[e]]
  end
- return tbl[keys[e]]
 end
 ---@param tbl table
 ---@param keys nonil[]|string

@@ -18,9 +18,12 @@ local Reference={}
 --- raw.a.b=nil
 --- print(t.a.b) -- nil
 ---```
-local function _create(main,keys)
+local function node(main,keys)
  if type(main)~="table" then
   return main
+ end
+ if keys==nil then
+  keys={}
  end
  local nested=false
  for _,v in pairs(main) do
@@ -30,18 +33,16 @@ local function _create(main,keys)
   end
  end
  if not nested then
-  return vim.deepcopy(main)
- end
- if keys==nil then
-  keys={}
+  return Util.copy(main)
  end
  return setmetatable({},{
   __index=function(_,k)
-   local ret=Util.tbl_get(main,keys)[k]
+   local t=Util.tbl_get(main,keys)
+   local ret=t[k]
    if type(ret)=="table" then
     local _keys=Util.deepcopy(keys)
     table.insert(_keys,k)
-    return _create(main,_keys)
+    return node(main,_keys)
    end
    return ret
   end,
@@ -52,7 +53,7 @@ end
 ---@param main T
 ---@return T
 function Reference.create(main)
- return _create(main,{})
+ return node(main)
 end
 --- Use `sup` to keep access local environment's table locals
 ---@generic T
@@ -60,10 +61,10 @@ end
 ---@return T
 function Reference.get(sup)
  local mt; mt={
-  __index=function (_, k)
+  __index=function(_,k)
    return sup()[k]
-  end
+  end,
  }
- return _create(setmetatable({},mt),{})
+ return node(setmetatable({},mt))
 end
 return Reference
