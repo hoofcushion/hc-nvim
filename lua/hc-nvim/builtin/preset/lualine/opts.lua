@@ -187,11 +187,19 @@ return {
    {Util.when({
     event={"TabEnter","BufEnter","WinEnter"},
     func=function()
-     return ("T:%s W:%s B:%s"):format(
-      vim.api.nvim_get_current_tabpage(),
-      vim.api.nvim_get_current_win(),
-      vim.api.nvim_get_current_buf()
-     )
+     if Config.ui.sign=="hanzi" then
+      return ("拓:%s 映:%s 坝:%s"):format(
+       vim.api.nvim_get_current_tabpage(),
+       vim.api.nvim_get_current_win(),
+       vim.api.nvim_get_current_buf()
+      )
+     else
+      return ("T:%s W:%s B:%s"):format(
+       vim.api.nvim_get_current_tabpage(),
+       vim.api.nvim_get_current_win(),
+       vim.api.nvim_get_current_buf()
+      )
+     end
     end,
    })},
    --- VRange
@@ -311,7 +319,11 @@ return {
      local ec=fn.virtcol("$")
      local llen=math.ceil(math.log(el,10))
      local clen=math.ceil(math.log(el,10))
-     return ("L:%0"..llen.."d/%0"..llen.."d C:%0"..clen.."d/%0"..clen.."d"):format(cl,el,cc,ec)
+     if Config.ui.sign=="hanzi" then
+      return ("行:%0"..llen.."d/%0"..llen.."d 列:%0"..clen.."d/%0"..clen.."d"):format(cl,el,cc,ec)
+     else
+      return ("L:%0"..llen.."d/%0"..llen.."d C:%0"..clen.."d/%0"..clen.."d"):format(cl,el,cc,ec)
+     end
     end,
    })},
   },

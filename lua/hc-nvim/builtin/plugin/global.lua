@@ -19,17 +19,17 @@ return {
  {"folke/which-key.nvim",                       event="SafeState"},
 
  --- Information
- {"Bekaboo/dropbar.nvim",                       event=Events.File},
- {"kevinhwang91/nvim-ufo",                      event=Events.File},
- {"ldelossa/buffertag",                         event=Events.File},
+ -- {"Bekaboo/dropbar.nvim",                       event=Events.File},
+ -- {"kevinhwang91/nvim-ufo",                      event=Events.File},
+ -- {"ldelossa/buffertag",                         event=Events.File},
  {"chentoast/marks.nvim",                       event=Events.File},
- {"rainbowhxch/beacon.nvim",                    event=Events.File},
+ -- {"rainbowhxch/beacon.nvim",                    event=Events.File},
 
  {"smjonas/live-command.nvim",                  event="CmdlineEnter"},
  {"nacro90/numb.nvim",                          event="CmdlineEnter"},
 
  --- Searchers
- {"ibhagwan/fzf-lua"},
+ -- {"ibhagwan/fzf-lua"},
  {"nvim-telescope/telescope.nvim"},
 
  --- Motions
@@ -44,15 +44,15 @@ return {
  {"echasnovski/mini.align",                     virtual=true},
  {"echasnovski/mini.surround",                  virtual=true},
  {"numToStr/Comment.nvim"},
- {"gbprod/yanky.nvim"},
- {"monaqa/dial.nvim"},
+ -- {"gbprod/yanky.nvim"},
+ -- {"monaqa/dial.nvim"},
 
  --- Tools
  {"hoofcushion/hc-func",                        event=Events.File,                                   main="hc-func",virtual=true},
- {"RaafatTurki/hex.nvim"},
+ -- {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
- {"glepnir/dbsession.nvim"},
+ -- {"glepnir/dbsession.nvim"},
  {"nvim-neo-tree/neo-tree.nvim",                ft="directory"},
  -- {"nvim-telescope/telescope-file-browser.nvim", lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
  -- {"nvim-tree/nvim-tree.lua",                    event=Events.DirEnter},
@@ -60,7 +60,7 @@ return {
  {"s1n7ax/nvim-window-picker"},
  {"smoka7/multicursors.nvim"},
  --- Profiller
- {"dstein64/vim-startuptime"},
+ -- {"dstein64/vim-startuptime"},
  -- {"stevearc/profile.nvim"}, -- replaced by snacks.nvim
 
 
@@ -116,20 +116,21 @@ return {
 
  --- Treesitter
  {"nvim-treesitter/nvim-treesitter",            event=Events.Treesitter},
- {"nvim-treesitter/nvim-treesitter-context",    event=Events.Treesitter},
+ -- {"nvim-treesitter/nvim-treesitter-context",    event=Events.Treesitter},
  {"andymass/vim-matchup",                       event=Events.Treesitter},
- {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
- {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
- {"RRethy/nvim-treesitter-endwise",             event=Events.Treesitter},
- {"Wansmer/binary-swap.nvim"},
+ -- {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
+ -- {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
+ -- {"RRethy/nvim-treesitter-endwise",             event=Events.Treesitter},
+ -- {"Wansmer/binary-swap.nvim"},
  {"mizlan/iswap.nvim"},
  {"nvim-treesitter/nvim-treesitter-textobjects"},
  {"altermo/ultimate-autopair.nvim",             event={"InsertEnter","CmdlineEnter"}},
 
- {"windwp/nvim-ts-autotag"},
+ -- {"windwp/nvim-ts-autotag"},
  {"abecodes/tabout.nvim"},
  {"Wansmer/treesj"},
  {"sustech-data/wildfire.nvim"},
+
 
  --- Notebook
  {"zk-org/zk-nvim",                             event=Events.RootPattern(".zk")},
