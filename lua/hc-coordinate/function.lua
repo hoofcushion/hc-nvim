@@ -107,19 +107,18 @@ function M.setup() -- 获取当前光标位置
  vim.keymap.set("n","<leader>cd",close,    {desc="Create coordinate system around cursor"})
 end
 M.setup()
--- init_grid()
--- local buf = vim.api.nvim_create_buf(false, true)  -- 创建临时缓冲区
--- local win = vim.api.nvim_open_win(buf, false, {
---   relative = 'editor',
---   anchor = 'SW',  -- 定位到左下角
---   row = vim.o.lines - 1,  -- 最后一行
---   col = 0,  -- 最左侧
---   width = 20,  -- 宽度
---   height = 1,  -- 高度
---   focusable = false,  -- 不可聚焦
---   style = 'minimal',  -- 最小化样式
---   border = 'none',  -- 无边框
---   noautocmd = true,  -- 阻止自动命令
--- })
--- vim.api.nvim_set_current_win(win)
+local buf = vim.api.nvim_create_buf(false, true)  -- 创建临时缓冲区
+local win = vim.api.nvim_open_win(buf, false, {
+  relative = 'editor',
+  anchor = 'SW',  -- 定位到左下角
+  row = vim.o.lines - 1,  -- 最后一行
+  col = 0,  -- 最左侧
+  width = 20,  -- 宽度
+  height = 1,  -- 高度
+  focusable = false,  -- 不可聚焦
+  style = 'minimal',  -- 最小化样式
+  border = 'none',  -- 无边框
+  noautocmd = true,  -- 阻止自动命令
+})
+vim.api.nvim_set_current_win(win)
 return M
