@@ -5,9 +5,7 @@ local Events=require("hc-nvim.setup.events")
 --- auto: boolean?,
 ---}
 return {
- -- {"goolord/alpha-nvim",               lazy=false,          cond=vim.fn.argv(0)==""},
  {"folke/tokyonight.nvim",                      lazy=false},
- -- {"nvimdev/dashboard-nvim",           event="VimEnter",               cond=vim.fn.argc()==0},  -- replaced by snacks.nvim
  {"folke/noice.nvim",                           event={"CmdlineEnter",Events.File}},
  {"nvim-lualine/lualine.nvim",                  event=Events.File},
 
@@ -19,11 +17,11 @@ return {
  {"folke/which-key.nvim",                       event="SafeState"},
 
  --- Information
- -- {"Bekaboo/dropbar.nvim",                       event=Events.File},
- -- {"kevinhwang91/nvim-ufo",                      event=Events.File},
- -- {"ldelossa/buffertag",                         event=Events.File},
+ {"Bekaboo/dropbar.nvim",                       event=Events.File},
+ {"kevinhwang91/nvim-ufo",                      event=Events.File},
+ {"ldelossa/buffertag",                         event=Events.File},
  {"chentoast/marks.nvim",                       event=Events.File},
- -- {"rainbowhxch/beacon.nvim",                    event=Events.File},
+ {"rainbowhxch/beacon.nvim",                    event=Events.File},
 
  {"smjonas/live-command.nvim",                  event="CmdlineEnter"},
  {"nacro90/numb.nvim",                          event="CmdlineEnter"},
@@ -44,24 +42,20 @@ return {
  {"echasnovski/mini.align",                     virtual=true},
  {"echasnovski/mini.surround",                  virtual=true},
  {"numToStr/Comment.nvim"},
- -- {"gbprod/yanky.nvim"},
- -- {"monaqa/dial.nvim"},
+ {"gbprod/yanky.nvim"},
+ {"monaqa/dial.nvim"},
 
  --- Tools
  {"hoofcushion/hc-func",                        event=Events.File,                                   main="hc-func",virtual=true},
- -- {"RaafatTurki/hex.nvim"},
+ {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
- -- {"glepnir/dbsession.nvim"},
  {"nvim-neo-tree/neo-tree.nvim",                ft="directory"},
- -- {"nvim-telescope/telescope-file-browser.nvim", lazy=vim.fn.isdirectory(vim.fn.argv(0))==0,event=Events.DirEnter},
- -- {"nvim-tree/nvim-tree.lua",                    event=Events.DirEnter},
  {"nvim-pack/nvim-spectre"},
  {"s1n7ax/nvim-window-picker"},
  {"smoka7/multicursors.nvim"},
  --- Profiller
  -- {"dstein64/vim-startuptime"},
- -- {"stevearc/profile.nvim"}, -- replaced by snacks.nvim
 
 
  --- Completions
@@ -85,6 +79,7 @@ return {
  {"echasnovski/mini.trailspace",                event=Events.File,                                   virtual=true},
  {"folke/todo-comments.nvim",                   event=Events.File},
  {"nfrid/due.nvim",                             event=Events.File},
+
  -- {"lukas-reineke/indent-blankline.nvim",        event=Events.File}, -- replaced by snacks.nvim
  -- This werid plugin can't load at "BufEnter"
  {"hiphish/rainbow-delimiters.nvim",            event=Events.File},
@@ -92,7 +87,6 @@ return {
  --- AI
  -- {"zbirenbaum/copilot.lua"},
  {"luozhiya/fittencode.nvim",                   event="InsertEnter"},
- -- {"huggingface/llm.nvim",                       event="InsertEnter"},
 
  --- Git
  {"sindrets/diffview.nvim"},
@@ -126,7 +120,7 @@ return {
  {"nvim-treesitter/nvim-treesitter-textobjects"},
  {"altermo/ultimate-autopair.nvim",             event={"InsertEnter","CmdlineEnter"}},
 
- -- {"windwp/nvim-ts-autotag"},
+ {"windwp/nvim-ts-autotag"},
  {"abecodes/tabout.nvim"},
  {"Wansmer/treesj"},
  {"sustech-data/wildfire.nvim"},

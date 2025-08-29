@@ -188,13 +188,6 @@ return {
   {name=NS.fittencode_api_panel,lhs="<leader>A"},
  },
 },{
- override={tags="llm"},
- {
-  override={mode={"i"}},
-  {name=NS.llm_accept_keymap, index="accept_keymap", value="<c-g>a"},
-  {name=NS.llm_dismiss_keymap,index="dismiss_keymap",value="<c-g>d"},
- },
-},{
  override={tags="nvim-various-textobjs"},
  {
   override={
