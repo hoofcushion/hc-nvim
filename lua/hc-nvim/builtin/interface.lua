@@ -1,3 +1,5 @@
+-- Keymap interface table, defines basic information for all shortcuts
+-- The plugin needs to implement the corresponding shortcut interface according to the rules in the table
 return {
  {
   override={tags="global"},
@@ -358,7 +360,8 @@ return {
 },{
  wkspec={"<leader>n",group="Noice"},
  override={tags="noice"},
- {name=NS.noice_history,  lhs="<leader>nn"},
+ {name=NS.noice_all,      lhs="<leader>nn"},
+ {name=NS.noice_history,  lhs="<leader>nh"},
  {name=NS.noice_last,     lhs="<leader>nl"},
  {name=NS.noice_dismiss,  lhs="<leader>nm"},
  {name=NS.noice_errors,   lhs="<leader>ne"},
