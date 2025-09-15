@@ -530,6 +530,7 @@ Settings.normal={
  completion={
   enable=true,
   showWord="Disable",
+  workspaceWord=false,
  },
  diagnostics={
   disable={"different-requires"},

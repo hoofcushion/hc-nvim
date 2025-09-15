@@ -31,16 +31,28 @@ return {
     return str
    end
    local kinds=Rsc.kind[Config.ui.kind]
-   ---@param entry cmp.Entry
+   ---@type fun(entry: cmp.Entry, vim_item: vim.CompletedItem): vim.CompletedItem
    return function(entry,item)
+    -- custom menu name
     local menu=kinds[entry.source.name] or entry.source.name
     if menu~=nil then
      item.menu=menu
     end
+    -- custom kind naame
     local kind=kinds[item.kind]
     if kind~=nil then
      item.kind=kind
     end
+    -- add lsp client source to lsp item
+    local has_lsp_name,lsp_name=pcall(function()
+     return assert(entry.source.name=="nvim_lsp")
+      and assert(type(entry.source.source.client.name)=="string")
+      and entry.source.source.client.name
+    end)
+    if has_lsp_name then
+     item.menu=("%s(%s)"):format(item.menu,lsp_name)
+    end
+    -- truncate abbr text
     item.abbr=truncate(item.abbr,math.floor(vim.o.columns)*0.5)
     return item
    end
