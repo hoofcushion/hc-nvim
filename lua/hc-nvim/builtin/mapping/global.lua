@@ -202,11 +202,10 @@ return {
     name=NS.global_motion_h,
     rhs=Util.Keymod.Hold.create("h",function()
      -- move 1/20 of the line, and rounding to the window-buffer width
-     local offset=vim.fn.wincol()-vim.fn.col(".")
-     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width-offset
+     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
      local col_len=vim.fn.col("$")
      local col=math.min(win_width,col_len)-1
-     local step=math.floor(math.max(1,math.max(1,col/20)))
+     local step=math.floor(math.max(1,math.min(col/30,math.max(1,col/20))))
      return tostring(step)
       .."h"
     end),
@@ -215,11 +214,10 @@ return {
     name=NS.global_motion_l,
     rhs=Util.Keymod.Hold.create("l",function()
      -- move 1/20 of the line, and rounding to the window-buffer width
-     local offset=vim.fn.wincol()-vim.fn.col(".")
-     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width-offset
+     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
      local col_len=vim.fn.col("$")
      local col=math.min(win_width,col_len)-1
-     local step=math.floor(math.max(1,math.max(1,col/20)))
+     local step=math.floor(math.max(1,math.min(col/30,math.max(1,col/20))))
      return tostring(step)
       .."l"
     end),
