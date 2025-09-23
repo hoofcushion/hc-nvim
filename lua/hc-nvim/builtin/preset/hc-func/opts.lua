@@ -19,8 +19,6 @@ end)({
  },
  code_lens={enabled=false},
  auto_format={enabled=false},
- inlay_hint={enabled=false},
- semantic_tokens={enabled=false},
  document_highlight={enabled=true},
  toggler={
   enabled=true,

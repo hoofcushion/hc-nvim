@@ -6,18 +6,31 @@ return {
  cmdline={
   view="cmdline",
  },
- redirect={
-  view="popup",
- },
- -- set refresh limit
- throttle=Config.performance.throttle,
- ---change all default commands view to popup
  ---@type table<string, NoiceCommand|{}>
  commands={
   history={view="popup"},
   last={view="popup"},
   errors={view="popup"},
   all={view="popup"},
+ },
+ lsp={
+  override={
+   ["vim.lsp.util.convert_input_to_markdown_lines"]=true,
+   ["vim.lsp.util.stylize_markdown"]=true,
+   ["cmp.entry.get_documentation"]=true,
+  },
+ },
+ redirect={
+  view="popup",
+ },
+ -- set refresh limit
+ throttle=Config.performance.throttle,
+ presets={
+  bottom_search=true,
+  command_palette=true,
+  long_message_to_split=true,
+  inc_rename=true,
+  lsp_doc_border=false,
  },
  ---@type NoiceConfigViews|{}
  views=vim.tbl_deep_extend(
@@ -46,17 +59,32 @@ return {
      border={
       style=Rsc.border[Config.ui.border],
      },
+     win_options={
+      winblend=Config.ui.blend,
+     }
     }
    end
    return ret
   end)(),
+  {
+   hover={
+    position={row=0,col=4}
+   }
+  },
+
   -- set window size
   {
-   popup={size={height=Config.ui.window.percentage.height,width=Config.ui.window.percentage.width}},
-   split={size=Config.ui.window.percentage.vertical},
-   vsplit={size=Config.ui.window.percentage.horizontal},
+   popup={size={height=Config.ui.size.percentage.height,width=Config.ui.size.percentage.width}},
+   split={size=Config.ui.size.percentage.vertical},
+   vsplit={size=Config.ui.size.percentage.horizontal},
   },
   -- fix cmdline border
-  {cmdline={border={padding={0,-1}}}}
+  {
+   cmdline={
+    border={
+     -- padding={0,-1},
+    },
+   },
+  }
  ),
 }

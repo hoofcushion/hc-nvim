@@ -9,7 +9,7 @@ vim.api.nvim_create_autocmd("TermOpen",{
  callback=function(event)
   local id=vim.api.nvim_create_autocmd("TermEnter",{
    buffer=event.buf,
-   callback=function(_)
+   callback=function()
     vim.cmd.startinsert()
    end,
   })
@@ -69,14 +69,14 @@ vim.api.nvim_create_autocmd("FileType",{
  end,
 })
 -- Fix conceallevel for json files
-vim.api.nvim_create_autocmd({"FileType"},{
+vim.api.nvim_create_autocmd("FileType",{
  group=augroup("json_conceal"),
  pattern="json*",
  callback=function()
   vim.opt_local.conceallevel=0
  end,
 })
-vim.api.nvim_create_autocmd({"BufWritePre"},{
+vim.api.nvim_create_autocmd("BufWritePre",{
  group=augroup("auto_create_dir"),
  callback=function(event)
   vim.fn.mkdir(vim.fn.fnamemodify(event.match,":p:h"),"p")

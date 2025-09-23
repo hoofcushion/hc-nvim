@@ -1,4 +1,5 @@
-
+local Util=require("hc-nvim.util")
+local Type=Util.Type
 ---@class Substitute.config_manager
 local Config={}
 ---@class Substitute.config
@@ -35,12 +36,10 @@ Config.default={
   },
  },
 }
-Config.current=Config.default
-local Validate=require("hc-nvim.util.validate")
 local valitab={
  command="boolean",
  paste={
-  end_pos=Validate.mkenum("start","finish","cursor_s","cursor_e"),
+  end_pos=Type.any({"start","finish","cursor_s","cursor_e"}),
   highlight={
    enabled="boolean",
    blink_delay="integer",
@@ -49,8 +48,8 @@ local valitab={
   },
  },
  exchange={
-  end_pos=Validate.mkenum("start","finish","cursor_s","cursor_e"),
-  end_mark=Validate.mkenum("start","finish","cursor_s","cursor_e"),
+  end_pos=Type.any({"start","finish","cursor_s","cursor_e"}),
+  end_mark=Type.any({"start","finish","cursor_s","cursor_e"}),
   end_select={
    v="boolean",
    V="boolean",
@@ -64,17 +63,16 @@ local valitab={
   },
  },
 }
---- Set options.
---- if opts is nil, reset to default options.
---- else, update opts into current options.
----@param opts Substitute.config
-function Config.setup(opts)
- local new_options=vim.tbl_deep_extend("force",Config.current,opts)
- Validate.validate_assert("<hc-substitute>.options",new_options,valitab)
- Config.current=new_options
-end
+Config.current=Config.default
+Config.options=Util.Reference.get(function() return Config.current end)
 function Config.fini()
  Config.current=Config.default
+end
+function Config.setup(opts)
+ local new_options=vim.tbl_deep_extend("force",Config.current,opts)
+ local ok,msg = Type.check_type(valitab,"<hc-substitute.config>.options",new_options)
+ print(ok,msg)
+ Config.current=new_options
 end
 ---@generic T
 ---@param default T

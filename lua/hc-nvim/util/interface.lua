@@ -1,5 +1,5 @@
 local api=vim.api
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 local function _set(buffer,mode,lhs,rhs,opts)
  --- HACK: Work-around for nvim_buf_del_keymap
  rhs=rhs.."<ignore>"
@@ -139,18 +139,16 @@ local Mapping={
 ---@param spec mapspec
 ---@return Mapping
 function Mapping.new(spec)
- local obj=Util.Class.new(Mapping)
+ local obj=setmetatable({},{__index=Mapping})
  obj.instances={}
  obj.cond=spec.cond
  obj.lazykey=spec.lazykey
  obj.name=spec.name
  obj.priority=spec.priority
  obj.fallback=spec.fallback
- if not Util.is_empty(spec.tags) then
-  local tags=Util.to_fat_table(spec.tags)
-  if tags then
-   obj.tags=Util.tbl_to_set(tags)
-  end
+ local tags=Util.to_fat_table(spec.tags)
+ if tags then
+  obj.tags=Util.tbl_to_set(tags)
  end
  if spec.index then
   obj.key_as_lhs=spec.key_as_lhs
@@ -316,7 +314,7 @@ Interface.wkspec={}
 ---@param mapspecs mapspec?
 ---@return KeymapInterface
 function Interface.new(mapspecs)
- local obj=Util.Class.new(Interface)
+ local obj=setmetatable({},{__index=Interface})
  obj.index={}
  obj.mappings={}
  if mapspecs~=nil then

@@ -1,8 +1,8 @@
 local Config=require("hc-func.config")
 local Options=Config.options.rainbowcursor
 local Util=require("hc-nvim.util")
-local Autocmd=Util.Autocmd.new()
-local Updater=Util.Timer.new()
+local Autocmd=Util.ConductedAutocmd.new()
+local Updater=Util.ConductedTimer.new()
 local ColorIter={
  index=1,
  length=0,
@@ -82,17 +82,16 @@ function M.activate()
  RainbowCursor.guicursor=vim.o.guicursor
  set_cursor_hlgroup(Options.hl_group)
  Autocmd:activate()
- Updater:start()
+ Updater:enable()
  HiGroup:set(ColorIter:get())
 end
 function M.deactivate()
  vim.o.guicursor=RainbowCursor.guicursor
  Autocmd:deactivate()
- Updater:stop()
+ Updater:disable()
 end
 function M.enable()
  HiGroup.hl_group=Options.hl_group
- local FuncBind=Util.TaskLock.new(Options.throttle)
  --- ---
  --- setup rainbow cursor iterator
  --- ---
@@ -110,10 +109,12 @@ function M.enable()
   end
  end
  ColorIter:attach(colors)
- local refresh_cb=FuncBind:bind(function()
+ local refresh_cb=Util.throttle(Options.throttle,function()
   local hl_opts=ColorIter:get()
   if hl_opts~=HiGroup.hl_opts then
-   HiGroup:set(hl_opts)
+   vim.schedule(function()
+    HiGroup:set(hl_opts)
+   end)
   end
  end)
  --- ---
@@ -125,12 +126,12 @@ function M.enable()
    local timer_cb=function()
     ColorIter:next(timer_step)
    end
-   Updater:new_timer(0,Options.timer.interval,timer_cb)
+   Updater:add(0,Options.timer.interval,timer_cb)
   end
   if Options.timer.refresh then
-   Updater:new_timer(0,Options.timer.refresh,refresh_cb)
+   Updater:add(0,Options.timer.refresh,refresh_cb)
   end
-  Updater:start()
+  Updater:enable()
  end
  --- ---
  --- setup autocmd
@@ -152,7 +153,7 @@ function M.enable()
   if Options.autocmd.refresh then
    Autocmd:add({{Options.autocmd.refresh,{callback=refresh_cb}}})
   end
-  Autocmd:create()
+  Autocmd:enable()
  end
 end
 function M.disable()

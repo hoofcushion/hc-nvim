@@ -1,11 +1,10 @@
-local Config=require("hc-func.config")
 local Util=require("hc-nvim.util")
+local Config=require("hc-func.config")
 local Options=Config.options.cursorword
-local CursorWordAu=Util.Autocmd.new()
-local Highlight=Util.Highlight.new()
-local Timer=Util.Timer.new()
-local env=Util.LocalEnv.new()
-local lock=Util.TaskLock.new()
+local CursorWordAu=Util.ConductedAutocmd.new()
+local Highlight=Util.ConductedHighlight.new()
+local Timer=Util.ConductedTimer.new()
+local LocalEnv=Util.LocalEnv.new()
 --- ---
 --- Matcher class
 --- ---
@@ -40,54 +39,61 @@ function CursorWord.match()
  if pattern==nil then
   return
  end
- if pattern==env.buffer.current_pattern then
+ if pattern==LocalEnv.buffer.current_pattern then
   return
  end
  CursorWord.clear()
- env.buffer.current_pattern=pattern
+ LocalEnv.buffer.current_pattern=pattern
  Match.add(Options.hl_group,pattern)
 end
 function CursorWord.clear()
  Match.fini()
- env.buffer.current_pattern=nil
+ LocalEnv.buffer.current_pattern=nil
 end
-CursorWord.match=lock:bind(CursorWord.match)
+CursorWord.match=Util.throttle(0,vim.schedule_wrap(CursorWord.match))
+local defaults={delay=200,landing=100,fn=function() end}
+local function adaptive_debounce(opts)
+ setmetatable(opts or {},{__index=defaults})
+ local timer=Timer:get()
+ return function()
+  if timer:is_active() then
+   timer:start(opts.landing,0,CursorWord.match)
+   return
+  end
+  timer:start(opts.delay,0,CursorWord.match)
+ end
+end
 local M={}
 function M.activate()
  CursorWordAu:activate()
- Highlight:set()
+ Highlight:enable()
  CursorWord.match()
 end
 function M.deactivate()
  CursorWordAu:deactivate()
- Highlight:clear()
+ Highlight:disable()
  CursorWord.clear()
 end
 function M.enable()
  Highlight:add(Options.hl_group,Options.hl_opts)
- local event=Options.autocmd.enter
  local callback
  if Options.timer.enabled==true then
-  local timer=Timer:new_timer()
-  local landing,delay=Options.timer.landing,Options.timer.delay
-  callback=function()
-   if timer:is_active() then
-    timer:start(landing,0,CursorWord.match)
-    return
-   end
-   timer:start(delay,0,CursorWord.match)
-  end
+  callback=adaptive_debounce({
+   fn=CursorWord.match,
+   landing=Options.timer.landing,
+   delay=Options.timer.delay,
+  })
  else
   callback=CursorWord.match
  end
- CursorWordAu:add({{event,{callback=callback}}})
+ CursorWordAu:add({{Options.autocmd.enter,{callback=callback}}})
  CursorWordAu:add({{Options.autocmd.clear,{callback=CursorWord.clear}}})
- CursorWordAu:create()
+ CursorWordAu:enable()
 end
 function M.disable()
  CursorWordAu:fini()
  Highlight:fini()
  Timer:fini()
- env:reset()
+ LocalEnv:reset()
 end
 return M

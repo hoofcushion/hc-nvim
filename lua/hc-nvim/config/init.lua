@@ -49,7 +49,8 @@ M.ui={
  ---| "shadow"  # shadow effect
  ---| "block"   # block border
  border="single",
- window={
+ blend=33,
+ size={
   -- side window
   vertical=0.25,
   horizontal=0.25,
@@ -73,7 +74,7 @@ M.ui={
   ---@type table<"horizontal"|"vertical"|"width"|"height",string>
   percentage=setmetatable({},{
    __index=function(_,k)
-    local factor=M.ui.window[k]
+    local factor=M.ui.size[k]
     return string.format("%d%%",factor*100)
    end,
   }),
@@ -81,7 +82,9 @@ M.ui={
 }
 M.performance={
  refresh=500,
- throttle=100,
+ throttle=200,
+ debounce=200,
+ timeout=500,
  plugin={
   --- Duration (ms) to wait, when loading plugin continuously.
   --- Set to 0 to disable.

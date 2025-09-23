@@ -1,6 +1,10 @@
+--- Track cycle require
 local Util=require("hc-nvim.util")
+-- init plugin rtp
 vim.opt.rtp:append(Util.root_path)
-_G.NS=require("hc-nvim.namespace")
+-- init NS for string reference
+_G.NS=Util.namespace
+-- load modules
 local modules={
  "i18n",
  "option",
@@ -14,10 +18,12 @@ local modules={
 }
 for _,modname in ipairs(modules) do
  Util.track(modname)
- require("hc-nvim.setup."..modname)
+ Util.try(function()
+           return require("hc-nvim.setup."..modname)
+          end,Util.ERROR)
  Util.track()
 end
-
+-- :e for every file buffer
 vim.schedule(function()
  local bufs=vim.api.nvim_list_bufs()
  for _,buf in ipairs(bufs) do

@@ -11,92 +11,92 @@
 ---@field enable boolean
 ---@field active boolean
 ---@field suspend boolean
+
 local Util=require("hc-nvim.util")
 local Config=require("hc-func.config")
----@enum (key) HCFunc.function.modname
-local modnames={
- cursorword="hc-func.function.cursorword",
- rainbowcursor="hc-func.function.rainbowcursor",
- toggler="hc-func.function.toggler",
- document_highlight="hc-func.function.document_highlight",
- code_lens="hc-func.function.code_lens",
- auto_format="hc-func.function.auto_format",
-}
----@type table<HCFunc.function.modname,HCFunc.function.main>
-local functionality=Util.LazyTab.create(modnames)
-local statuses={}
-for name in pairs(modnames) do
- statuses[name]={enable=false,active=false,suspend=false}
-end
 local M={}
----@type table<HCFunc.function.modname,HCFunc.function.status>
-M.statuses=statuses
----@class HCFunc.function.funcs
----@field [HCFunc.function.modname] HCFunc.function.func
-local funcs={}
-for modname in pairs(modnames) do
- ---@class HCFunc.function.func
- local func={
-  status=M.statuses[modname],
-  activate=function()
-   M.activate(modname,true)
-  end,
-  deactivate=function()
-   M.activate(modname,false)
-  end,
-  setup=function()
-   M.enable(modname,true)
-   M.activate(modname,true)
-  end,
-  fini=function()
-   M.enable(modname,false)
-   M.activate(modname,false)
-  end,
+local modules=Util.LazyTab.from(function()
+ ---@enum (key) HCFunc.function.modname
+ local ret={
+  cursorword        =require("hc-func.function.cursorword"),
+  rainbowcursor     =require("hc-func.function.rainbowcursor"),
+  toggler           =require("hc-func.function.toggler"),
+  document_highlight=require("hc-func.function.document_highlight"),
+  code_lens         =require("hc-func.function.code_lens"),
+  auto_format       =require("hc-func.function.auto_format"),
  }
- funcs[modname]=func
+ return ret
+end)
+M.modules=modules
+---@class HCFunc.function.func
+local Func={
+ modname="",
+ option={},
+ status={enable=false,active=false,suspend=false},
+}
+function Func:activate(bool)
+ if self.status.active==bool then
+  return
+ end
+ if bool==nil then
+  bool=not self.status.active
+ end
+ local mod=modules[self.modname]
+ local ok,msg=pcall(bool and mod.activate or mod.deactivate)
+ if not ok and msg then
+  vim.notify(msg,vim.log.levels.ERROR)
+  return
+ end
+ self.status.active=bool
 end
-M.funcs=funcs
+function Func:enable(bool)
+ if self.status.enable==bool then
+  return
+ end
+ if bool==nil then
+  bool=not self.status.enable
+ end
+ local mod=modules[self.modname]
+ local ok,msg=pcall(bool and mod.enable or mod.disable)
+ if not ok and msg then
+  vim.notify(msg,vim.log.levels.ERROR)
+  return
+ end
+ self.status.enable=bool
+end
+function Func.new(modname)
+ local obj=setmetatable({},{__index=Func})
+ obj.modname=modname
+ obj.option=Config.options[modname]
+ obj.status={enable=false,active=false,suspend=false}
+ return obj
+end
+---@type table<HCFunc.function.modname,HCFunc.function.func>
+M.funcs={}
 ---@param name HCFunc.function.modname
 ---@param target boolean|nil
 function M.activate(name,target)
- local status=M.statuses[name]
- local current=status.active
- if target==current then return end
- if target==nil then target=not current end
- local func=functionality[name]
- if target==false then
-  func.deactivate()
-  status.active=target
- elseif status.enable then
-  func.activate()
-  status.active=target
- end
+ M.funcs[name]:activate(target)
 end
 ---@param name HCFunc.function.modname
 ---@param target boolean|nil
 function M.enable(name,target)
- local status=M.statuses[name]
- local current=status.enable
- if target==current then return end
- if target==nil then target=not current end
- local func=functionality[name]
- if target then
-  func.enable()
- else
-  func.disable()
- end
- status.enable=target
+ M.funcs[name]:enable(target)
 end
 function M.fini()
- for name in pairs(M.statuses) do
-  M.funcs[name].fini()
+ for _,func in pairs(M.funcs) do
+  func:enable(false)
+  func:activate(false)
  end
 end
 function M.setup()
- for name in pairs(M.statuses) do
-  if Config.options[name].enabled then
-   M.funcs[name].setup()
-  end
+ for modname in Util.iter_mod("hc-func.function") do
+  modname=Util.str_cut_r(modname,".",true)
+  M.funcs[modname]=Func.new(modname)
+ end
+ for _,func in pairs(M.funcs) do
+  func:enable(func.option.enabled)
+  func:activate(func.option.enabled)
  end
 end
 return M

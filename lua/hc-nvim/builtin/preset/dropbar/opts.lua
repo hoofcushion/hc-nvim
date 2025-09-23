@@ -12,6 +12,6 @@ return {
   },
  },
  bar={
-  update_debounce=Config.performance.throttle,
+  update_debounce=Config.performance.debounce,
  }
 }

@@ -1,7 +1,7 @@
 local Config=require("hc-func.config")
 local Function=require("hc-func.function")
 local Util=require("hc-nvim.util")
-local TogglerAu=Util.Autocmd.new()
+local TogglerAu=Util.ConductedAutocmd.new()
 local Options=Config.options.toggler
 --- Short cut to get entries from functionalities name
 ---@type HCFunc.toggler.rule
@@ -35,14 +35,15 @@ end
 TogglerAu:add({
  {{"BufEnter","BufWrite"},{
   callback=function(event)
-   for func_name,status in pairs(Function.statuses) do
-    if not (func_name=="toggler"
+   for name,func in pairs(Function.funcs) do
+    local status = func.status
+    if not (name=="toggler"
      or status.enable==false
      or status.suspend==true)
     then
      goto continue
     end
-    Function.activate(func_name,get_target(func_name,event.buf))
+    Function.activate(name,get_target(name,event.buf))
     ::continue::
    end
   end,
@@ -51,7 +52,8 @@ TogglerAu:add({
 TogglerAu:add({
  {{"FocusLost","FocusGained"},{
   callback=function(event)
-   for name,status in pairs(Function.statuses) do
+   for name,func in pairs(Function.funcs) do
+    local status = func.status
     if name=="toggler"
     or status.enable==false
     or TogglerRules[name].auto_suspend==false
@@ -73,9 +75,9 @@ function M.deactivate()
  TogglerAu:deactivate()
 end
 function M.disable()
- TogglerAu:delete()
+ TogglerAu:disable()
 end
 function M.enable()
- TogglerAu:create()
+ TogglerAu:enable()
 end
 return M

@@ -53,6 +53,7 @@ local Option={}
 ---@class AutoOptsSpec
 ---@field event   string|string[]?
 ---@field pattern nil|string|string[]
+---@field scheduled boolean?
 ---@field options scope_options
 ---@type AutoOptsSpec[]
 ---@alias OptSpec AutoOptsSpec|scope_options|OptSpec[]
@@ -63,11 +64,15 @@ function Option.set(opts)
    Option.set(v)
   end
  elseif opts.options then
-  vim.api.nvim_create_autocmd(opts.event or "filetype",{
+  local callback=function()
+   Option.set(opts.options)
+  end
+  if opts.scheduled then
+   callback=vim.schedule_wrap(callback)
+  end
+  vim.api.nvim_create_autocmd(opts.event or "FileType",{
    pattern=opts.pattern,
-   callback=function()
-    Option.set(opts.options)
-   end,
+   callback=callback,
   })
   return
  end

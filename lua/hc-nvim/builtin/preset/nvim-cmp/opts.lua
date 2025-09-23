@@ -5,6 +5,9 @@ local Rsc=require("hc-nvim.rsc")
 ---@type cmp.ConfigSchema
 return {
  view={
+  docs={
+   auto_open=true,
+  },
   entries={
    name="custom",
    selection_order="near_cursor",
@@ -15,9 +18,11 @@ return {
    border=Rsc.border[Config.ui.border],
    side_padding=0,
    col_offset=0,
+   winblend=Config.ui.blend,
   },
   documentation={
    border=Rsc.border[Config.ui.border],
+   winblend=Config.ui.blend,
   },
  },
  formatting={
@@ -59,17 +64,7 @@ return {
   end)(),
  },
  performance={
-  -- (60) the interval (in ms) used to group up completions from different sources
-  -- debounce=60,
-  -- (30) time (in ms) to delay filtering and displaying completions.
-  throttle=Config.performance.throttle,
-  -- (500) the timeout  (in ms)of candidate fetching process.
-  -- fetching_timeout=500,
-  -- (80) the timeout (in ms) for resolving item before confirmation.
-  -- confirm_resolve_timeout=80,
-  -- (1) the maximum time (in ms) an async function is allowed to run during one step of the event loop.
-  -- async_budget=1,
-  -- (200) the maximum number of items to show in the entries list.
-  -- max_view_entries=25,
+  debounce=30,
+  throttle=15,
  },
 }

@@ -1,8 +1,7 @@
-local method="textDocument/formatting"
+local Util=require("hc-nvim.util")
 local Config=require("hc-func.config")
 local Options=Config.options.auto_format
-local Util=require("hc-nvim.util")
-local AutoFormatAu=Util.Autocmd.new()
+local AutoFormatAu=Util.ConductedAutocmd.new()
 AutoFormatAu:add({
  {"BufWritePre",{
   callback=function(event)
@@ -10,7 +9,7 @@ AutoFormatAu:add({
    if vim.bo[buf].modified==false then
     return
    end
-   if next(vim.lsp.get_clients({bufnr=buf,method=method}))==nil then
+   if next(vim.lsp.get_clients({bufnr=buf,method="textDocument/formatting"}))==nil then
     return
    end
    local opts=vim.deepcopy(Options.opts)
@@ -27,9 +26,9 @@ function M.deactivate()
  AutoFormatAu:deactivate()
 end
 function M.enable()
- AutoFormatAu:create()
+ AutoFormatAu:enable()
 end
 function M.disable()
- AutoFormatAu:delete()
+ AutoFormatAu:disable()
 end
 return M

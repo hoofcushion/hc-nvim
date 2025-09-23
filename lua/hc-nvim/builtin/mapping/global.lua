@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 return {
  {
   {name=NS.global_buffer_delete,  cmd="bdelete"},
@@ -158,7 +158,6 @@ return {
     name=NS.global_motion_j,
     rhs=(function()
      local hold=Util.Keymod.Hold.create("j",function()
-      -- scroll 1/20 of the buffer, and rounding to the window-buffer height
       local win_lineend=vim.fn.line("w$")-vim.fn.line("w0")
       local lineend=vim.fn.line("$")
       local line=math.min(lineend,win_lineend)-1
@@ -180,7 +179,6 @@ return {
     name=NS.global_motion_k,
     rhs=(function()
      local hold=Util.Keymod.Hold.create("k",function()
-      -- scroll 1/20 of the buffer, and rounding to the window-buffer height
       local win_lineend=vim.fn.line("w$")-vim.fn.line("w0")
       local lineend=vim.fn.line("$")
       local line=math.min(lineend,win_lineend)-1
@@ -201,11 +199,10 @@ return {
    {
     name=NS.global_motion_h,
     rhs=Util.Keymod.Hold.create("h",function()
-     -- move 1/20 of the line, and rounding to the window-buffer width
      local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
      local col_len=vim.fn.col("$")
      local col=math.min(win_width,col_len)-1
-     local step=math.floor(math.max(1,math.min(col/30,math.max(1,col/20))))
+     local step=math.floor(math.max(1,math.min(col/30)))
      return tostring(step)
       .."h"
     end),
@@ -213,11 +210,10 @@ return {
    {
     name=NS.global_motion_l,
     rhs=Util.Keymod.Hold.create("l",function()
-     -- move 1/20 of the line, and rounding to the window-buffer width
      local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
      local col_len=vim.fn.col("$")
      local col=math.min(win_width,col_len)-1
-     local step=math.floor(math.max(1,math.min(col/30,math.max(1,col/20))))
+     local step=math.floor(math.max(1,math.min(col/30)))
      return tostring(step)
       .."l"
     end),

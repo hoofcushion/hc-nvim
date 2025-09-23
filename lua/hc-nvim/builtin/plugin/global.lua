@@ -5,26 +5,26 @@ local Events=require("hc-nvim.setup.events")
 --- auto: boolean?,
 ---}
 return {
- {"folke/tokyonight.nvim",                      lazy=false},
- {"folke/noice.nvim",                           event={"CmdlineEnter",Events.File}},
- {"nvim-lualine/lualine.nvim",                  event=Events.File},
+ {"folke/tokyonight.nvim",                     lazy=false},
+ {"folke/noice.nvim",                          event={"CmdlineEnter",Events.File}},
+ {"nvim-lualine/lualine.nvim",                 event=Events.File},
 
  -- {"rcarriga/nvim-notify"}, -- replaced by snacks.nvim
  {"stevearc/dressing.nvim"},
 
  {"echasnovski/mini.nvim"},
 
- {"folke/which-key.nvim",                       event="SafeState"},
+ {"folke/which-key.nvim",                      event="SafeState"},
 
  --- Information
- {"Bekaboo/dropbar.nvim",                       event=Events.File},
- {"kevinhwang91/nvim-ufo",                      event=Events.File},
- {"ldelossa/buffertag",                         event=Events.File},
- {"chentoast/marks.nvim",                       event=Events.File},
- {"rainbowhxch/beacon.nvim",                    event=Events.File},
+ {"Bekaboo/dropbar.nvim",                      event=Events.File},
+ {"kevinhwang91/nvim-ufo",                     event=Events.File},
+ {"ldelossa/buffertag",                        event=Events.File},
+ {"chentoast/marks.nvim",                      event=Events.File},
+ {"rainbowhxch/beacon.nvim",                   event=Events.File},
 
- {"smjonas/live-command.nvim",                  event="CmdlineEnter"},
- {"nacro90/numb.nvim",                          event="CmdlineEnter"},
+ {"smjonas/live-command.nvim",                 event="CmdlineEnter"},
+ {"nacro90/numb.nvim",                         event="CmdlineEnter"},
 
  --- Searchers
  -- {"ibhagwan/fzf-lua"},
@@ -32,25 +32,25 @@ return {
 
  --- Motions
  {"chrisgrieser/nvim-spider"},
- {"echasnovski/mini.ai",                        virtual=true},
- {"echasnovski/mini.operators",                 virtual=true},
+ {"echasnovski/mini.ai",                       virtual=true},
+ {"echasnovski/mini.operators",                virtual=true},
  {"folke/flash.nvim"},
- {"folke/snacks.nvim",                          lazy=false,                                          version="*"},
+ {"folke/snacks.nvim",                         lazy=false,                                          version="*"},
 
  --- Edit
- {"hoofcushion/hc-substitute",                  virtual=true},
- {"echasnovski/mini.align",                     virtual=true},
- {"echasnovski/mini.surround",                  virtual=true},
+ {"hoofcushion/hc-substitute",                 virtual=true},
+ {"echasnovski/mini.align",                    virtual=true},
+ {"echasnovski/mini.surround",                 virtual=true},
  {"numToStr/Comment.nvim"},
  {"gbprod/yanky.nvim"},
  {"monaqa/dial.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",                        event=Events.File,                                   main="hc-func",virtual=true},
+ {"hoofcushion/hc-func",                       event=Events.File,                                   main="hc-func",virtual=true},
  {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  {"chrisgrieser/nvim-various-textobjs"},
- {"nvim-neo-tree/neo-tree.nvim",                ft="directory"},
+ {"nvim-neo-tree/neo-tree.nvim",               ft="directory"},
  {"nvim-pack/nvim-spectre"},
  {"s1n7ax/nvim-window-picker"},
  {"smoka7/multicursors.nvim"},
@@ -59,38 +59,38 @@ return {
 
 
  --- Completions
- {"L3MON4D3/LuaSnip",                           event="InsertEnter"},
- {"rafamadriz/friendly-snippets",               event=Events.LazyLoad("LuaSnip")},
+ {"L3MON4D3/LuaSnip",                          event="InsertEnter"},
+ {"rafamadriz/friendly-snippets",              event=Events.LazyLoad("LuaSnip")},
  -- {"hrsh7th/nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
- {"iguanacucumber/magazine.nvim",               event={"InsertEnter","CmdlineEnter"},                name="nvim-cmp"},
- {"dmitmel/cmp-cmdline-history",                event={"CmdlineEnter"}},
- {"FelipeLema/cmp-async-path",                  event=Events.File},
- {"hrsh7th/cmp-buffer",                         event=Events.File},
- {"hrsh7th/cmp-cmdline",                        event="CmdlineEnter"},
- {"hrsh7th/cmp-nvim-lsp",                       event="LspAttach"},
- {"petertriho/cmp-git",                         ftfiletype={"gitcommit","octo","NeogitCommitMessage"}},
- {"saadparwaiz1/cmp_luasnip",                   event=Events.File},
+ {"iguanacucumber/magazine.nvim",              event={"InsertEnter","CmdlineEnter"},                name="nvim-cmp"},
+ {"dmitmel/cmp-cmdline-history",               event={"CmdlineEnter"}},
+ {"FelipeLema/cmp-async-path",                 event=Events.File},
+ {"hrsh7th/cmp-buffer",                        event=Events.File},
+ {"hrsh7th/cmp-cmdline",                       event="CmdlineEnter"},
+ {"hrsh7th/cmp-nvim-lsp",                      event="LspAttach"},
+ {"petertriho/cmp-git",                        ftfiletype={"gitcommit","octo","NeogitCommitMessage"}},
+ {"saadparwaiz1/cmp_luasnip",                  event=Events.File},
  -- {"Saghen/blink.cmp",                           lazy=false},
 
 
 
  --- Highlighter
- {"NvChad/nvim-colorizer.lua",                  event=Events.File},
- {"echasnovski/mini.trailspace",                event=Events.File,                                   virtual=true},
- {"folke/todo-comments.nvim",                   event=Events.File},
- {"nfrid/due.nvim",                             event=Events.File},
+ {"NvChad/nvim-colorizer.lua",                 event=Events.File},
+ {"echasnovski/mini.trailspace",               event=Events.File,                                   virtual=true},
+ {"folke/todo-comments.nvim",                  event=Events.File},
+ {"nfrid/due.nvim",                            event=Events.File},
 
  -- {"lukas-reineke/indent-blankline.nvim",        event=Events.File}, -- replaced by snacks.nvim
  -- This werid plugin can't load at "BufEnter"
- {"hiphish/rainbow-delimiters.nvim",            event=Events.File},
+ {"hiphish/rainbow-delimiters.nvim",           event=Events.File},
 
  --- AI
  -- {"zbirenbaum/copilot.lua"},
- {"luozhiya/fittencode.nvim",                   event="InsertEnter"},
+ {"luozhiya/fittencode.nvim",                  event="InsertEnter"},
 
  --- Git
  {"sindrets/diffview.nvim"},
- {"lewis6991/gitsigns.nvim",                    event=Events.RootPattern(".git")},
+ {"lewis6991/gitsigns.nvim",                   event=Events.RootPattern(".git")},
  {"NeogitOrg/neogit"},
  {"kdheepak/lazygit.nvim"},
 
@@ -102,23 +102,23 @@ return {
  {"nvimtools/none-ls.nvim"},
 
  --- LSP tools
- {"Wansmer/symbol-usage.nvim",                  event="LspAttach"},
+ {"Wansmer/symbol-usage.nvim",                 event="LspAttach"},
  {"SmiteshP/nvim-navbuddy"},
 
  -- Neovim develop
- {"folke/lazydev.nvim",                         event=Events.NeoConfig},
+ {"folke/lazydev.nvim",                        event=Events.NeoConfig},
 
  --- Treesitter
- {"nvim-treesitter/nvim-treesitter",            event=Events.Treesitter},
+ {"nvim-treesitter/nvim-treesitter",           event=Events.Treesitter},
  -- {"nvim-treesitter/nvim-treesitter-context",    event=Events.Treesitter},
- {"andymass/vim-matchup",                       event=Events.Treesitter},
+ {"andymass/vim-matchup",                      event=Events.Treesitter},
  -- {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
  -- {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
  -- {"RRethy/nvim-treesitter-endwise",             event=Events.Treesitter},
  -- {"Wansmer/binary-swap.nvim"},
  {"mizlan/iswap.nvim"},
  {"nvim-treesitter/nvim-treesitter-textobjects"},
- {"altermo/ultimate-autopair.nvim",             event={"InsertEnter","CmdlineEnter"}},
+ {"altermo/ultimate-autopair.nvim",            event={"InsertEnter","CmdlineEnter"}},
 
  {"windwp/nvim-ts-autotag"},
  {"abecodes/tabout.nvim"},
@@ -127,11 +127,11 @@ return {
 
 
  --- Notebook
- {"zk-org/zk-nvim",                             event=Events.RootPattern(".zk")},
- {"MeanderingProgrammer/markdown.nvim",         ft="markdown"},
+ {"zk-org/zk-nvim",                            event=Events.RootPattern(".zk")},
+ {"MeanderingProgrammer/markdown.nvim",        ft="markdown"},
  -- {"nvim-neorg/neorg",                           ft="norg",                           config=true},
 
  --- Libraries
  -- {"nvim-tree/nvim-web-devicons"},
- {"echasnovski/mini.icon",                      virtual=true},
+ {"echasnovski/mini.icon",                     virtual=true},
 }

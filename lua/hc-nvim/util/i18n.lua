@@ -1,5 +1,5 @@
 local Config=require("hc-nvim.config")
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 ---@class I18nSpec
 local I18nSpec={
  language="en",
@@ -19,7 +19,8 @@ local Translation={
  map={},
 }
 function Translation.new()
- return Util.Class.new(Translation)
+ local obj=setmetatable({},{__index=Translation})
+ return obj
 end
 function Translation:get()
  for _,locale in ipairs(Config.locale.fallbacks) do
@@ -42,7 +43,7 @@ local function extend(ret,language,country,translations)
   end
  elseif type(translations)=="string" then
   Util.tbl_check(ret.map,language)[country]=translations
-  Util.Class.set(ret,Translation)
+  setmetatable(ret,{__index=Translation})
  else
   vim.notify("Invalid translation type",vim.log.levels.WARN)
  end

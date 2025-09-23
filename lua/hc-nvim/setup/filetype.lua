@@ -32,10 +32,6 @@ for modname in Util.iter_mod({
 }) do
  FileType.add(require(modname))
 end
-vim.api.nvim_create_autocmd("VimEnter",{
- once=true,
- callback=FileType.check,
-})
 vim.api.nvim_create_autocmd("BufEnter",{
  callback=FileType.check,
 })

@@ -1,7 +1,7 @@
 ---@diagnostic disable: duplicate-set-field
 --- Rewrite lazy.nvim to use delay loading mechanism
 local Config=require("hc-nvim.config")
-if  Config.performance.plugin.load_cooldown==0 then
+if Config.performance.plugin.load_cooldown==0 then
  return
 end
 local Loader=require("lazy.core.loader")
@@ -42,13 +42,10 @@ vim.api.nvim_create_autocmd("SafeState",{
 ---@param reason {[string]:string}
 ---@param opts? {force:boolean}
 function Loader._load(plugin,reason,opts)
- if is_valid_event(reason.event) then
+ if not safestate and is_valid_event(reason.event) then
   TaskSequence:add(function()
    raw(plugin,reason,opts)
   end)
-  if safestate then
-   TaskSequence:start(Config.performance.plugin.load_cooldown)
-  end
   return
  end
  raw(plugin,reason,opts)

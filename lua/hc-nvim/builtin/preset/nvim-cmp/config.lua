@@ -7,15 +7,8 @@ return function(_,opts)
  --- ---
  ---@class cmp.SourceObj:cmp.SourceConfig
  local Source={
-  max_item_count=25,
+  max_item_count=1000,
  }
- local kinds=vim.lsp.protocol.CompletionItemKind
- cmp.event:on("confirm_done",function(x)
-  local kind=x.entry.completion_item.kind
-  if kind==kinds.Function or kind==kinds.Method then
-   vim.fn.feedkeys("(")
-  end
- end)
  function Source:new(name,properties)
   local source=vim.tbl_deep_extend("force",Source,properties)
   source.name=name
@@ -24,8 +17,9 @@ return function(_,opts)
  function Source:with(override)
   return vim.tbl_deep_extend("force",self,override)
  end
- ---@type table<string,cmp.SourceObj>
+ ---@type table<string,cmp.SourceObj|{}>
  local src=setmetatable({},{
+  -- auto create filed when index
   __index=function(t,name)
    local ret=rawget(t,name)
    if ret==nil then
@@ -34,6 +28,7 @@ return function(_,opts)
    end
    return ret
   end,
+  -- auto merge field when newindex
   __newindex=function(t,name,option)
    rawset(t,name,Source:new(name,option))
   end,

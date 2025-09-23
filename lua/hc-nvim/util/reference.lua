@@ -2,7 +2,7 @@
 --- A reference of a table is a fake table that correspond to key index
 --- And return real value of that index, but it block all newindex.
 --- ---
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 local Reference={}
 --- return a reference table of `main`
 --- example:

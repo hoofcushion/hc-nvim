@@ -2,15 +2,15 @@ local function get_hl_by_name(name)
  return vim.api.nvim_get_hl(0,{name=name})
 end
 local Util=require("hc-nvim.util")
-Util.HLGroup.create({
+local Hignlight=Util.ConductedHighlight.new()
+Hignlight:extend({
  {"SymbolUsageRounding",{fg=get_hl_by_name("CursorLine").bg,italic=true}},
  {"SymbolUsageContent", {bg=get_hl_by_name("CursorLine").bg,fg=get_hl_by_name("Comment").fg,italic=true}},
  {"SymbolUsageRef",     {fg=get_hl_by_name("Function").fg,bg=get_hl_by_name("CursorLine").bg,italic=true}},
  {"SymbolUsageDef",     {fg=get_hl_by_name("Type").fg,bg=get_hl_by_name("CursorLine").bg,italic=true}},
  {"SymbolUsageImp",     {fg=get_hl_by_name("@keyword").fg,bg=get_hl_by_name("CursorLine").bg,italic=true}},
 })
- :set_hl()
- :attach()
+Hignlight:attach()
 local Config=require("hc-nvim.config")
 local kind=require("hc-nvim.rsc").kind[Config.ui.kind]
 local defs={

@@ -76,7 +76,7 @@ return {
  popup_border_style=require("hc-nvim.rsc").border[Config.ui.border],
  window={
   position="right",
-  width=("%f%%"):format(Config.ui.window.horizontal*100),
+  width=("%f%%"):format(Config.ui.size.horizontal*100),
   mappings={
    ["<space>"]=false,
    ["O"]={"open_external",desc="Open file externally"},

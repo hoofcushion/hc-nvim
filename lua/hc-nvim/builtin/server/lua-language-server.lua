@@ -529,7 +529,7 @@ local Settings={}
 Settings.normal={
  completion={
   enable=true,
-  showWord="Disable",
+  showWord="Enable",
   workspaceWord=false,
  },
  diagnostics={
@@ -606,10 +606,16 @@ Settings.normal={
   enable=false,
  },
  semantic={
-  enable=false,
+  enable=true,
+  keyword=true,
+  variable=true,
+  annotation=true,
  },
  runtime={
   pathStrict=true,
+ },
+ telemetry={
+  enable=false,
  },
  window={
   progressBar=false,
