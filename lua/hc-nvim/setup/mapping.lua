@@ -11,7 +11,7 @@ for modname in Util.iter_mod({
  local mapping=require(modname)
  if mapping then
   Interface.forspecs(mapping,function(spec)
-   Interface:add(spec):start()
+   Interface:add(spec):create()
   end)
  end
 end

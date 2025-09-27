@@ -38,7 +38,7 @@ end
 ---@param keys any[]|string
 function Util.tbl_get(tbl,keys,expr)
  if type(keys)=="string" then
-  keys=Util.split(keys,".",{plain=true,trimempty=true})
+  keys=vim.split(keys,".",{plain=true,trimempty=true})
  end
  local e=#keys
  for i=1,e-1 do
@@ -57,7 +57,7 @@ end
 ---@param val any
 function Util.tbl_set(tbl,keys,val)
  if type(keys)=="string" then
-  keys=Util.split(keys,".",{plain=true,trimempty=true})
+  keys=vim.split(keys,".",{plain=true,trimempty=true})
  end
  local e=#keys
  for i=1,e-1 do

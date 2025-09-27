@@ -121,7 +121,7 @@ local PresetGetter={
   local keyimp=Util.eval(preset.keyimp,plugin)
   if keyimp~=nil then
    Mappings.forspecs(keyimp,function(mapspec)
-    Mappings:add(mapspec):start()
+    Mappings:add(mapspec):create()
    end)
   end
   Util.eval(preset.after,plugin)

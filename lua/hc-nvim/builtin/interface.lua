@@ -54,13 +54,13 @@ return {
    {name=NS.global_visual_indent,       lhs={"<",">"},                         mode="x"},
   },
   {
-   override={mode={"n","x","o"}},
+   override={mode={"n","x"}},
    {name=NS.global_change_c,lhs="c"},
    {name=NS.global_change_r,lhs="b"},
    {name=NS.global_change_R,lhs="B"},
   },
   {
-   override={mode={"n","x","o"}},
+   override={mode={"n","x"}},
    {name=NS.global_motion_ge,    lhs="q"},
    {name=NS.global_motion_gE,    lhs="Q"},
    {name=NS.global_motion_b,     lhs="w"},

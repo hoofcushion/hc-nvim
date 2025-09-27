@@ -78,3 +78,9 @@ if false then
  --users.foo.
  --          ^will show completions: name,age
 end
+---@generic T
+---@param t T
+---@return T
+function Lua.as(v,t)
+ return v
+end
