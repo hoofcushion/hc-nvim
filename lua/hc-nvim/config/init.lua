@@ -49,7 +49,7 @@ M.ui={
  ---| "shadow"  # shadow effect
  ---| "block"   # block border
  border="single",
- blend=33,
+ blend=10,
  size={
   -- side window
   vertical=0.25,

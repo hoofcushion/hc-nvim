@@ -83,10 +83,6 @@ local function keymap_del(buffer,mode,lhs)
  end
 end
 
-local function resolve_buffer(buffer)
- return buffer==true and 0 or tonumber(buffer)
-end
-
 ---@class RawSpec
 ---@field override? RawSpec
 ---@field wkspec? table
@@ -103,7 +99,7 @@ end
 ---@field opts? vim.keymap.set.Opts
 ---@field rhs? string|function
 ---@field suffix? string
----@field event? string|string[]
+---@field event? vim.api.keyset.events|vim.api.keyset.events[]
 ---@field pattern? string|string[]
 ---@field buffer? boolean
 ---@field once? boolean
@@ -124,27 +120,36 @@ end
 ---@field opts        vim.keymap.set.Opts
 ---@field rhs?        string|function
 ---@field suffix?     string
----@field event?      string[]
+---@field event?      vim.api.keyset.events[]
 ---@field pattern?    string[]
----@field buffer?     boolean
----@field once?       boolean
+---@field buffer     boolean
+---@field once       boolean
 ---@field prefix?     string
 ---@field index?      any[]
 ---@field value?      any
----@field key_as_lhs? boolean
+---@field key_as_lhs boolean
 
-local Spec={}
+local Spec={
+ cond=true,
+ fallback=false,
+ lazykey=true,
+ priority=0,
+ buffer=false,
+ once=false,
+ key_as_lhs=false,
+}
+local _Spec={__index=Spec}
 --- 将原始规范转换为处理后的规范
 ---@param raw_spec RawSpec
 ---@return Spec
 function Spec.new(raw_spec)
- local spec={}
+ local spec=setmetatable({},_Spec)
  -- meta
- spec.cond=raw_spec.cond or true
- spec.fallback=raw_spec.fallback or false
- spec.lazykey=raw_spec.lazykey or true
+ spec.cond=raw_spec.cond
+ spec.fallback=raw_spec.fallback
+ spec.lazykey=raw_spec.lazykey
  spec.name=raw_spec.name
- spec.priority=raw_spec.priority or 0
+ spec.priority=raw_spec.priority
  spec.tags=Util.tbl_to_set(Util.totable(raw_spec.tags))
  -- basic
  if raw_spec.cmd then
@@ -179,14 +184,14 @@ function Spec.new(raw_spec)
  end
  spec.index=index
  spec.value=raw_spec.value
- spec.key_as_lhs=raw_spec.key_as_lhs or false
+ spec.key_as_lhs=raw_spec.key_as_lhs
  return spec
 end
 ---@class Mapping
 local Mapping={
  spec=nil, ---@type Spec
- instances={},
- autocmd_id=nil, ---@type nil|integer
+ instances=nil, ---@type {[1]:integer,[2]:string,[3]:string}[]
+ autocmd_id=nil, ---@type integer?
 }
 --- mapping class
 ---@param spec Spec
@@ -220,7 +225,7 @@ function Mapping:override(mapping)
  end
  local active=self:is_active()
  if active then
-  self:stop()
+  self:delete()
  end
  Util.tbl_deep_extend(self.spec,mapping.spec)
  if active then
@@ -230,6 +235,30 @@ end
 function Mapping:check()
  local spec=self.spec
  return Util.toboolean(Util.eval(spec.cond))
+end
+---@param buffer integer|boolean?
+function Mapping:_create(buffer)
+ local spec=self.spec
+ if not self:is_keymap() or self:is_config() then
+  return
+ end
+ if buffer==nil then
+  buffer=spec.buffer
+ end
+ -- ignore nil|false
+ if not buffer then
+  buffer=nil
+ end
+ -- true -> current buf
+ if buffer==true then
+  buffer=0
+ end
+ -- resolve current buf
+ if buffer==0 then
+  buffer=vim.api.nvim_get_current_buf()
+ end
+ keymap_set(buffer,spec.mode,spec.lhs,spec.rhs,spec.opts,spec.fallback)
+ table.insert(self.instances,{buffer,spec.mode,spec.lhs})
 end
 ---@param buffer integer|boolean?
 function Mapping:create(buffer)
@@ -250,37 +279,20 @@ function Mapping:create(buffer)
  end
  self:_create(buffer)
 end
-function Mapping:stop()
+function Mapping:delete()
  if self.autocmd_id~=nil then
-  api.nvim_del_autocmd(self.autocmd_id)
+  Util.try(function()
+            api.nvim_del_autocmd(self.autocmd_id)
+           end,Util.ERROR)
   self.autocmd_id=nil
  end
- self:delete()
-end
----@param buffer integer|boolean?
-function Mapping:_create(buffer)
- local spec=self.spec
- if not self:is_keymap() or self:is_config() then
-  return
+ if next(self.instances)~=nil then
+  for _,spec in ipairs(self.instances) do
+   local buffer,mode,lhs=spec[1],spec[2],spec[3]
+   keymap_del(buffer,mode,lhs)
+  end
+  self.instances={}
  end
- if buffer==nil then
-  buffer=spec.buffer
- end
- if buffer~=nil then
-  buffer=resolve_buffer(buffer)
- end
- keymap_set(buffer,spec.mode,spec.lhs,spec.rhs,spec.opts,spec.fallback)
- table.insert(self.instances,{buffer,spec.mode,spec.lhs})
-end
-function Mapping:delete()
- if next(self.instances)==nil then
-  return
- end
- for _,spec in ipairs(self.instances) do
-  local buffer,mode,lhs=spec[1],spec[2],spec[3]
-  keymap_del(buffer,mode,lhs)
- end
- self.instances={}
 end
 function Mapping:configure(opts)
  local spec=self.spec
@@ -322,15 +334,14 @@ function Mapping:lazykeys()
 end
 ---@class Interface
 local Interface={
- ---@type table<any, Mapping[]>
- index={},
- ---@type table<any, Mapping>
- mappings={},
+ index={}, ---@type table<any, Mapping[]>
+ mappings={},---@type table<any, Mapping>
 }
 Interface.wkspec={}
+local _Interface={__index=Interface}
 ---@return Interface
 function Interface.new()
- local obj=setmetatable({},{__index=Interface})
+ local obj=setmetatable({},_Interface)
  obj.index={}
  obj.mappings={}
  return obj

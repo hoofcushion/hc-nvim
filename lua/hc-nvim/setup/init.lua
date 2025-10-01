@@ -8,10 +8,9 @@ _G.NS=Util.namespace
 local modules={
  "i18n",
  "option",
+ "basic",
  "mapping",
- "autocmd",
  "filetype",
- "diagnostic",
  "lazy",
  "vscode",
  "server",

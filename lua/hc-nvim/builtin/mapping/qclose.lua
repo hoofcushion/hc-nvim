@@ -18,8 +18,8 @@ return {
    "dbout",
    "gitsigns-blame",
   },
+  buffer=true,
   lhs="q",
   cmd="close",
-  buffer=true,
  },
 }

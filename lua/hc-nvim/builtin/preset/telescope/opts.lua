@@ -3,8 +3,20 @@ local Rsc=require("hc-nvim.rsc")
 local opts={
  defaults={
   layout_strategy="bottom_pane",
+  layout_config={
+   height=0.9999,
+   preview_cutoff=120,
+   prompt_position="top",
+  },
   winblend=Config.ui.blend,
   sorting_strategy="ascending",
+ },
+ mappings={
+  n={
+   ["?"]=require("telescope.actions.generate").which_key({
+    close_with_action=false,
+   }),
+  },
  },
 }
 opts.defaults=opts.defaults or {}

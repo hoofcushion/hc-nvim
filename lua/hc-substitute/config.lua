@@ -63,6 +63,9 @@ local valitab={
   },
  },
 }
+if UnitTest then
+ UnitTest:add_case({name="hc-substitute",expect=true,test=function() return Type.check_type(valitab,"config",Config.default) end})
+end
 Config.current=Config.default
 Config.options=Util.Reference.get(function() return Config.current end)
 function Config.fini()
@@ -70,8 +73,12 @@ function Config.fini()
 end
 function Config.setup(opts)
  local new_options=vim.tbl_deep_extend("force",Config.current,opts)
- local ok,msg = Type.check_type(valitab,"<hc-substitute.config>.options",new_options)
- print(ok,msg)
+ Util.try(
+  function()
+   assert(Type.check_type(valitab,"<hc-substitute.config>.options",new_options))
+  end,
+  Util.ERROR
+ )
  Config.current=new_options
 end
 ---@generic T

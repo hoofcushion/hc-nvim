@@ -6,10 +6,10 @@ local Events=require("hc-nvim.setup.events")
 ---}
 return {
  {"folke/tokyonight.nvim",                     lazy=false},
- {"folke/noice.nvim",                          event={"CmdlineEnter",Events.File}},
+ {"folke/noice.nvim",                          lazy=false},
  {"nvim-lualine/lualine.nvim",                 event=Events.File},
 
- -- {"rcarriga/nvim-notify"}, -- replaced by snacks.nvim
+ {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
 
  {"echasnovski/mini.nvim"},
@@ -110,12 +110,12 @@ return {
 
  --- Treesitter
  {"nvim-treesitter/nvim-treesitter",           event=Events.Treesitter},
- -- {"nvim-treesitter/nvim-treesitter-context",    event=Events.Treesitter},
+ {"nvim-treesitter/nvim-treesitter-context",    event=Events.Treesitter},
  {"andymass/vim-matchup",                      event=Events.Treesitter},
- -- {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
- -- {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
- -- {"RRethy/nvim-treesitter-endwise",             event=Events.Treesitter},
- -- {"Wansmer/binary-swap.nvim"},
+ {"JoosepAlviste/nvim-ts-context-commentstring",event=Events.LazyLoad("Comment.nvim")},
+ {"folke/ts-comments.nvim",                     event=Events.LazyLoad("Comment.nvim")},
+ {"RRethy/nvim-treesitter-endwise",             event=Events.Treesitter},
+ {"Wansmer/binary-swap.nvim"},
  {"mizlan/iswap.nvim"},
  {"nvim-treesitter/nvim-treesitter-textobjects"},
  {"altermo/ultimate-autopair.nvim",            event={"InsertEnter","CmdlineEnter"}},

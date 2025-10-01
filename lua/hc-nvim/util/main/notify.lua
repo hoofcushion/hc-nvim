@@ -9,7 +9,7 @@ function Util.OFF(msg) vim.notify(msg,vim.log.levels.OFF) end
 function Util.try(fn,catch)
  local ok,err=Util.pack_pcall(fn)
  if not ok then
-  catch(err)
+  catch(Util.unpacklen(err))
  end
- return err
+ return Util.unpacklen(err)
 end
