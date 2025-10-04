@@ -67,3 +67,25 @@ function Util.debounce(delay,fn)
   end)
  end
 end
+local queue={}
+---@param id any
+---@param time integer
+---@param fn function
+function Util.debounce_with_id(id,time,fn)
+ if not queue[id] then
+  queue[id]=Util.debounce(time,function()
+   Util.try(fn,Util.ERROR)
+   queue[id]=nil
+  end)
+ end
+ queue[id]()
+end
+---@param init function
+---@return table
+function Util.lazy(init)
+ return setmetatable({},{
+  __index=function(_,k)
+   return init()[k]
+  end,
+ })
+end

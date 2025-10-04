@@ -1,9 +1,12 @@
 local Util=require("hc-nvim.util")
 local Interface=Util.Interface.new()
 Util.track("interface")
-Util.try(function()
-          Interface:extend(require("hc-nvim.builtin.interface"))
-         end,Util.ERROR)
+Util.try(
+ function()
+  Interface:extend(require("hc-nvim.builtin.interface"))
+ end,
+ Util.ERROR
+)
 Util.track()
 for modname in Util.iter_mod({
  "hc-nvim.builtin.mapping",

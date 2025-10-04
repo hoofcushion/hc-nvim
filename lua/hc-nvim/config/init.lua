@@ -111,9 +111,6 @@ M.performance={
   },
  },
 }
---- spec[1] is the mason name of the server, specify it to download the server.
---- spec[2] is the setup name for the server, specify it to setup the server.
---- e.g, lua language server has name lua-language-server as mason package, but lua_ls in nvim-lspconfig's setup function.
 M.server={
  vscode=false,
  ensure_installed=true,
@@ -121,28 +118,28 @@ M.server={
  auto_setup=true,
  list={
   --- lspconfig
-  -- {name="ast-grep",            setup="ast_grep"},
-  {name="lua-language-server", setup="lua_ls"},
-  {name="bash-language-server",setup="bashls"},
+  -- {name="ast-grep",            main="ast_grep"},
+  {name="lua-language-server", main="lua_ls"},
+  {name="bash-language-server",main="bashls"},
   {name="clangd"},
-  {name="deno",                setup="denols"},
-  {name="json-lsp",            setup="jsonls"},
+  {name="deno",                main="denols"},
+  {name="json-lsp",            main="jsonls"},
   {name="marksman"},
   {name="pyright"},
-  {name="rust-analyzer",       setup="rust_analyzer"},
+  {name="rust-analyzer",       main="rust_analyzer"},
   {name="taplo"},
-  {name="vim-language-server", setup="vimls"},
+  {name="vim-language-server", main="vimls"},
   {name="vls"},
-  {name="yaml-language-server",setup="yamlls"},
+  {name="yaml-language-server",main="yamlls"},
   {name="zk"},
   {name="zls"},
   {name="llm-ls"},
   --- null-ls
   {name="cbfmt"},
   {name="prettier"},
-  {name="stylua",              setup="formatting.stylua"},
-  {name="codespell",           setup="diagnostic.stylua"},
-  {name="write-good",          setup="write_good"},
+  {name="stylua",              main="formatting.stylua"},
+  {name="codespell",           main="diagnostic.stylua"},
+  {name="write-good",          main="write_good"},
   -- {nil,                   "spell"},
  },
 }

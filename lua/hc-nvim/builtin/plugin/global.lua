@@ -5,8 +5,8 @@ local Events=require("hc-nvim.setup.events")
 --- auto: boolean?,
 ---}
 return {
- {"folke/tokyonight.nvim",                     lazy=false},
- {"folke/noice.nvim",                          lazy=false},
+ {"folke/tokyonight.nvim",                     event="VimEnter"},
+ {"folke/noice.nvim",                          event="VimEnter"},
  {"nvim-lualine/lualine.nvim",                 event=Events.File},
 
  {"rcarriga/nvim-notify"},

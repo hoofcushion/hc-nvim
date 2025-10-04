@@ -23,11 +23,14 @@ for _,modname in ipairs(modules) do
  Util.track()
 end
 -- :e for every file buffer
-vim.schedule(function()
- local bufs=vim.api.nvim_list_bufs()
- for _,buf in ipairs(bufs) do
-  if vim.uv.fs_stat(vim.api.nvim_buf_get_name(buf))~=nil then
-   vim.api.nvim_buf_call(buf,vim.cmd.edit)
+vim.api.nvim_create_autocmd("VimEnter",{
+ once=true,
+ callback=function()
+  local bufs=vim.api.nvim_list_bufs()
+  for _,buf in ipairs(bufs) do
+   if vim.uv.fs_stat(vim.api.nvim_buf_get_name(buf))~=nil then
+    vim.api.nvim_buf_call(buf,vim.cmd.edit)
+   end
   end
- end
-end)
+ end,
+})

@@ -7,8 +7,8 @@
 if false then
  ---@class event_t
  local _event_t={
-  event="filetype",
-  pattern="*.lua", ---@type string|string[]
+  event="FileType", ---@type vim.api.keyset.events|vim.api.keyset.events
+  pattern="lua", ---@type string|string[]
   cond=function() return true end, ---@type (fun(ev:vim.api.keyset.create_autocmd.callback_args):boolean?)
  }
  ---@class step_opt

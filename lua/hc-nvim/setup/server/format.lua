@@ -1,45 +1,61 @@
 local Config=require("hc-nvim.config")
-if Config.platform.is_vscode then
- return vim.lsp.buf.format
-end
-local function format(opts)
- if opts==nil then
-  opts={}
+local Util=require("hc-nvim.util")
+local LocalEnv=Util.LocalEnv.new()
+local click=0
+local _format=Util.debounce(200,vim.schedule_wrap(function(opts)
+ click=0
+ if Config.platform.is_vscode then
+  return vim.lsp.buf.format(opts)
  end
+ opts=opts or {}
  local buf=vim.api.nvim_get_current_buf()
  local mode=vim.fn.mode()
- local range=mode=="v" or mode=="V"
- local method=range and "textDocument/rangeFormatting" or "textDocument/formatting"
+ local is_visual_mode=mode:match("[vV]")~=nil
+ local method=is_visual_mode and "textDocument/rangeFormatting" or "textDocument/formatting"
  local clients=vim.lsp.get_clients({
   bufnr=buf,
   method=method,
  })
  if #clients==0 then
+  vim.notify("No LSP clients available for formatting",vim.log.levels.WARN)
   return
  end
  if #clients==1 then
-  vim.lsp.buf.format({name=clients[1].name})
+  vim.lsp.buf.format(vim.tbl_extend("force",opts,{name=clients[1].name}))
   return
  end
- if vim.b.lsp_format_choice then
-  vim.lsp.buf.format({name=vim.b.lsp_format_choice})
-  return
+ if LocalEnv.buffer.lsp_format_choice then
+  local valid_choice=vim.lsp.get_clients({name=LocalEnv.buffer.lsp_format_choice})[1]~=nil
+  if valid_choice then
+   vim.lsp.buf.format(vim.tbl_extend("force",opts,{name=LocalEnv.buffer.lsp_format_choice}))
+   return
+  else
+   LocalEnv.buffer.lsp_format_choice=nil
+  end
  end
  vim.ui.select(
   clients,
   {
-   prompt="Select a client",
-   format_item=function(item) return item.name end,
+   prompt="Select formatting client:",
+   format_item=function(item)
+    return string.format("%s (%s)",item.name,item.id)
+   end,
   },
   function(choice)
-   -- escape
-   if choice==nil then
-    return
-   end
-   local name=choice and choice.name or clients[1].name
-   vim.b.lsp_format_choice=name
-   vim.lsp.buf.format({name=name})
+   if not choice then return end
+   LocalEnv.buffer.lsp_format_choice=choice.name
+   vim.lsp.buf.format(vim.tbl_extend("force",opts,{name=choice.name}))
   end
  )
+end))
+---@param opts? table Format options
+---@return nil
+local function format(opts)
+ click=math.min(2,click+1)
+ if click==2 then
+  LocalEnv.buffer.lsp_format_choice=false
+ end
+ _format(opts)
 end
+
 return format

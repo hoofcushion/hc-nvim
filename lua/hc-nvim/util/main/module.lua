@@ -68,3 +68,49 @@ do
   return coroutine.wrap(_iter_mod),modnames
  end
 end
+---@param path string
+---@param fn fun(name: string, type: string, full_path: string)
+function Util.scan(path,fn)
+ for name,type in vim.fs.dir(path) do
+  local full_path=path.."/"..name
+  fn(name,type,full_path)
+  if type=="directory" then
+   Util.scan(full_path,fn)
+  end
+ end
+end
+---@param full_path string
+---@param base_path string
+---@return string[]
+local function get_relative_parts(full_path,base_path)
+ local relative_path=full_path:sub(#base_path+2)
+ local parts={}
+ for part in relative_path:gmatch("[^/]+") do
+  table.insert(parts,part)
+ end
+ return parts
+end
+---@param modname string
+---@return table
+function Util.create_modmap(modname)
+ local found=vim.loader.find(modname,{patterns={""}})[1]
+ local modpath=found and found.modpath or nil
+ if not modpath then
+  return {}
+ end
+ local modmap={}
+ Util.scan(modpath,function(name,type,full_path)
+  local parts=get_relative_parts(full_path,modpath)
+  local current_table=modmap
+  for i,part in ipairs(parts) do
+   if i==#parts and type=="file" then
+    local clean_name=part:gsub("%.lua$","")
+    current_table[clean_name]=true
+   else
+    current_table[part]=current_table[part] or {}
+    current_table=current_table[part]
+   end
+  end
+ end)
+ return modmap
+end

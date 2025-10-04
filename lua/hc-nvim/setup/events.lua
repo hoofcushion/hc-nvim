@@ -36,7 +36,7 @@ M.NeoConfig=Util.Event.create({
 M.File=Util.Event.create({
  name="File",
  any={
-  event={"VimEnter","BufEnter","BufAdd"},
+  event={"BufEnter"},
   cond=function(ev)
    return ev.file~=""
   end,

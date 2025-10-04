@@ -1,5 +1,3 @@
-local NULLLS_CONFIG_MODFORMAT="null-ls.builtins.%s.%s"
-local NVIMDAP_CONFIG_MODFORMAT="mason-nvim-dap.mappings.%s"
 local Util=require("hc-nvim.util")
 local Presets={}
 function Presets.lsp(name)
@@ -9,34 +7,79 @@ function Presets.lsp(name)
  end
 end
 local all_methods={"diagnostics","formatting","code_actions","completion","hover"}
----@param name string # e.g, formatting.stylua or stylua.
+local builtin_map; do
+ builtin_map=setmetatable({},{
+  __index=function(_,k)
+   builtin_map=Util.create_modmap("null-ls.builtins")
+   return builtin_map[k]
+  end,
+ })
+end
+---@param method string
+---@param name string
+---@return table?
+local function get_builtin(method,name)
+ if not builtin_map[method] or not builtin_map[method][name] then
+  return nil
+ end
+ local ok,builtin=pcall(require,("null-ls.builtins.%s.%s"):format(method,name))
+ return ok and builtin or nil
+end
 function Presets.null_ls(name)
- local methods={}
- if name:find(".",1,true) then
-  local method
-  method,name=name:match("^(.-)%.(.+)$")
-  table.insert(methods,method)
+ local methods
+ local _method,_name=name:match("^(.-)%.(.+)$")
+ if _method then
+  methods={_method}
+  name=_name
  else
   methods=all_methods
  end
  local ret={}
  for _,method in ipairs(methods) do
-  local builtin=Util.prequire(NULLLS_CONFIG_MODFORMAT:format(method,name))
-  ret[method]=builtin
+  local builtin=get_builtin(method,name)
+  if builtin then
+   ret[method]=builtin
+  end
  end
  if next(ret)==nil then
-  return
+  return nil
  end
  ret.filetypes={}
  for _,builtin in pairs(ret) do
-  if builtin.filetypes~=nil then
+  if builtin.filetypes then
    vim.list_extend(ret.filetypes,builtin.filetypes)
   end
  end
  return ret
 end
+local dap_config_names={"adapters","configurations","filetypes"}
+local dap_map; do
+ dap_map=setmetatable({},{
+  __index=function(_,k)
+   dap_map=Util.create_modmap("mason-nvim-dap.mappings")
+   return dap_map[k]
+  end,
+ })
+end
+---@param config_name string
+---@param name string
+---@return table?
+local function get_dap_config(config_name,name)
+ if not dap_map[config_name] or not dap_map[config_name][name] then
+  return nil
+ end
+ local ok,config=pcall(require,("mason-nvim-dap.mappings.%s.%s"):format(config_name,name))
+ return ok and config or nil
+end
 function Presets.dap(name)
- local ret=Util.prequire(NVIMDAP_CONFIG_MODFORMAT:format(name))
+ local ret={name=name}
+ for _,config_name in ipairs(dap_config_names) do
+  local config=get_dap_config(config_name,name)
+  if config then
+   ret[config_name]=config
+  end
+ end
+ ret.filetypes=ret.filetypes or {}
  return ret
 end
 for k,v in pairs(Presets) do
@@ -62,7 +105,9 @@ function SetupMaker.lsp(name)
   end
   Clients.lsp.enable(name)
   config=Clients.lsp.config[name]
-  if vim.list_contains(config.filetypes,vim.bo.filetype) then
+  if  not Clients.lsp.is_enabled(name)
+  and vim.list_contains(config.filetypes,vim.bo.filetype)
+  then
    Clients.lsp.start(config)
   end
  end
@@ -81,11 +126,14 @@ function SetupMaker.null_ls(name)
    Clients.null_ls.setup()
    setuped_null_ls=true
   end
-  for method,builtin in Util.rpairs(opts,all_methods) do
-   if config~=nil and config[method]~=nil then
-    builtin=builtin.with(config[method])
+  for _,method in ipairs(all_methods) do
+   local builtin=opts[method]
+   if builtin~=nil then
+    if config~=nil and config[method]~=nil then
+     builtin=builtin.with(config[method])
+    end
+    Clients.null_ls.register(builtin)
    end
-   Clients.null_ls.register(builtin)
   end
  end
 end
@@ -104,7 +152,8 @@ function SetupMaker.dap(name)
   if opts.configurations~=nil then
    local dap_cfgs=Clients.dap.configurations
    for _,filetype in ipairs(opts.filetypes) do
-    Util.list_extend(Util.tbl_check(dap_cfgs,filetype),opts.configurations)
+    dap_cfgs[filetype]=dap_cfgs[filetype] or {}
+    Util.list_extend(dap_cfgs[filetype],opts.configurations)
    end
   end
  end
@@ -118,20 +167,27 @@ local ConfigTab=Util.Cache.table(function(modname)
   return require(info.modname)
  end
 end)
+---@type table<string,clients>
 local TypeTab=Util.Cache.table(function(name)
- return Presets.lsp(name) and "lsp" or Presets.null_ls(name) and "null_ls" or Presets.dap(name) and "dap" or nil
+ return Presets.lsp(name) and "lsp"
+  or Presets.null_ls(name) and "null_ls"
+  or Presets.dap(name) and "dap" or nil
 end)
 local Handler={}
 local setuped={}
 function Handler.load(spec)
- local setup_name=spec.setup or spec.name
- if setuped[setup_name] then
+ local main=spec.main or spec.name
+ local name=spec.name
+ if setuped[main] then
   return
  end
- setuped[setup_name]=true
- local ls_type=TypeTab[setup_name]
+ setuped[main]=true
+ local ls_type=TypeTab[main]
  if ls_type then
-  SetupMaker[ls_type](setup_name)(ConfigTab[spec.name])
+  local setup_maker=SetupMaker[ls_type]
+  local config=ConfigTab[name]
+  local setup=setup_maker(main)
+  setup(config)
  end
 end
 return Handler
