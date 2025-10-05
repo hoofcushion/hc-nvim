@@ -3,6 +3,7 @@ M.Config=require("hc-nvim.config")
 M.Util=require("hc-nvim.util")
 M.Rsc=require("hc-nvim.rsc")
 function M.setup()
+ HCNvim=M
  require("hc-nvim.setup")
 end
 function M.export()

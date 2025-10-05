@@ -105,7 +105,7 @@ function Util.create_modmap(modname)
   for i,part in ipairs(parts) do
    if i==#parts and type=="file" then
     local clean_name=part:gsub("%.lua$","")
-    current_table[clean_name]=true
+    current_table[clean_name]=full_path
    else
     current_table[part]=current_table[part] or {}
     current_table=current_table[part]

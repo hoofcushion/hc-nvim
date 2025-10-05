@@ -80,8 +80,9 @@ function Util.debounce_with_id(id,time,fn)
  end
  queue[id]()
 end
----@param init function
----@return table
+---@generic T
+---@param init fun():T
+---@return T
 function Util.lazy(init)
  return setmetatable({},{
   __index=function(_,k)

@@ -1,25 +1,11 @@
 local Util=require("hc-nvim.util")
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
-local Mappings=require("hc-nvim.setup.mapping")
---- Get all available path of preset at once
-local presets={}
-do
- local function find_file(filename)
-  return vim.loader.find(filename,{patterns={""}})[1].modpath
- end
- for name in vim.fs.dir(find_file("hc-nvim.builtin.preset")) do
-  local fields={}
-  presets[name]=fields
-  local dir=find_file("hc-nvim.builtin.preset."..name)
-  for name2 in vim.fs.dir(dir) do
-   fields[name2:sub(1,-5)]=dir.."/"..name2
-  end
- end
-end
+local Mappings=Util.lazy(function() return require("hc-nvim.setup.mapping") end)
+local preset_modmap=Util.create_modmap("hc-nvim.builtin.preset")
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
- local fields=presets[name]
+ local fields=preset_modmap[name]
  if not fields then
   return Util.empty_t
  end
