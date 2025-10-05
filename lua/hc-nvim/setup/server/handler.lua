@@ -7,14 +7,10 @@ function Presets.lsp(name)
  end
 end
 local all_methods={"diagnostics","formatting","code_actions","completion","hover"}
-local builtin_map; do
- builtin_map=setmetatable({},{
-  __index=function(_,k)
-   builtin_map=Util.create_modmap("null-ls.builtins")
-   return builtin_map[k]
-  end,
- })
-end
+local builtin_map; builtin_map=Util.lazy(function()
+ builtin_map=Util.create_modmap("null-ls.builtins")
+ return builtin_map
+end)
 ---@param method string
 ---@param name string
 ---@return table?
@@ -22,7 +18,9 @@ local function get_builtin(method,name)
  if not builtin_map[method] or not builtin_map[method][name] then
   return nil
  end
- local ok,builtin=pcall(require,("null-ls.builtins.%s.%s"):format(method,name))
+ local ok,builtin=pcall(function()
+  return require(("null-ls.builtins.%s.%s"):format(method,name))
+ end)
  return ok and builtin or nil
 end
 function Presets.null_ls(name)
@@ -53,14 +51,10 @@ function Presets.null_ls(name)
  return ret
 end
 local dap_config_names={"adapters","configurations","filetypes"}
-local dap_map; do
- dap_map=setmetatable({},{
-  __index=function(_,k)
-   dap_map=Util.create_modmap("mason-nvim-dap.mappings")
-   return dap_map[k]
-  end,
- })
-end
+local dap_map; dap_map=Util.lazy(function()
+ dap_map=Util.create_modmap("mason-nvim-dap.mappings")
+ return dap_map
+end)
 ---@param config_name string
 ---@param name string
 ---@return table?
@@ -68,7 +62,9 @@ local function get_dap_config(config_name,name)
  if not dap_map[config_name] or not dap_map[config_name][name] then
   return nil
  end
- local ok,config=pcall(require,("mason-nvim-dap.mappings.%s.%s"):format(config_name,name))
+ local ok,config=pcall(function()
+  return require(("mason-nvim-dap.mappings.%s.%s"):format(config_name,name))
+ end)
  return ok and config or nil
 end
 function Presets.dap(name)

@@ -36,7 +36,7 @@ function Util.pt(tbl,fn)
 end
 ---@param tbl table
 ---@param keys any[]|string
-function Util.tbl_get(tbl,keys,expr)
+function Util.tbl_get(tbl,keys)
  if type(keys)=="string" then
   keys=vim.split(keys,".",{plain=true,trimempty=true})
  end
@@ -46,11 +46,9 @@ function Util.tbl_get(tbl,keys,expr)
  end
  local k=keys[e]
  if k then
-  if expr then
-   return Util.tbl_check(tbl,keys[e],expr)
-  end
   return tbl[keys[e]]
  end
+ return tbl
 end
 ---@param tbl table
 ---@param keys any[]|string
@@ -172,43 +170,6 @@ function Util.list_flatten(dst,...)
   end
  end
  return dst
-end
---- Use `repl` to replace `orig` if their type matched and orig isn't nil
-local function prefer(repl,orig)
- if repl==nil or repl==orig or type(repl)~=type(orig) then
-  return orig
- end
- if orig==nil then
-  return repl
- end
-end
-do
- --- Override a value recursively
- --- Use cache to check loop
- local function _override(dst,src,cache)
-  if cache[dst] or cache[src] then
-   return dst
-  end
-  local prefered=prefer(dst,src)
-  if prefered~=nil then
-   return prefered
-  end
-  cache[dst]=true
-  cache[src]=true
-  for k,v in pairs(src) do
-   dst[k]=_override(dst[k],v,cache)
-  end
-  return dst
- end
- --- Use src's elements to override dst
- --- Return dst
- ---@generic T
- ---@param dst T
- ---@param src T
- ---@return T
- function Util.override(dst,src)
-  return _override(dst,src,{})
- end
 end
 do
  local function _deepcopy(orig)

@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util.init_space")
+local Util=require("hc-nvim.util")
 return {
  {
   {name=NS.global_buffer_delete,  cmd="bdelete"},
