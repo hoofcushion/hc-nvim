@@ -2,7 +2,7 @@ return {
  pattern="noice",
  scheduled=true,
  options={
-  opt_local={
+  wo={
    wrap=true,
   }
  }

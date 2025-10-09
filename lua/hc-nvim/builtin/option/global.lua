@@ -78,5 +78,14 @@ return {
   foldlevel=99,
   foldlevelstart=99,
   foldcolumn="0",
+
+  --- Performance ---
+  synmaxcol=500,      -- Syntax highlighting column limit
+  updatetime=500,     -- Faster completion and git signs
+  timeoutlen=500,     -- Faster key sequence timeouts
+  ttimeoutlen=50,     -- Faster key code timeouts
+
+  linespace=0,        -- No extra line spacing
+  conceallevel=0,     -- Disable conceal for faster rendering
  },
 }

@@ -6,10 +6,14 @@ local is_visualmode={
  V=true,
  [""]=true,
 }
+---@return visualmode
 function Util.get_vmode()
  local vmode=vim.api.nvim_get_mode().mode:sub(1,1)
  if is_visualmode[vmode]==nil then
-  return vim.fn.visualmode() --[[@as visualmode]]
+  vmode=vim.fn.visualmode()
+  if vmode=="" then
+   vmode="v"
+  end
  end
  return vmode
 end

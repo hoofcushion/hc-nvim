@@ -145,6 +145,8 @@ return {
    [NS.lsp_workspace_list_folders]                     ="列出工作区文件夹",
    [NS.lsp_workspace_remove_folder]                    ="移除工作区文件夹",
    [NS.lsp_workspace_symbols]                          ="工作区符号",
+   [NS.lsp_inlay_hints_toggle]                         ="开关内联提示",
+   [NS.lsp_lua_ls_toggle_hint]                         ="开关 LuaLS 提示",
    [NS.cmp_select_prev]                                ="选择上一个候选",
    [NS.cmp_select_next]                                ="选择下一个候选",
    [NS.cmp_abort]                                      ="取消补全",
