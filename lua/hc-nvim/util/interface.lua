@@ -130,6 +130,8 @@ end
 ---@field key_as_lhs boolean
 
 local Spec={
+ mode={"n"},
+ tags={},
  cond=true,
  fallback=false,
  lazykey=true,
@@ -138,53 +140,67 @@ local Spec={
  once=false,
  key_as_lhs=false,
 }
+local function get_desc(name)
+ local map=Util.I18n.map
+ local trans=map.mapdesc[name]
+ if trans then
+  return trans:get()
+ end
+end
 local _Spec={__index=Spec}
 --- 将原始规范转换为处理后的规范
----@param raw_spec RawSpec
+--- 将原始规范转换为处理后的规范
+---@param raw RawSpec
 ---@return Spec
-function Spec.new(raw_spec)
+function Spec.new(raw)
  local spec=setmetatable({},_Spec)
  -- meta
- spec.cond=raw_spec.cond
- spec.fallback=raw_spec.fallback
- spec.lazykey=raw_spec.lazykey
- spec.name=raw_spec.name
- spec.priority=raw_spec.priority
- spec.tags=Util.tbl_to_set(Util.totable(raw_spec.tags))
- -- basic
- if raw_spec.cmd then
-  spec.rhs="<cmd>"..raw_spec.cmd.."<cr>"
- else
-  spec.rhs=raw_spec.rhs
+ if raw.cond~=nil then spec.cond=raw.cond end
+ if raw.fallback~=nil then spec.fallback=raw.fallback end
+ if raw.lazykey~=nil then spec.lazykey=raw.lazykey end
+ if raw.name~=nil then spec.name=raw.name end
+ if raw.priority~=nil then spec.priority=raw.priority end
+ if raw.tags~=nil then
+  spec.tags=Util.tbl_to_set(Util.totable(raw.tags))
  end
- spec.mode=raw_spec.mode and Util.to_fat_table(raw_spec.mode) or {"n"}
- if raw_spec.lhs then
+ -- basic
+ if raw.cmd~=nil then
+  spec.rhs="<cmd>"..raw.cmd.."<cr>"
+ else
+  if raw.rhs~=nil then spec.rhs=raw.rhs end
+ end
+ if raw.mode~=nil then
+  spec.mode=Util.totable(raw.mode)
+ end
+ local prefix=raw.prefix
+ local suffix=raw.suffix
+ if raw.lhs~=nil then
   local lhs={}
-  for _,l in Util.pipairs(raw_spec.lhs) do
-   table.insert(lhs,Util.concat(raw_spec.prefix,l,raw_spec.suffix))
+  for _,l in Util.pipairs(raw.lhs) do
+   table.insert(lhs,Util.concat(prefix,l,suffix))
   end
   spec.lhs=Util.to_fat_table(lhs)
  end
- local desc=raw_spec.desc
-  or (raw_spec.name and Util.I18n.get({"mapdesc",raw_spec.name})
-   or tostring(raw_spec.rhs))
- spec.opts=Util.tbl_extend({},{noremap=true,silent=true},raw_spec.opts or {},{desc=desc})
+ local desc=raw.desc or (get_desc(raw.name))
+ spec.opts={noremap=true,silent=true,desc=desc}
+ if raw.opts~=nil then
+  spec.opts=Util.tbl_extend(spec.opts,raw.opts)
+ end
  -- autocmd
- spec.event=Util.to_fat_table(raw_spec.event)
- spec.pattern=Util.to_fat_table(raw_spec.pattern)
- spec.buffer=raw_spec.buffer
- spec.once=raw_spec.once
+ if raw.event~=nil then spec.event=Util.totable(raw.event) end
+ if raw.pattern~=nil then spec.pattern=Util.totable(raw.pattern) end
+ if raw.buffer~=nil then spec.buffer=raw.buffer end
+ if raw.once~=nil then spec.once=raw.once end
  -- options
- spec.prefix=raw_spec.prefix or ""
- spec.suffix=raw_spec.suffix or ""
- local index; index=raw_spec.index
+ local index
+ if raw.index~=nil then index=raw.index end
  if type(index)=="string" then
-  index=Util.concat(spec.prefix,index,spec.suffix)
+  index=Util.concat(prefix,index,suffix)
   index=vim.split(index,".",{plain=true})
  end
- spec.index=index
- spec.value=raw_spec.value
- spec.key_as_lhs=raw_spec.key_as_lhs
+ if index~=nil then spec.index=index end
+ if raw.value~=nil then spec.value=raw.value end
+ if raw.key_as_lhs~=nil then spec.key_as_lhs=raw.key_as_lhs end
  return spec
 end
 ---@class Mapping
@@ -335,7 +351,7 @@ end
 ---@class Interface
 local Interface={
  index={}, ---@type table<any, Mapping[]>
- mappings={},---@type table<any, Mapping>
+ mappings={}, ---@type table<any, Mapping>
 }
 Interface.wkspec={}
 local _Interface={__index=Interface}
@@ -357,26 +373,38 @@ function Interface:export(tag)
  end
  return obj
 end
----@alias RawSpecs RawSpec|RawSpec[]
----@param raw_specs RawSpecs
----@param func fun(spec: RawSpec)
-function Interface.forspecs(raw_specs,func)
- local wkspec=raw_specs.wkspec
- if wkspec then
-  table.insert(Interface.wkspec,wkspec)
+local c={}
+C=c
+local function _p(ret,raw_specs)
+ if raw_specs.wkspec then
+  table.insert(Interface.wkspec,raw_specs.wkspec)
  end
  if raw_specs[1]~=nil then
   for _,raw_spec in ipairs(raw_specs) do
    if raw_specs.override then
-    raw_spec.override=Util.tbl_deep_extend(raw_spec.override or {},raw_specs.override)
+    raw_spec.override=raw_spec.override and Util.tbl_deep_extend(raw_spec.override,raw_specs.override) or raw_specs.override
    end
-   Interface.forspecs(raw_spec,func)
+   _p(ret,raw_spec)
   end
  else
   if raw_specs.override then
    Util.tbl_deep_extend(raw_specs,raw_specs.override)
   end
-  func(raw_specs)
+  table.insert(ret,raw_specs)
+ end
+ return ret
+end
+---@param raw_specs RawSpecs
+function Interface.parse_specs(raw_specs)
+ return _p({},raw_specs)
+end
+---@alias RawSpecs RawSpec|RawSpec[]
+---@param raw_specs RawSpecs
+---@param func fun(spec: RawSpec)
+function Interface.forspecs(raw_specs,func)
+ local specs=Interface.parse_specs(raw_specs)
+ for _,spec in ipairs(specs) do
+  func(spec)
  end
 end
 function Interface:formaps(func)

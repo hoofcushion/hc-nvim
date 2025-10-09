@@ -133,7 +133,6 @@ return {
  {name=NS.global_motion_e},
  {name=NS.global_motion_w},
 },{
-
  override={tags="dial"},
  {name=NS.dial_increment,    lhs="<c-a>", mode="n"},
  {name=NS.dial_decrement,    lhs="<c-x>", mode="n"},

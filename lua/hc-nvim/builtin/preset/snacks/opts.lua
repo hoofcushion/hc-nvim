@@ -1,14 +1,5 @@
 local Config=require("hc-nvim.config")
 local Rsc=require("hc-nvim.rsc")
-if vim.env.PROF then
- local snacks=vim.fn.stdpath("data").."/lazy/snacks.nvim"
- vim.opt.rtp:append(snacks)
- require("snacks.profiler").startup({
-  startup={
-   event="SafeState",
-  },
- })
-end
 local opts=vim.tbl_deep_extend(
  "force",
  {
