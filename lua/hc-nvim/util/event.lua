@@ -195,43 +195,44 @@ function Event.sequence(steps_t)
                 _steps.delay=nil
                 Event.sequence(_steps)
                end,steps_t.delay)
-  return {event="User",pattern=steps_t.name}
- end
- local i,e=1,#steps_t.steps
- -- Function to process the next step
- local function process_next_step()
-  local step=vim.deepcopy(steps_t.steps[i])
-  local callback=step.callback
-  step.group=steps_t.group
-  step.once=true
-  step.callback=function(ev)
-   if type(callback)=="function" then
-    callback(ev)
-   end
-   i=i+1
-   if i>e then
-    if steps_t.callback then
-     if steps_t.wait then
-      vim.defer_fn(function()
-                    steps_t.callback(ev)
-                   end,steps_t.wait)
-     else
-      steps_t.callback(ev)
+ else
+  local i,e=1,#steps_t.steps
+  -- Function to process the next step
+  local function process_next_step()
+   local step=vim.deepcopy(steps_t.steps[i])
+   local callback=step.callback
+   step.group=steps_t.group
+   step.once=true
+   step.callback=function(ev)
+    if type(callback)=="function" then
+     callback(ev)
+    end
+    i=i+1
+    if i>e then
+     if steps_t.callback then
+      if steps_t.wait then
+       vim.defer_fn(function()
+                     steps_t.callback(ev)
+                    end,steps_t.wait)
+      else
+       steps_t.callback(ev)
+      end
      end
+     if not steps_t.once then
+      Event.sequence(steps_t)
+     end
+    else
+     process_next_step()
     end
-    if not steps_t.once then
-     Event.sequence(steps_t)
-    end
-   else
-    process_next_step()
+    return true
    end
-   return true
+   -- Create the current step
+   Event.create(step)
   end
-  -- Create the current step
-  Event.create(step)
+  -- Start processing the first step
+  process_next_step()
  end
- -- Start processing the first step
- process_next_step()
+ return {event="User",pattern=steps_t.name}
 end
 -- local event2=Eventx.sequence({
 --  steps={
