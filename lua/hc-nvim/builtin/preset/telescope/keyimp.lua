@@ -1,6 +1,7 @@
 local builtin=require("telescope.builtin")
 local Wrapper=require("hc-nvim.util.wrapper")
-return {
+local Util=require("hc-nvim.util")
+return Util.parse_override({
  {name=NS.telescope_builtin_autocommands,                 rhs=builtin.autocommands},
  {name=NS.telescope_builtin_buffers,                      rhs=builtin.buffers},
  {name=NS.telescope_builtin_builtin,                      rhs=builtin.builtin},
@@ -65,4 +66,4 @@ return {
   {name=NS.lsp_workspace_symbols,        rhs=builtin.lsp_workspace_symbols},
   {name=NS.lsp_workspace_dynamic_symbols,rhs=builtin.lsp_workspace_dynamic_symbols},
  },
-}
+})

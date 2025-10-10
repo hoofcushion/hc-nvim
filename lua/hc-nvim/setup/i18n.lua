@@ -4,7 +4,8 @@ local Util=require("hc-nvim.util")
 for _,locale in ipairs(Config.locale.fallbacks) do
  Util.try(
   function()
-   Util.I18n.load(require("hc-nvim.builtin.language."..locale.code))
+   local spec=Util.BufferCache.require("hc-nvim.builtin.language."..locale.code)
+   Util.I18n.load(spec)
   end,
   Util.ERROR
  )

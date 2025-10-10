@@ -43,7 +43,7 @@ return function(_,opts)
    get_bufnrs=function()
     local res={}
     for _,buf in ipairs(vim.api.nvim_list_bufs()) do
-     if vim.fn.bufwinid(buf)~=-1 then
+     if vim.fn.bufname(buf)~="" or vim.fn.bufwinid(buf)~=-1 then
       table.insert(res,buf)
      end
     end
@@ -54,6 +54,10 @@ return function(_,opts)
  cmp.setup.filetype("gitcommit",{
   sources={
    src.git,
+   src.async_path,
+   src.bufname,
+   src.rg:with({max_item_count=5}),
+   src.buffer:with({max_item_count=5}),
   },
  })
  --- Search
@@ -66,28 +70,35 @@ return function(_,opts)
     options={history_type="/"},
     max_item_count=5,
    }),
+   src.treesitter,
+   src.rg:with({max_item_count=5}),
+   src.buffer:with({max_item_count=5}),
   },
  })
  --- Command
  cmp.setup.cmdline(":",{
   sources={
-   src.cmdline:with({priority=1024}),
+   src.cmdline:with({priority=2^31}),
    src.async_path,
    src.bufname,
    src.cmdline_history:with({
     options={history_type=":"},
     max_item_count=5,
    }),
+   src.treesitter,
+   src.rg:with({max_item_count=5}),
    src.buffer:with({max_item_count=5}),
   },
  })
  cmp.setup({
   sources={
-   src.nvim_lsp,
+   src.nvim_lsp:with({priority=2^31}),
    src.luasnip,
    src.lazydev,
    src.bufname,
    src.async_path,
+   src.treesitter,
+   src.rg:with({max_item_count=5}),
    src.buffer:with({max_item_count=5}),
   },
  })

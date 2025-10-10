@@ -5,7 +5,7 @@ for modname in Util.iter_mod({
 }) do
  Util.try(
   function()
-   Util.Option.set(require(modname))
+   Util.Option.set(Util.BufferCache.require(modname))
   end,
   Util.ERROR
  )

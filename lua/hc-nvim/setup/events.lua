@@ -27,7 +27,7 @@ end
 M.NeoConfig=Util.Event.create({
  name="NeoConfig",
  any={
-  event={"VimEnter","BufEnter","BufAdd"},
+  event={"BufEnter"},
   cond=function(ev)
    return Util.is_profile(vim.fs.normalize(ev.file))
   end,
@@ -37,15 +37,6 @@ M.File=Util.Event.create({
  name="File",
  any={
   event={"BufEnter"},
-  cond=function(ev)
-   return ev.file~=""
-  end,
- },
-})
-M.FileAdd=Util.Event.create({
- name="FileAdd",
- any={
-  event="BufAdd",
   cond=function(ev)
    return ev.file~=""
   end,
@@ -61,18 +52,4 @@ M.Treesitter=Util.Event.create({
   end,
  },
 })
--- local t=vim.uv.new_timer()
--- local cb=function()
---  vim.schedule(function()
---   vim.api.nvim_exec_autocmds("User",{pattern="Idle"})
---   t:stop()
---  end)
--- end
--- vim.api.nvim_create_autocmd({"CursorMoved","CursorMovedI"},{
---  callback=function(x)
---   t:start(1000,0,cb)
---  end,
--- }
--- )
--- M.Idle={event="User",pattern="Idle"}
 return M

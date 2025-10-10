@@ -60,8 +60,7 @@ return {
  --- Completions
  {"L3MON4D3/LuaSnip",                           event="InsertEnter"},
  {"rafamadriz/friendly-snippets",               event=Events.LazyLoad("LuaSnip")},
- -- {"hrsh7th/nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
- {"iguanacucumber/magazine.nvim",               event={"InsertEnter","CmdlineEnter"},        name="nvim-cmp"},
+ {"hrsh7th/nvim-cmp",                           event={"InsertEnter","CmdlineEnter"}},
  {"dmitmel/cmp-cmdline-history",                event={"CmdlineEnter"}},
  {"FelipeLema/cmp-async-path",                  event=Events.File},
  {"hrsh7th/cmp-buffer",                         event=Events.File},
@@ -69,6 +68,8 @@ return {
  {"hrsh7th/cmp-nvim-lsp",                       event="LspAttach"},
  {"petertriho/cmp-git",                         ft={"gitcommit","octo","NeogitCommitMessage"}},
  {"saadparwaiz1/cmp_luasnip",                   event=Events.File},
+ {"ray-x/cmp-treesitter",                       event=Events.File},
+ {"lukas-reineke/cmp-rg",                       event=Events.File},
  -- {"Saghen/blink.cmp",                           lazy=false},
 
 

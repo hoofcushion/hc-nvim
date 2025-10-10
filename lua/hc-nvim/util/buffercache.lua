@@ -38,6 +38,7 @@
 ---- `BufferCache.print_stats()` - Show profiling results
 ---
 
+local Util=require("hc-nvim.util.init_space")
 local BufferCache={}
 ---@boolean # Whether caching is enabled (set via BC_NOCACHE environment variable)
 BufferCache.enabled=vim.env.BC_NOCACHE==nil
@@ -47,32 +48,46 @@ BufferCache.profiler=vim.env.BC_PROFILER~=nil
 BufferCache.records={
  _={name="_",cache=0,source=0},
 }
+local stringbuffer=require("string.buffer")
 ---@string # Directory where cache files are stored
 local cache_dir=vim.fn.stdpath("cache").."/buffercache/"
 -- Ensure cache directory exists
 vim.fn.mkdir(cache_dir,"p")
----Check if value contains only basic LuaJIT-compatible types
----@param value any
----@return boolean
-local function is_basic_type(value)
- local t=type(value)
- -- Basic primitive types
- if t=="string" or t=="number" or t=="boolean" or t=="nil" then
-  return true
+local bit32=require("bit")
+---@param data string
+---@return string
+local function fnv1a32(data)
+ local hash=0x811c9dc5
+ for i=1,#data do
+  hash=bit32.bxor(hash,string.byte(data,i))
+  hash=hash*0x01000193
  end
- -- Simple tables (only contain basic types)
- if t=="table" then
-  for k,v in pairs(value) do
-   if not is_basic_type(k) or not is_basic_type(v) then
-    return false
+ return string.format("%08x",hash)
+end
+local function write(filename,value)
+ local cache_file=cache_dir..fnv1a32(filename)..".bin"
+ local encoded=stringbuffer.encode(value)
+ local fd=vim.uv.fs_open(cache_file,"w",438)
+ if fd then
+  vim.uv.fs_write(fd,encoded,0)
+  vim.uv.fs_close(fd)
+ end
+end
+local function read(filename)
+ local cache_file=cache_dir..fnv1a32(filename)..".bin"
+ local source_stat=vim.uv.fs_stat(filename)
+ local cache_stat=vim.uv.fs_stat(cache_file)
+ if cache_stat and source_stat and cache_stat.mtime.sec>source_stat.mtime.sec then
+  local fd=vim.uv.fs_open(cache_file,"r",438)
+  if fd then
+   local encoded=vim.uv.fs_read(fd,cache_stat.size,0)
+   vim.uv.fs_close(fd)
+   if encoded then
+    return stringbuffer.decode(encoded)
    end
   end
-  return true
  end
- -- Unsupported types: function, userdata, thread
- return false
 end
-
 ---Internal function to handle cached execution with automatic invalidation
 ---@param filename string The source file path to use as cache key
 ---@param fn function The function to execute and cache
@@ -81,43 +96,22 @@ local function get_cached(filename,fn)
  if not BufferCache.enabled then
   return fn()
  end
- local cache_file=cache_dir..vim.fn.sha256(filename)..".bin"
- local source_stat=vim.uv.fs_stat(filename)
- local cache_stat=vim.uv.fs_stat(cache_file)
  local result
  local cache_start=vim.uv.hrtime()
- if cache_stat and source_stat and cache_stat.mtime.sec>source_stat.mtime.sec then
-  local fd=vim.uv.fs_open(cache_file,"r",438)
-  if fd then
-   local encoded=vim.uv.fs_read(fd,cache_stat.size,0)
-   vim.uv.fs_close(fd)
-   if encoded then
-    result=require("string.buffer").decode(encoded)
-    if not BufferCache.profiler and is_basic_type(result) then
-     return result
-    end
-   end
-  end
- end
+ result=Util.try(function() return read(filename) end,Util.ERROR)
  local cache_end=vim.uv.hrtime()
- local source_start=vim.uv.hrtime()
- result=fn()
- local source_end=vim.uv.hrtime()
- -- Only cache basic types (LuaJIT compatible)
- if is_basic_type(result) then
-  local encoded=require("string.buffer").encode(result)
-  local fd=vim.uv.fs_open(cache_file,"w",438)
-  if fd then
-   vim.uv.fs_write(fd,encoded,0)
-   vim.uv.fs_close(fd)
-  end
+ if result and not BufferCache.profiler then
+  return result
  end
+ local source_start=vim.uv.hrtime()
+ result=Util.try(fn,Util.ERROR)
+ local source_end=vim.uv.hrtime()
+ write(filename,result)
  if BufferCache.profiler then
   local record={
    name=filename,
    cache=(cache_end-cache_start)/1e9,
    source=(source_end-source_start)/1e9,
-   cached=is_basic_type(result),
   }
   table.insert(BufferCache.records,record)
  end
@@ -152,46 +146,56 @@ function BufferCache.require(modname)
  local modpath=found.modpath
  return get_cached(modpath,function() return require(modname) end)
 end
----Print performance profiling statistics when profiling is enabled
----Shows cache hit rates, time savings, and efficiency metrics
+-- 使用 Sheet.print 打印性能分析数据
 function BufferCache.print_stats()
  local records=BufferCache.records
  if not BufferCache.profiler or #records==0 then
   print("No profiler data available")
   return
  end
- local total_cache=0
- local total_source=0
- local total_saved=0
- local cached_count=0
- print("BufferCache Profiler Results:")
- print("="..string.rep("=",80))
- print(string.format("%-15s %12s %12s %12s %8s","Filename","Cache(ms)","Source(ms)","Saved(ms)","Cached"))
- print(string.rep("-",96))
+ -- 准备表格数据
+ local table_data={}
+ -- 添加表头
+ local headers={"Filename","Cache(ms)","Source(ms)","Saved(ms)","Cached"}
+ -- 添加数据行
  for _,record in ipairs(records) do
   if record.name~="_" then
-   local cache_ms=record.cache*1000
-   local source_ms=record.source*1000
-   local saved_ms=source_ms-cache_ms
-   total_cache=total_cache+cache_ms
-   total_source=total_source+source_ms
-   total_saved=total_saved+saved_ms
-   if record.cached then cached_count=cached_count+1 end
-   print(string.format("%-15s %12.3f %12.3f %12.3f %8s",
-                       vim.fn.fnamemodify(record.name,":t"),
-                       cache_ms,
-                       source_ms,
-                       saved_ms,
-                       record.cached and "✓" or "✗"
-   ))
+   table.insert(table_data,{
+    vim.fn.fnamemodify(record.name,":t"),
+    string.format("%.3f",record.cache*1000),
+    string.format("%.3f",record.source*1000),
+    string.format("%.3f",(record.source-record.cache)*1000),
+   })
   end
  end
- print(string.rep("-",96))
- print(string.format("%-15s %12.3f %12.3f %12.3f %8d/%d",
-                     "TOTAL",total_cache,total_source,total_saved,cached_count,#records-1))
- print(string.format("%-15s %12.1f%%",
-                     "Efficiency",(total_saved/total_source)*100))
- print(string.format("%-15s %12.1f%%",
-                     "Cacheable",(cached_count/(#records-1))*100))
+ -- 添加总计行
+ local total_cache=0
+ local total_source=0
+ for _,record in ipairs(records) do
+  if record.name~="_" then
+   total_cache=total_cache+record.cache
+   total_source=total_source+record.source
+  end
+ end
+ local total_saved=total_source-total_cache
+ table.insert(table_data,{
+  "TOTAL",
+  string.format("%.3f",total_cache*1000),
+  string.format("%.3f",total_source*1000),
+  string.format("%.3f",total_saved*1000),
+ })
+ -- 添加效率行
+ table.insert(table_data,{
+  "Efficiency",
+  "",
+  "",
+  string.format("%.1f%%",(total_source/total_cache)*100),
+  "",
+ })
+ Util.Sheet.print(table_data,{
+  headers=headers,
+  alignments={"left","right","right","right","center"},
+  style="single",
+ })
 end
 return BufferCache

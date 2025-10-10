@@ -373,38 +373,19 @@ function Interface:export(tag)
  end
  return obj
 end
-local c={}
-C=c
-local function _p(ret,raw_specs)
- if raw_specs.wkspec then
-  table.insert(Interface.wkspec,raw_specs.wkspec)
+---@alias RawSpecs RawSpec|RawSpec[]
+---@param raw RawSpecs
+---@param func fun(spec: RawSpec)
+function Interface.forspecs(raw,func)
+ if raw.wkspec then
+  table.insert(Interface.wkspec,raw.wkspec)
  end
- if raw_specs[1]~=nil then
-  for _,raw_spec in ipairs(raw_specs) do
-   if raw_specs.override then
-    raw_spec.override=raw_spec.override and Util.tbl_deep_extend(raw_spec.override,raw_specs.override) or raw_specs.override
-   end
-   _p(ret,raw_spec)
+ if raw[1]~=nil then
+  for _,raw_spec in ipairs(raw) do
+   Interface.forspecs(raw_spec,func)
   end
  else
-  if raw_specs.override then
-   Util.tbl_deep_extend(raw_specs,raw_specs.override)
-  end
-  table.insert(ret,raw_specs)
- end
- return ret
-end
----@param raw_specs RawSpecs
-function Interface.parse_specs(raw_specs)
- return _p({},raw_specs)
-end
----@alias RawSpecs RawSpec|RawSpec[]
----@param raw_specs RawSpecs
----@param func fun(spec: RawSpec)
-function Interface.forspecs(raw_specs,func)
- local specs=Interface.parse_specs(raw_specs)
- for _,spec in ipairs(specs) do
-  func(spec)
+  func(raw)
  end
 end
 function Interface:formaps(func)

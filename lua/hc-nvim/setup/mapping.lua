@@ -3,7 +3,7 @@ local Interface=Util.Interface.new()
 Util.track("interface")
 Util.try(
  function()
-  local specs=require("hc-nvim.util.buffercache").require("hc-nvim.builtin.interface")
+  local specs=Util.BufferCache.require("hc-nvim.builtin.interface")
   Interface:extend(specs)
  end,
  Util.ERROR

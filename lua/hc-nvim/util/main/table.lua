@@ -232,3 +232,37 @@ end
 function Util.deepset(tbl,key,val)
  deepset({orig=tbl[key],t=tbl,k=key,v=val})
 end
+function Util.override(p,t)
+ for _,v in ipairs(t) do
+  if type(v)=="table" then
+   if v[1]~=nil then
+    Util.override(p,v)
+   else
+    Util.tbl_deep_extend(v,p)
+   end
+  end
+ end
+ return t
+end
+---@param raws table|table[]
+---@param ret table
+local function parse_override(ret,raws)
+ if raws[1]~=nil then
+  for _,raw in ipairs(raws) do
+   if raws.override then
+    raw.override=raw.override and Util.tbl_deep_extend(raw.override,raws.override) or raws.override
+   end
+   parse_override(ret,raw)
+  end
+ else
+  if raws.override then
+   Util.tbl_deep_extend(raws,raws.override)
+  end
+  table.insert(ret,raws)
+ end
+ return ret
+end
+---@param raws table|table[]
+function Util.parse_override(raws)
+ return parse_override({},raws)
+end
