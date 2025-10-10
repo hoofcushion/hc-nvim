@@ -2,7 +2,7 @@ local Config=require("hc-nvim.config")
 local Util=require("hc-nvim.util")
 local LocalEnv=Util.LocalEnv.new()
 local click=0
-local _format=Util.debounce(200,vim.schedule_wrap(function(opts)
+local function format_raw(opts)
  click=0
  if Config.platform.is_vscode then
   return vim.lsp.buf.format(opts)
@@ -47,15 +47,19 @@ local _format=Util.debounce(200,vim.schedule_wrap(function(opts)
    vim.lsp.buf.format(vim.tbl_extend("force",opts,{name=choice.name}))
   end
  )
-end))
+end
+local format_d=Util.debounce(200,vim.schedule_wrap(format_raw))
 ---@param opts? table Format options
 ---@return nil
 local function format(opts)
+ if not LocalEnv.buffer.lsp_format_choice then
+  format_raw(opts)
+ end
  click=math.min(2,click+1)
  if click==2 then
   LocalEnv.buffer.lsp_format_choice=false
  end
- _format(opts)
+ format_d(opts)
 end
 
 return format
