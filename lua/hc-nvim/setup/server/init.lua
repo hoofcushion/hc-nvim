@@ -53,6 +53,7 @@ local lspMaps; lspMaps=Util.lazy(function()
   {name=NS.lsp_workspace_list_folders, rhs=Util.Wrapper.fn_eval(vim.print,vim.lsp.buf.list_workspace_folders),           cond=has_cap("workspace/workspaceFolders")},
   {name=NS.lsp_workspace_remove_folder,rhs=vim.lsp.buf.remove_workspace_folder,                                          cond=has_cap("workspace/workspaceFolders")},
   {name=NS.lsp_workspace_symbols,      rhs=vim.lsp.buf.workspace_symbol,                                                 cond=has_cap("textDocument/documentSymbol")},
+  {name=NS.lsp_workspace_diagnostic,   rhs=require("hc-nvim.setup.server.diagnostic"),                                   cond=has_cap("workspace/diagnostic")},
   {name=NS.lsp_inlay_hints_toggle,     rhs=function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled()) end,cond=has_cap("textDocument/inlayHint")},
   {
    name=NS.lsp_lua_ls_toggle_hint,

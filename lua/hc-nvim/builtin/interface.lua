@@ -104,6 +104,7 @@ return Util.parse_override({
   {name=NS.lsp_workspace_list_folders, lhs="<leader>ll"},
   {name=NS.lsp_workspace_remove_folder,lhs="<leader>lr"},
   {name=NS.lsp_workspace_symbols,      lhs="<leader>lS"},
+  {name=NS.lsp_workspace_diagnostic,   lhs="<leader>lD"},
   {name=NS.lsp_lua_ls_toggle_hint,     lhs="<leader>olL"},
   {name=NS.lsp_inlay_hints_toggle,     lhs="<leader>ols"},
  },

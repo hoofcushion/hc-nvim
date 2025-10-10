@@ -155,6 +155,20 @@ function Util.list_extend(dst,...)
  return dst
 end
 ---@generic T
+---@param lst T[]
+---@return T[]
+function Util.list_unique(lst)
+ local seen={}
+ local ret={}
+ for _,v in ipairs(lst) do
+  if not seen[v] then
+   table.insert(ret,v)
+   seen[v]=true
+  end
+ end
+ return lst
+end
+---@generic T
 ---@param dst T[]
 ---@param ... T[]
 ---@return T[]

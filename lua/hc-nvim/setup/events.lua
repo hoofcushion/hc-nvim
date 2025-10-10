@@ -47,8 +47,8 @@ M.Treesitter=Util.Event.create({
  any={
   event="FileType",
   cond=function(ev)
-   local M=require("nvim-treesitter.parsers")
-   return M.has_parser(M.get_buf_lang(ev.buf))
+   local ts=require("nvim-treesitter.parsers")
+   return ts.has_parser(ts.get_buf_lang(ev.buf))
   end,
  },
 })

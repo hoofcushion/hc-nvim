@@ -162,6 +162,7 @@ add_strategy(
 ---@type vim.lsp.ClientConfig|{}
 local config={}
 config.settings={} -- Necessary
+
 config.cmd=vim.list_extend(vim.lsp.config.lua_ls.cmd,{
  ("--locale=%s-%s"):format(
   Config.locale.current.language,

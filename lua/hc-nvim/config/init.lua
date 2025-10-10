@@ -137,8 +137,9 @@ M.server={
   --- null-ls
   {name="cbfmt"},
   {name="prettier"},
+  {name="black",               main="formatting.black"},
   {name="stylua",              main="formatting.stylua"},
-  {name="codespell",           main="diagnostic.stylua"},
+  {name="codespell",           main="diagnostics.codespell"},
   {name="write-good",          main="write_good"},
   -- {nil,                   "spell"},
  },

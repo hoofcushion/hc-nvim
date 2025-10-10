@@ -1,4 +1,3 @@
-local Util=require("hc-nvim.util.init_space")
 ---@alias Autocmd.param {[1]:vim.api.keyset.events|vim.api.keyset.events[],[2]:vim.api.keyset.create_autocmd}
 
 ---@class Autocmd

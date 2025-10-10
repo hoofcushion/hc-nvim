@@ -9,8 +9,10 @@ end
 local all_methods={"diagnostics","formatting","code_actions","completion","hover"}
 local builtin_map; builtin_map=Util.lazy(function()
  builtin_map=Util.create_modmap("null-ls.builtins")
+ A=builtin_map
  return builtin_map
 end)
+
 ---@param method string
 ---@param name string
 ---@return table?
@@ -68,13 +70,17 @@ local function get_dap_config(config_name,name)
  return ok and config or nil
 end
 function Presets.dap(name)
- local ret={name=name}
+ local ret={}
  for _,config_name in ipairs(dap_config_names) do
   local config=get_dap_config(config_name,name)
   if config then
    ret[config_name]=config
   end
  end
+ if next(ret)==nil then
+  return nil
+ end
+ ret.name=name
  ret.filetypes=ret.filetypes or {}
  return ret
 end
@@ -163,11 +169,12 @@ local ConfigTab=Util.Cache.table(function(modname)
   return require(info.modname)
  end
 end)
----@type table<string,clients>
+---@type table<string,"lsp"|"null_ls"|"dap">
 local TypeTab=Util.Cache.table(function(name)
- return Presets.lsp(name) and "lsp"
-  or Presets.null_ls(name) and "null_ls"
-  or Presets.dap(name) and "dap" or nil
+ return Presets.lsp(name)~=nil and "lsp"
+  or Presets.null_ls(name)~=nil and "null_ls"
+  or Presets.dap(name)~=nil and "dap"
+  or nil
 end)
 local Handler={}
 local setuped={}
