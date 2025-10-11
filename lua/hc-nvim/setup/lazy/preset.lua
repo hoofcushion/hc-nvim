@@ -1,7 +1,8 @@
+local Config=require("hc-nvim.config")
 local Util=require("hc-nvim.util")
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
-local Mappings=Util.lazy(function() return require("hc-nvim.setup.mapping") end)
+local Mappings=require("hc-nvim.setup.mapping")
 local preset_modmap=Util.create_modmap("hc-nvim.builtin.preset")
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
@@ -59,61 +60,50 @@ function Hook.check(name)
 end
 --- hooked lazy plugin field
 local PresetGetter={
- keys=function(plugin,field,orig,preset,name)
-  orig=orig or preset[field]
-  local val
+ keys=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
-  val=Plugin._values(plugin,{[field]=orig},field,false)
-  Mappings:export(name):lazykeys(val)
-  if orig==nil and next(val)==nil then
-   val=nil
+  value=Plugin._values(plugin,{[field]=value},field,false)
+  Mappings:export(name):lazykeys(value)
+  if value~=nil and next(value)~=nil then
+   return value
   end
-  Util.deepset(plugin,field,val)
-  return val
  end,
- event=function(plugin,field,orig,preset,_)
-  orig=orig or preset[field]
-  local val
+ event=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
-  val=Plugin._values(plugin,{[field]=orig},field,false)
-  val=Util.Event._events_normalize(val) or {}
-  if orig==nil and next(val)==nil then
-   val=nil
+  value=Plugin._values(plugin,{[field]=value},field,false)
+  value=Util.Event._events_normalize(value) or {}
+  if value~=nil and next(value)~=nil then
+   return value
   end
-  Util.deepset(plugin,field,val)
-  return val
  end,
- cmd=function(_,field,orig,preset,_)
-  return orig or preset[field]
+ cmd=function(plugin,field,value,preset,name)
+  return value
  end,
- opts=function(plugin,field,orig,preset,name)
-  orig=orig or preset[field]
-  local val
+ opts=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
-  val=Plugin._values(plugin,{[field]=orig},field,false)
-  Mappings:export(name):configure(val)
-  if orig==nil and next(val)==nil then
-   val=nil
+  value=Plugin._values(plugin,{[field]=value},field,false)
+  Mappings:export(name):configure(value)
+  if value~=nil and next(value)~=nil then
+   return value
   end
-  Util.deepset(plugin,field,val)
-  return val
  end,
- config=function(plugin,field,orig,preset,name)
-  orig=orig or preset[field]
-  Util.deepset(plugin,field,orig)
+ config=function(plugin,field,value,preset,name)
   if plugin.config or plugin.opts then
    Loader.config(plugin)
   end
-  local keyimp=Util.eval(preset.keyimp,plugin)
-  if keyimp~=nil then
-   Mappings.forspecs(keyimp,function(mapspec)
-    Mappings:add(mapspec):create()
-   end)
+  if preset.keyimp then
+   local specs=Util.eval(preset.keyimp,plugin)
+   if specs~=nil then
+    Mappings.forspecs(specs,function(mapspec)
+     Mappings:add(mapspec):create()
+    end)
+   end
   end
-  Util.eval(preset.after,plugin)
-  local hook=preset.hook
-  if hook then
-   Hook.add(hook)
+  if preset.after then
+   Util.eval(preset.after,plugin)
+  end
+  if preset.hook then
+   Hook.add(preset.hook)
   end
   Hook.check(name)
   Hook.check(plugin.name)
@@ -127,19 +117,27 @@ function Preset.apply(specs)
   local name=Util.Lazy.getname(spec)
   local modname=Util.Lazy.normname(name)
   local preset=PluginPresets[modname]
-  for k,v in Util.ppairs(preset.base) do
-   spec[k]=v
+  if preset.base and type(preset.base)=="table" then
+   for k,v in pairs(preset.base) do
+    spec[k]=v
+   end
   end
-  if vim.g.vscode and spec.vscode==false then
+  if Config.platform.vscode and spec.vscode==false then
    spec.enabled=false
    return
   end
+  -- set hooked getter
   for field,getter in pairs(PresetGetter) do
    local orig=spec[field]
    spec[field]=function(plugin)
-    return getter(plugin,field,orig,preset,modname)
+    local value=orig or preset[field]
+    Util.deepset(plugin,field,value)
+    local ret=getter(plugin,field,value,preset,modname)
+    Util.deepset(plugin,field,ret)
+    return ret
    end
   end
+  -- equalize dependencies
   if spec.dependencies~=nil then
    spec={spec,spec.dependencies}
    spec.dependencies=nil

@@ -1,11 +1,11 @@
 local Util=require("hc-nvim.util")
-for modname in Util.iter_mod({
+for modname,modpath in Util.iter_mod({
  "hc-nvim.builtin.basic",
  "hc-nvim.user.basic",
 }) do
  Util.try(
   function()
-   require(modname)
+   Util.path_require(modname,modpath)
   end,
   Util.ERROR
  )

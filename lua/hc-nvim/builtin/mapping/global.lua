@@ -1,5 +1,4 @@
 local Util=require("hc-nvim.util")
-local o=Util.override
 return {
  {
   {name=NS.global_buffer_delete,  cmd="bdelete"},

@@ -30,6 +30,15 @@ function Util.local_require(modname)
  end
  return nil
 end
+---@return unknown
+function Util.path_require(modname,modpath)
+ local ret=assert(loadfile(modpath))() or true
+ package.loaded[modname]=ret
+ return ret
+end
+if false then
+ Util.path_require=require
+end
 do
  local function _find_file(modname)
   return vim.loader.find(modname,{patterns={""}})[1]

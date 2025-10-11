@@ -30,22 +30,15 @@ local function is_valid_event(event)
 end
 local raw=Loader._load
 local TaskSequence=require("hc-nvim.util.task_sequence").new()
-local safestate=false
-vim.api.nvim_create_autocmd("SafeState",{
- once=true,
- callback=function()
-  TaskSequence:start(Config.performance.plugin.load_cooldown)
-  safestate=true
- end,
-})
 ---@param plugin LazyPlugin
 ---@param reason {[string]:string}
 ---@param opts? {force:boolean}
 function Loader._load(plugin,reason,opts)
- if not safestate and is_valid_event(reason.event) then
-  TaskSequence:add(function()
+ if is_valid_event(reason.event) then
+  TaskSequence:add(vim.schedule_wrap(function()
    raw(plugin,reason,opts)
-  end)
+  end))
+  TaskSequence:start(Config.performance.plugin.load_cooldown)
   return
  end
  raw(plugin,reason,opts)

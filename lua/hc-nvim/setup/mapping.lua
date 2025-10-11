@@ -9,12 +9,12 @@ Util.try(
  Util.ERROR
 )
 Util.track()
-for modname in Util.iter_mod({
+for modname,modpath in Util.iter_mod({
  "hc-nvim.builtin.mapping",
  "hc-nvim.user.mapping",
 }) do
  Util.try(function()
-           local mapping=require(modname)
+           local mapping=Util.path_require(modname,modpath)
            if mapping then
             Interface.forspecs(mapping,function(spec)
              Interface:add(spec):create()

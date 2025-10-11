@@ -340,11 +340,7 @@ function Mapping:lazykeys()
  end
  local ret={}
  for _,v in Util.pipairs(keys) do
-  ---@type {}
-  local base=vim.deepcopy(spec.opts)
-  base[1]=v
-  base.mode=spec.mode
-  table.insert(ret,base)
+  table.insert(ret,{v,mode=spec.mode,desc=spec.opts.desc})
  end
  return ret
 end

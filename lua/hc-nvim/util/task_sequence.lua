@@ -21,12 +21,12 @@ function TaskSequence:start(interval)
  if self.timer:is_active() then
   return
  end
- local fn=table.remove(self.fns,1)
- if fn==nil then
+ if #self.fns==0 then
   self.timer:stop()
   return
  end
  self.timer:start(interval,0,function()
+  local fn=table.remove(self.fns,1)
   fn()
   self:start(interval)
  end)
