@@ -58,8 +58,8 @@ Config.default={
    enabled=true,
    event={"CursorMoved","CursorMovedI"},
    interval=3,
-   loopover=360,
-   refresh={"CursorMoved","CursorMovedI"},
+   loopover=360/3,
+   refresh=true,
   },
   timer={
    enabled=true,
@@ -143,7 +143,7 @@ local valitab={
    event=Type.any({"false",Type.list("string")}),
    interval=Type.any({"false","integer"}),
    loopover="integer",
-   refresh=Type.list("string"),
+   refresh=Type.optional("boolean"),
   },
   timer={
    enabled="boolean",

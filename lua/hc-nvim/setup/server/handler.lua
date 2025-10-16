@@ -9,7 +9,6 @@ end
 local all_methods={"diagnostics","formatting","code_actions","completion","hover"}
 local builtin_map; builtin_map=Util.lazy(function()
  builtin_map=Util.create_modmap("null-ls.builtins")
- A=builtin_map
  return builtin_map
 end)
 

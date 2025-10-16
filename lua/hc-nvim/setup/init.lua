@@ -24,7 +24,7 @@ for _,modname in ipairs(modules) do
  Util.track()
 end
 -- :e for every file buffer
-vim.api.nvim_create_autocmd("VimEnter",{
+vim.api.nvim_create_autocmd("SafeState",{
  once=true,
  callback=function()
   local bufs=vim.api.nvim_list_bufs()

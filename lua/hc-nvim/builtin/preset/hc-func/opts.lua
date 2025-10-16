@@ -10,11 +10,12 @@ end)({
   enabled=true,
   throttle=5,
   autocmd={
-   loopover=360,
+   interval=3,     -- 3 cursor move for 1 step
+   loopover=360/3, -- 3° each step
   },
   timer={
    enabled=true,
-   loopover=360,
+   loopover=360/2, -- 2° each step
   },
  },
  code_lens={enabled=false},

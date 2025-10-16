@@ -35,6 +35,7 @@ function Util.when(opts)
   return Util.unpacklen(cache)
  end
 end
+---@return number seconds
 function Util.clock()
  return vim.uv.hrtime()/1e9
 end
