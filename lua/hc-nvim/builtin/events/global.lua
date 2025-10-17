@@ -34,6 +34,13 @@ M.NeoConfig=Util.Event.create({
   end,
  },
 })
+M.AfterEnter=Util.Event.from("AfterEnter",function(exec)
+ vim.api.nvim_create_autocmd("VimEnter",{
+  callback=function()
+   vim.schedule(exec)
+  end,
+ })
+end)
 M.File=Util.Event.create({
  name="File",
  any={

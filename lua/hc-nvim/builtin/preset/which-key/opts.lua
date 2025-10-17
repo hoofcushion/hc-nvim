@@ -1,9 +1,7 @@
 local Config=require("hc-nvim.config")
 return {
  spec=require("hc-nvim.setup.mapping").wkspec,
- delay=function(ctx)
-  return ctx.plugin and 0 or 10
- end,
+ delay=0,
  win={
   border=require("hc-nvim.rsc").border[Config.ui.border],
   padding={0,1},

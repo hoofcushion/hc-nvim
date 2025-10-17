@@ -11,7 +11,6 @@ local builtin_map; builtin_map=Util.lazy(function()
  builtin_map=Util.create_modmap("null-ls.builtins")
  return builtin_map
 end)
-
 ---@param method string
 ---@param name string
 ---@return table?
@@ -113,7 +112,6 @@ function SetupMaker.lsp(name)
   end
  end
 end
-local setuped_null_ls=false
 --- setup server_configuration when filetype matches
 ---@param name string client name
 ---@return function
@@ -122,10 +120,6 @@ function SetupMaker.null_ls(name)
   local opts=Presets.null_ls(name)
   if opts==nil then
    return
-  end
-  if not setuped_null_ls then
-   Clients.null_ls.setup()
-   setuped_null_ls=true
   end
   for _,method in ipairs(all_methods) do
    local builtin=opts[method]

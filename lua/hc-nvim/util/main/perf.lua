@@ -83,11 +83,17 @@ function Util.debounce_with_id(id,time,fn)
 end
 ---@generic T
 ---@param init fun():T
+---@param set? fun(t:T)
 ---@return T
-function Util.lazy(init)
- return setmetatable({},{
+function Util.lazy(init,set)
+ set=set or Util.empty_f
+ local lazyt=setmetatable({},{
   __index=function(_,k)
-   return init()[k]
+   local t=init()
+   set(t)
+   return t[k]
   end,
  })
+ set(lazyt)
+ return lazyt
 end

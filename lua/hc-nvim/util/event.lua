@@ -34,7 +34,7 @@ end
 local Event={}
 ---@param event string|event_t
 ---@return event_t
-function Event._event_normalize(event)
+function Event.event_normalize(event)
  if type(event)=="string" then
   local _=vim.split(event," ")
   local event_t={
@@ -47,10 +47,10 @@ function Event._event_normalize(event)
 end
 ---@param events string|string[]|event_t|event_t[]
 ---@return event_t[]?
-function Event._events_normalize(events)
+function Event.events_normalize(events)
  -- string
  if type(events)=="string" then
-  local event_t=Event._event_normalize(events)
+  local event_t=Event.event_normalize(events)
   return {event_t}
  end
  if type(events)=="table" then
@@ -58,7 +58,7 @@ function Event._events_normalize(events)
   if events[1]~=nil then
    local event_list={}
    for _,event in ipairs(events) do
-    table.insert(event_list,Event._event_normalize(event))
+    table.insert(event_list,Event.event_normalize(event))
    end
    return event_list
   elseif next(events)~=nil then
@@ -76,10 +76,10 @@ function Event._step_normalize(step_t)
   step_t.group=vim.api.nvim_create_augroup(group,{clear=true})
  end
  if step_t.all then
-  step_t.all=Event._events_normalize(step_t.all)
+  step_t.all=Event.events_normalize(step_t.all)
  end
  if step_t.any then
-  step_t.any=Event._events_normalize(step_t.any)
+  step_t.any=Event.events_normalize(step_t.any)
  end
  return step_t
 end
@@ -101,6 +101,7 @@ end
 ---@return event_t
 function Event.create(step_t)
  step_t=Event._step_normalize(step_t)
+ --- delay
  if step_t.delay then
   vim.defer_fn(function()
                 local _step_t=vim.deepcopy(step_t)
@@ -109,6 +110,7 @@ function Event.create(step_t)
                end,step_t.delay)
   return {event="User",pattern=step_t.name}
  end
+ --- exec autocmd
  local function exec(v)
   if v.calm then
    vim.schedule(function()
@@ -118,11 +120,16 @@ function Event.create(step_t)
    vim.api.nvim_exec_autocmds("User",{pattern=step_t.name})
   end
  end
+ --- any
  local rests=0
- -- any
  if step_t.any then
   rests=rests+1
   local ids={}
+  local function clear()
+   for _,id in ipairs(ids) do
+    vim.api.nvim_del_autocmd(id)
+   end
+  end
   for _,v in ipairs(step_t.any) do
    local id=vim.api.nvim_create_autocmd(v.event,{
     group=step_t.group,
@@ -133,10 +140,7 @@ function Event.create(step_t)
       if rests<=0 then
        exec(v)
       end
-      -- clear all ids
-      for _,id in ipairs(ids) do
-       vim.api.nvim_del_autocmd(id)
-      end
+      clear()
       return true
      end
     end,
@@ -144,7 +148,7 @@ function Event.create(step_t)
    table.insert(ids,id)
   end
  end
- -- all
+ --- all
  if step_t.all then
   rests=rests+#step_t.all
   for _,v in ipairs(step_t.all) do
@@ -163,6 +167,7 @@ function Event.create(step_t)
    })
   end
  end
+ --- callback
  vim.api.nvim_create_autocmd("User",{
   group=step_t.group,
   pattern=step_t.name,
@@ -195,62 +200,49 @@ function Event.sequence(steps_t)
                 _steps.delay=nil
                 Event.sequence(_steps)
                end,steps_t.delay)
- else
-  local i,e=1,#steps_t.steps
-  -- Function to process the next step
-  local function process_next_step()
-   local step=vim.deepcopy(steps_t.steps[i])
-   local callback=step.callback
-   step.group=steps_t.group
-   step.once=true
-   step.callback=function(ev)
-    if type(callback)=="function" then
-     callback(ev)
-    end
-    i=i+1
-    if i>e then
-     if steps_t.callback then
-      if steps_t.wait then
-       vim.defer_fn(function()
-                     steps_t.callback(ev)
-                    end,steps_t.wait)
-      else
-       steps_t.callback(ev)
-      end
-     end
-     if not steps_t.once then
-      Event.sequence(steps_t)
-     end
-    else
-     process_next_step()
-    end
-    return true
-   end
-   -- Create the current step
-   Event.create(step)
-  end
-  -- Start processing the first step
-  process_next_step()
+  return {event="User",pattern=steps_t.name}
  end
+ local i,e=1,#steps_t.steps
+ -- Function to process the next step
+ local function process_next_step()
+  local step=vim.deepcopy(steps_t.steps[i])
+  local callback=step.callback
+  step.group=steps_t.group
+  step.once=true
+  step.callback=function(ev)
+   if type(callback)=="function" then
+    callback(ev)
+   end
+   i=i+1
+   if i>e then
+    if steps_t.callback then
+     if steps_t.wait then
+      vim.defer_fn(function()
+                    steps_t.callback(ev)
+                   end,steps_t.wait)
+     else
+      steps_t.callback(ev)
+     end
+    end
+    if not steps_t.once then
+     Event.sequence(steps_t)
+    end
+   else
+    process_next_step()
+   end
+   return true
+  end
+  -- Create the current step
+  Event.create(step)
+ end
+ -- Start processing the first step
+ process_next_step()
  return {event="User",pattern=steps_t.name}
 end
--- local event2=Eventx.sequence({
---  steps={
---   {
---    delay=1000,
---    any={"cursormoved","cursormovedi"},
---    name="composite",
---    callback=function() print(1) end,
---   },
---   {
---    delay=1000,
---    any={"cursormoved","cursormovedi"},
---    name="composite",
---    callback=function() print(2) end,
---   },
---  },
---  group="Sequence",
---  name="Sequence",
---  once=false,
--- })
+function Event.from(name,init)
+ init(function()
+  vim.api.nvim_exec_autocmds("User",{pattern=name})
+ end)
+ return {event="User",pattern=name}
+end
 return Event

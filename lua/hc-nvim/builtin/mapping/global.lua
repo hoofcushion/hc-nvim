@@ -199,7 +199,9 @@ return {
     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
     local col_len=vim.fn.col("$")
     local col=math.min(win_width,col_len)-1
-    local step=math.floor(math.max(1,math.min(col/30)))
+    local step=math.floor(
+     math.min(math.max(1,math.min(col/10)),3)
+    )
     return tostring(step)
      .."h"
    end),
@@ -211,7 +213,9 @@ return {
     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
     local col_len=vim.fn.col("$")
     local col=math.min(win_width,col_len)-1
-    local step=math.floor(math.max(1,math.min(col/30)))
+    local step=math.floor(
+     math.min(math.max(1,math.min(col/10)),3)
+    )
     return tostring(step)
      .."l"
    end),

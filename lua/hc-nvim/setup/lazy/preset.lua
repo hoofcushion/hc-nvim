@@ -71,7 +71,7 @@ local PresetGetter={
  event=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
   value=Plugin._values(plugin,{[field]=value},field,false)
-  value=Util.Event._events_normalize(value) or {}
+  value=Util.Event.events_normalize(value) or {}
   if value~=nil and next(value)~=nil then
    return value
   end
@@ -109,7 +109,7 @@ local PresetGetter={
   Hook.check(plugin.name)
  end,
 }
-local priority=2^10
+-- local priority=2^10
 local Preset={}
 function Preset.apply(specs)
  return Util.Lazy.foreach(specs,function(spec)
@@ -117,8 +117,9 @@ function Preset.apply(specs)
   local name=Util.Lazy.getname(spec)
   local modname=Util.Lazy.normname(name)
   local preset=PluginPresets[modname]
-  if preset.base and type(preset.base)=="table" then
-   for k,v in pairs(preset.base) do
+  local base=preset.base
+  if base and type(base)=="table" then
+   for k,v in pairs(base) do
     spec[k]=v
    end
   end
@@ -142,14 +143,14 @@ function Preset.apply(specs)
    spec={spec,spec.dependencies}
    spec.dependencies=nil
   end
-  -- add priority
-  if spec.priority==nil then
-   spec.priority=priority
-   priority=priority-1
-  end
-  if spec.auto==true then
-   spec.lazy=vim.fn.argc()==0
-  end
+  -- -- add priority
+  -- if spec.priority==nil then
+  --  spec.priority=priority
+  --  priority=priority-1
+  -- end
+ --  if spec.auto==true then
+ --   spec.lazy=vim.fn.argc()==0
+ --  end
  end)
 end
 return Preset

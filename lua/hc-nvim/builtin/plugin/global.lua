@@ -1,20 +1,18 @@
 ---@module "lazy"
 
 local Events=require("hc-nvim.setup.events")
----@type LazySpec|{
---- auto: boolean?,
----}
+---@type LazySpec
 return {
- {"folke/tokyonight.nvim",                      event="VimEnter"},
- {"folke/noice.nvim",                           event="VimEnter"},
- {"nvim-lualine/lualine.nvim",                  event=Events.File},
- {"folke/snacks.nvim",                          lazy=false,                                  version="*"},
+ {"folke/tokyonight.nvim",                      event=Events.AfterEnter},
+ {"folke/noice.nvim",                           event=Events.AfterEnter},
+ {"nvim-lualine/lualine.nvim",                  event=Events.AfterEnter},
+ {"folke/snacks.nvim",                          event=Events.AfterEnter,                                  version="*"},
+ {"folke/which-key.nvim",                       event=Events.AfterEnter},
 
  {"rcarriga/nvim-notify"},
  {"stevearc/dressing.nvim"},
  {"echasnovski/mini.nvim"},
 
- {"folke/which-key.nvim",                       event="SafeState"},
 
  --- Information
  {"Bekaboo/dropbar.nvim",                       event=Events.File},
@@ -54,7 +52,7 @@ return {
  {"s1n7ax/nvim-window-picker"},
  {"smoka7/multicursors.nvim"},
  --- Profiller
- -- {"dstein64/vim-startuptime"},
+ {"dstein64/vim-startuptime"},
 
 
  --- Completions
@@ -70,7 +68,6 @@ return {
  {"saadparwaiz1/cmp_luasnip",                   event=Events.File},
  {"ray-x/cmp-treesitter",                       event=Events.File},
  {"lukas-reineke/cmp-rg",                       event=Events.File},
- -- {"Saghen/blink.cmp",                           lazy=false},
 
 
 
@@ -79,9 +76,6 @@ return {
  {"echasnovski/mini.trailspace",                event=Events.File,                           virtual=true},
  {"folke/todo-comments.nvim",                   event=Events.File},
  {"nfrid/due.nvim",                             event=Events.File},
-
- -- {"lukas-reineke/indent-blankline.nvim",        event=Events.File}, -- replaced by snacks.nvim
- -- This werid plugin can't load at "BufEnter"
  {"hiphish/rainbow-delimiters.nvim",            event=Events.File},
 
  --- AI
@@ -129,7 +123,6 @@ return {
  --- Notebook
  {"zk-org/zk-nvim",                             event=Events.RootPattern(".zk")},
  {"MeanderingProgrammer/markdown.nvim",         ft="markdown"},
- -- {"nvim-neorg/neorg",                           ft="norg",                           config=true},
 
  --- Libraries
  -- {"nvim-tree/nvim-web-devicons"},

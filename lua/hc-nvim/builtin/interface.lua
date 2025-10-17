@@ -502,10 +502,6 @@ return Util.parse_override({
   {name=NS.goto_treesitter_context,lhs="[["},
  },
  {
-  override={tags="indent-blankline"},
-  {name=NS.ibl_toggle,lhs="<leader>oI"},
- },
- {
   override={tags="nvim-ufo"},
   {name=NS.ufo_open_all_folds,        lhs="zR"},
   {name=NS.ufo_open_folds,            lhs="zr"},
