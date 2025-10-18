@@ -97,3 +97,66 @@ function Util.lazy(init,set)
  set(lazyt)
  return lazyt
 end
+---@generic T:function
+---@param fn T
+---@param opts {
+--- i:integer?,
+--- e:integer?,
+--- step:integer?,
+--- interval:integer?,
+--- callback:function?,
+---}
+---@return T
+function Util.schedule(fn,opts)
+ opts=opts or {}
+ local i=opts.i or 1
+ local e=opts.e or math.huge
+ local step=opts.step or 1
+ local interval=opts.interval or 0
+ local callback=opts.callback
+ local defer; if interval<=0 then
+  defer=vim.schedule
+ else
+  local timer=assert(vim.uv.new_timer())
+  defer=function(f)
+   timer:stop()
+   timer:start(interval,0,f)
+  end
+ end
+ local did_stop=false
+ local function stop()
+  did_stop=true
+ end
+ local function run_step()
+  local continue=true
+  for _=1,step do
+   i=i+1
+   if i>e then
+    continue=false
+    break
+   end
+   fn(stop)
+   if did_stop then
+    continue=false
+    break
+   end
+  end
+  if continue then
+   defer(run_step)
+  else
+   if callback then callback() end
+  end
+ end
+
+ return Util.once(function()
+  defer(run_step)
+ end)
+end
+function Util.once(fn)
+ return function(...)
+  fn(...)
+  fn=function()
+   Util.ERROR("This function can only be called once")
+  end
+ end
+end
