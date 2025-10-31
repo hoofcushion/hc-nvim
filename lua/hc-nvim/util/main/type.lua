@@ -7,6 +7,15 @@ function Util.validate(x,t,o)
  error(("Expect %s%s, got %s"):format(t,o and "?" or "",type(x)))
 end
 ---@param tbl table
+---@return integer
+function Util.count(tbl)
+ local count=0
+ for _ in pairs(tbl) do
+  count=count+1
+ end
+ return count
+end
+---@param tbl table
 ---@return boolean
 function Util.is_list(tbl)
  local i=0

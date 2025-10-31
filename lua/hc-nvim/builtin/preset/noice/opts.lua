@@ -19,6 +19,9 @@ return vim.tbl_deep_extend(
    progress={
     enabled=true,
    },
+   signature={
+    enabled=true
+   },
    override={
     ["vim.lsp.util.convert_input_to_markdown_lines"]=true,
     ["vim.lsp.util.stylize_markdown"]=true,
@@ -104,9 +107,9 @@ return vim.tbl_deep_extend(
    message={
     view="notify",
    },
-   progress={
-    view="notify",
-   },
+   -- progress={
+   --  view="notify",
+   -- },
   },
  }
 )

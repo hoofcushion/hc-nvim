@@ -30,8 +30,13 @@ for modname,modpath in Util.iter_mod({
  "hc-nvim.builtin.filetype",
  "hc-nvim.user.filetype",
 }) do
- local filetypes=Util.path_require(modname,modpath)
- FileType.add(filetypes)
+ Util.try(
+  function()
+   local filetypes=Util.path_require(modname,modpath)
+   FileType.add(filetypes)
+  end,
+  Util.ERROR
+ )
 end
 vim.api.nvim_create_autocmd("BufEnter",{
  callback=FileType.check,

@@ -22,9 +22,7 @@ local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
 -- Default
 add_strategy(
- function()
-  return true
- end,
+ function() return true end,
  function(client)
   Util.tbl_set(client,{"config","settings","Lua"},{
    completion={
@@ -148,10 +146,10 @@ add_strategy(
    },
    workspace={
     checkThirdParty=false,
-    maxPreload=2^31,
-    preloadFileSize=2^31,
+    -- maxPreload=2^31,
+    -- preloadFileSize=2^31,
     library={
-     vim.env.VIMRUNTIME,
+     -- vim.env.VIMRUNTIME,
      "${3rd}/luv/library",
      "${3rd}/busted/library",
     },
@@ -162,13 +160,6 @@ add_strategy(
 ---@type vim.lsp.ClientConfig|{}
 local config={}
 config.settings={} -- Necessary
-
-config.cmd=vim.list_extend(vim.lsp.config.lua_ls.cmd,{
- ("--locale=%s-%s"):format(
-  Config.locale.current.language,
-  Config.locale.current.country:lower()
- ),
-})
 ---@param client vim.lsp.Client
 local function reattach(client)
  local lsp=vim.lsp
@@ -180,17 +171,23 @@ local function reattach(client)
  end
 end
 
+config.cmd={
+ "lua-language-server",
+ ("--locale=%s-%s"):format(Config.locale.current.language,Config.locale.current.country:lower()),
+}
 config.on_init=function(client)
  local last_cwd
+ local cur_cwd=vim.fn.getcwd()
  local function update_strategy()
-  local cur_cwd=vim.fn.getcwd()
   if cur_cwd==last_cwd then
    return
   end
-  apply_strategies(client)
-  Util.try(function()
-            reattach(client)
-           end,Util.ERROR)
+  vim.notify("Switching Lua language server strategy for current directory: "..(last_cwd or "none").." -> "..cur_cwd,vim.log.levels.TRACE)
+  last_cwd=cur_cwd
+  -- apply_strategies(client)
+  -- Util.try(function()
+  --           reattach(client)
+  --          end,Util.ERROR)
  end
  vim.api.nvim_create_autocmd({"BufRead","DirChanged"},{
   callback=function()

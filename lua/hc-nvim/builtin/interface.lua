@@ -53,6 +53,9 @@ return Util.parse_override({
    {name=NS.global_normal_Q,            lhs="gE"},
    {name=NS.global_edit_break_points,   lhs=vim.split(",.;+-=[]{}()#^*&<>",""),mode="i"},
    {name=NS.global_visual_indent,       lhs={"<",">"},                         mode="x"},
+   {name=NS.operator_entire_buffer,     lhs="gG",                              mode={"x","o"}},
+   {name=NS.operator_straght_up,        lhs="gk",                              mode={"x","o"}},
+   {name=NS.operator_straght_down,      lhs="gj",                              mode={"x","o"}},
   },
   {
    override={mode={"n","x"}},
@@ -421,6 +424,37 @@ return Util.parse_override({
    {index="scope_incremental",value="<leader><cr>",lazykey=false},
   },
  },
+ -- @assignment.inner
+ -- @assignment.lhs
+ -- @assignment.outer
+ -- @assignment.rhs
+ -- @attribute.inner
+ -- @attribute.outer
+ -- @block.inner
+ -- @block.outer
+ -- @call.inner
+ -- @call.outer
+ -- @class.inner
+ -- @class.outer
+ -- @comment.inner
+ -- @comment.outer
+ -- @conditional.inner
+ -- @conditional.outer
+ -- @frame.inner
+ -- @frame.outer
+ -- @function.inner
+ -- @function.outer
+ -- @loop.inner
+ -- @loop.outer
+ -- @number.inner
+ -- @parameter.inner
+ -- @parameter.outer
+ -- @regex.inner
+ -- @regex.outer
+ -- @return.inner
+ -- @return.outer
+ -- @scopename.inner
+ -- @statement.outer
  {
   override={tags="nvim-treesitter-textobjects"},
   {
@@ -430,36 +464,37 @@ return Util.parse_override({
     mode={"x","o"},
    },
    {
-    {index="ig",desc="Assignment lhs",value={desc="Assignment lhs",query="@assignment.lhs"}},
-    {index="ih",desc="Assignment rhs",value={desc="Assignment rhs",query="@assignment.rhs"}},
-    {index="in",desc="Number",        value={desc="Number",query="@number.inner"}},
-    {index="aS",desc="Statement",     value={desc="Statement",query="@statement.outer"}},
-    {index="iC",desc="Class",         value={desc="Class",query="@class.inner"}},
-    {index="aC",desc="Class",         value={desc="Class",query="@class.outer"}},
-    {index="iF",desc="Frame",         value={desc="Frame",query="@frame.inner"}},
-    {index="aF",desc="Frame",         value={desc="Frame",query="@frame.outer"}},
-    {index="iR",desc="Regex",         value={desc="Regex",query="@regex.inner"}},
-    {index="aR",desc="Regex",         value={desc="Regex",query="@regex.outer"}},
-    {index="aa",desc="Call",          value={desc="Call",query="@call.outer"}},
-    {index="ab",desc="Block",         value={desc="Block",query="@block.outer"}},
-    {index="ac",desc="Comment",       value={desc="Comment",query="@comment.outer"}},
-    {index="af",desc="Function",      value={desc="Function",query="@function.outer"}},
-    {index="ai",desc="Assignment",    value={desc="Assignment",query="@assignment.outer"}},
-    {index="al",desc="Loop",          value={desc="Loop",query="@loop.inner"}},
-    {index="al",desc="Loop",          value={desc="Loop",query="@loop.outer"}},
-    {index="io",desc="Conditional",   value={desc="Conditional",query="@conditional.inner"}},
-    {index="ao",desc="Conditional",   value={desc="Conditional",query="@conditional.outer"}},
-    {index="iP",desc="Parameter",     value={desc="Parameter",query="@parameter.inner"}},
-    {index="aP",desc="Parameter",     value={desc="Parameter",query="@parameter.outer"}},
-    {index="ir",desc="Return",        value={desc="Return",query="@return.inner"}},
-    {index="ar",desc="Return",        value={desc="Return",query="@return.outer"}},
-    {index="at",desc="Attribute",     value={desc="Attribute",query="@attribute.outer"}},
-    {index="ia",desc="Call",          value={desc="Call",query="@call.inner"}},
-    {index="ib",desc="Block",         value={desc="Block",query="@block.inner"}},
-    {index="ic",desc="Comment",       value={desc="Comment",query="@comment.inner"}},
-    {index="if",desc="Function",      value={desc="Function",query="@function.inner"}},
-    {index="ii",desc="Assignment",    value={desc="Assignment",query="@assignment.inner"}},
-    {index="it",desc="Attribute",     value={desc="Attribute",query="@attribute.inner"}},
+    {desc="Assignment lhs",index="ig",value={desc="Assignment lhs",query="@assignment.lhs"}},
+    {desc="Assignment rhs",index="ih",value={desc="Assignment rhs",query="@assignment.rhs"}},
+    {desc="Assignment",    index="ai",value={desc="Assignment",query="@assignment.outer"}},
+    {desc="Assignment",    index="ii",value={desc="Assignment",query="@assignment.inner"}},
+    {desc="Attribute",     index="at",value={desc="Attribute",query="@attribute.outer"}},
+    {desc="Attribute",     index="it",value={desc="Attribute",query="@attribute.inner"}},
+    {desc="Block",         index="ab",value={desc="Block",query="@block.outer"}},
+    {desc="Block",         index="ib",value={desc="Block",query="@block.inner"}},
+    {desc="Call",          index="aa",value={desc="Call",query="@call.outer"}},
+    {desc="Call",          index="ia",value={desc="Call",query="@call.inner"}},
+    {desc="Class",         index="aC",value={desc="Class",query="@class.outer"}},
+    {desc="Class",         index="iC",value={desc="Class",query="@class.inner"}},
+    {desc="Comment",       index="ac",value={desc="Comment",query="@comment.outer"}},
+    {desc="Comment",       index="ic",value={desc="Comment",query="@comment.inner"}},
+    {desc="Conditional",   index="ao",value={desc="Conditional",query="@conditional.outer"}},
+    {desc="Conditional",   index="io",value={desc="Conditional",query="@conditional.inner"}},
+    {desc="Frame",         index="aF",value={desc="Frame",query="@frame.outer"}},
+    {desc="Frame",         index="iF",value={desc="Frame",query="@frame.inner"}},
+    {desc="Function",      index="af",value={desc="Function",query="@function.outer"}},
+    {desc="Function",      index="if",value={desc="Function",query="@function.inner"}},
+    {desc="Loop",          index="al",value={desc="Loop",query="@loop.inner"}},
+    {desc="Loop",          index="al",value={desc="Loop",query="@loop.outer"}},
+    {desc="Number",        index="in",value={desc="Number",query="@number.inner"}},
+    {desc="Parameter",     index="aP",value={desc="Parameter",query="@parameter.outer"}},
+    {desc="Parameter",     index="iP",value={desc="Parameter",query="@parameter.inner"}},
+    {desc="Regex",         index="aR",value={desc="Regex",query="@regex.outer"}},
+    {desc="Regex",         index="iR",value={desc="Regex",query="@regex.inner"}},
+    {desc="Return",        index="ar",value={desc="Return",query="@return.outer"}},
+    {desc="Return",        index="ir",value={desc="Return",query="@return.inner"}},
+    {desc="Scopename",     index="iS",value={desc="Scopename",query="@scopename.inner"}},
+    {desc="Statement",     index="aS",value={desc="Statement",query="@statement.outer"}},
    },
   },
   {

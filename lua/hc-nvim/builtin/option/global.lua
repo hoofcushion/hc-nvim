@@ -80,12 +80,12 @@ return {
   foldcolumn="0",
 
   --- Performance ---
-  synmaxcol=500,      -- Syntax highlighting column limit
-  updatetime=500,     -- Faster completion and git signs
-  timeoutlen=500,     -- Faster key sequence timeouts
-  ttimeoutlen=50,     -- Faster key code timeouts
+  synmaxcol=500,   -- Syntax highlighting column limit
+  updatetime=1000,  -- swap file write interval
+  timeoutlen=500,  -- map key sequence timeouts
+  ttimeoutlen=50, -- key code timeouts
 
-  linespace=0,        -- No extra line spacing
-  conceallevel=0,     -- Disable conceal for faster rendering
+  linespace=0,     -- No extra line spacing
+  conceallevel=0,  -- Disable conceal for faster rendering
  },
 }

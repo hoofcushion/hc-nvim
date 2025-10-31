@@ -9,7 +9,7 @@ local modules={
  "i18n",
  "option",
  "basic",
- "events",
+ "event",
  "mapping",
  "filetype",
  "lazy",

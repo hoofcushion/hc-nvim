@@ -119,17 +119,62 @@ return {
   {name=NS.global_delete_left,    rhs="<Del>"},
   {name=NS.global_normal_q,       rhs="q"},
   {name=NS.global_normal_Q,       rhs="Q"},
-  {name=NS.global_change_r,       rhs="r"},
-  {name=NS.global_change_R,       rhs="R"},
   {
    name=NS.global_change_c,
    lhs="c",
    rhs=function() return vim.v.count==0 and "c" or "s" end,
    opts={expr=true},
   },
+  {name=NS.global_change_r,rhs="r"},
+  {name=NS.global_change_R,rhs="R"},
  },
  {name=NS.global_edit_break_points,rhs=function(lhs) return lhs.."<c-g>u" end,opts={expr=true}},
  {name=NS.global_visual_indent,    rhs=function(lhs) return lhs.."gv" end,    opts={expr=true}},
+ {name=NS.operator_entire_buffer,rhs=":<c-u>normal! ggVG<cr><c-o>",
+ },
+ {
+  name=NS.operator_straght_down,
+  rhs=function()
+   local current_line=vim.fn.line(".")
+   local display_col=vim.fn.virtcol(".")
+   local line_count=vim.api.nvim_buf_line_count(0)
+   for line=current_line+1,line_count do
+    local line_content=vim.api.nvim_buf_get_lines(0,line-1,line,false)[1]
+    local line_len=vim.fn.strdisplaywidth(line_content)
+    if line_len<display_col then
+     local distance=line-current_line-1
+     if distance>0 then
+      return tostring(distance).."j"
+     else
+      break
+     end
+    end
+   end
+   return ""
+  end,
+  opts={expr=true},
+ },
+ {
+  name=NS.operator_straght_up,
+  rhs=function()
+   local current_line=vim.fn.line(".")
+   local display_col=vim.fn.virtcol(".")
+   for line=current_line-1,0,-1 do
+    local line_content=vim.api.nvim_buf_get_lines(0,line-1,line,false)[1]
+    local line_len=vim.fn.strdisplaywidth(line_content)
+    if line_len<display_col then
+     local distance=current_line-line-1
+     if distance>0 then
+      return tostring(distance).."k"
+     else
+      break
+     end
+    end
+   end
+   return ""
+  end,
+  opts={expr=true},
+ },
  {
   {name=NS.global_motion_ge,    rhs="ge"},
   {name=NS.global_motion_gE,    rhs="gE"},

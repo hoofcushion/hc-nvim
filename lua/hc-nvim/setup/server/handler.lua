@@ -85,18 +85,10 @@ end
 for k,v in pairs(Presets) do
  Presets[k]=Util.Cache.create(v)
 end
-local Clients=Util.Cache.table(function(name)
- return name=="lsp" and vim.lsp
-  or name=="null_ls" and require("null-ls")
-  or name=="dap" and require("dap")
-end)
-if false then
- Clients={
-  lsp=vim.lsp,
-  null_ls=require("null-ls"),
-  dap=require("dap"),
- }
-end
+local Clients={}
+Util.lazy(function() return vim.lsp end,           function(t) Clients.lsp=t end)
+Util.lazy(function() return require("null-ls") end,function(t) Clients.null_ls=t end)
+Util.lazy(function() return require("dap") end,    function(t) Clients.dap=t end)
 local SetupMaker={}
 function SetupMaker.lsp(name)
  return function(config)
@@ -104,12 +96,6 @@ function SetupMaker.lsp(name)
    Clients.lsp.config(name,config)
   end
   Clients.lsp.enable(name)
-  config=Clients.lsp.config[name]
-  if  not Clients.lsp.is_enabled(name)
-  and vim.list_contains(config.filetypes,vim.bo.filetype)
-  then
-   Clients.lsp.start(config)
-  end
  end
 end
 --- setup server_configuration when filetype matches
