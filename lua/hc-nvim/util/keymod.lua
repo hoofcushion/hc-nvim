@@ -84,9 +84,9 @@ local function cache(fn)
 end
 ---@class hold_opts
 local default_opts={
- init_speed=50.0,
- max_speed=1000.0,
- trigger=2,           -- key repeat threshold
+ init_speed=25,
+ max_speed=200,
+ trigger=3,           -- key repeat threshold
  acceleration_ms=200, -- acceleration time to max_speed
  threshold_ms=100,    -- key repeat timeout when active
  timeout_ms=200,      -- key repeat timeout when inactive
@@ -117,8 +117,9 @@ function Hold.create(lhs,rhs,opts)
     return false
    end
    local delay=smooth(clock:elapsed(),acceleration_ms,init_interval_ms,max_interval_ms)
-   if delay>1 then
-    timer:start(math.floor(delay),0,empty_f)
+   delay=math.floor(delay)
+   if delay>=1 then
+    timer:start(delay,0,empty_f)
    end
    return true
   end)

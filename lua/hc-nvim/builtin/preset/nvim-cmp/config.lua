@@ -90,13 +90,16 @@ return function(_,opts)
    src.buffer:with({max_item_count=5}),
   },
  })
+ 
+ require("hc-nvim.builtin.preset.nvim-cmp.path")
  cmp.setup({
   sources={
+   src.path,
    src.nvim_lsp:with({priority=2^31}),
    src.luasnip,
    src.lazydev,
    src.bufname,
-   src.async_path,
+   -- src.async_path,
    src.treesitter:with({max_item_count=5}),
    src.rg:with({max_item_count=5}),
    src.buffer:with({max_item_count=5}),

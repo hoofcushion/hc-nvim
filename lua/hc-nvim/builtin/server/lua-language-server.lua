@@ -26,6 +26,7 @@ add_strategy(
  function(client)
   Util.tbl_set(client,{"config","settings","Lua"},{
    completion={
+    autoRequire=false,
     enable=true,
     showWord="Disable",
     workspaceWord=false,
@@ -184,10 +185,8 @@ config.on_init=function(client)
   end
   vim.notify("Switching Lua language server strategy for current directory: "..(last_cwd or "none").." -> "..cur_cwd,vim.log.levels.TRACE)
   last_cwd=cur_cwd
-  -- apply_strategies(client)
-  -- Util.try(function()
-  --           reattach(client)
-  --          end,Util.ERROR)
+  apply_strategies(client)
+  Util.try(function() reattach(client) end,Util.ERROR)
  end
  vim.api.nvim_create_autocmd({"BufRead","DirChanged"},{
   callback=function()

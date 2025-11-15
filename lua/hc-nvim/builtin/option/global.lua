@@ -74,11 +74,6 @@ return {
   undolevels=10000, -- Set undo levels to keep a large history of changes
   fileencodings={"utf-8,gbk,gb18030,gb2312,big5",vim.o.fileencodings},
 
-  --- Fold ---
-  foldlevel=99,
-  foldlevelstart=99,
-  foldcolumn="0",
-
   --- Performance ---
   synmaxcol=500,   -- Syntax highlighting column limit
   updatetime=1000,  -- swap file write interval
