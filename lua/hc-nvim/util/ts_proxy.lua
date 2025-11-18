@@ -79,4 +79,4 @@ function TSProxy.new(node)
   TSProxy
  )
 end
-
+return TSProxy

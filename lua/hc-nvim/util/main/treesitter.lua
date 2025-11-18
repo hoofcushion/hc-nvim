@@ -1,11 +1,17 @@
 ---@class hc_nvim.util
 local Util=require("hc-nvim.util.init_space")
 ---@param node TSNode
----@param target string
+---@param find string|fun(node:TSNode):boolean?
 ---@return TSNode?
-function Util.ts_lookup(node,target)
+function Util.ts_lookup(node,find)
  local n; n=node
- while n and n:type()~=target do
+ if type(find)~="function" then
+  local target=find
+  find=function(_node)
+   return _node:type()==target
+  end
+ end
+ while n and not find(n) do
   n=n:parent()
  end
  return n
@@ -33,10 +39,19 @@ function Util.ts_extract(node,source,name)
  end
  return result
 end
----@param pos {[1]:integer,[2]:integer} (0,0)-indexed cursor position
----@param range {[1]:integer;[2]:integer;[3]:integer;[4]:integer} (0,0,0,0)-indexed start position and finish position
+---@alias pos {[1]:integer;[2]:integer;}
+---@alias range {[1]:integer;[2]:integer;[3]:integer;[4]:integer}
+---@param pos pos (0,0)-indexed cursor position
+---@param range range (0,0,0,0)-indexed start position and finish position
 function Util.ts_get_distance(pos,range)
  local d_start=math.abs(pos[1]-range[1])+math.abs(pos[2]-range[2])
  local d_end=math.abs(pos[1]-range[3])+math.abs(pos[2]-range[4])
  return math.min(d_start,d_end)
+end
+function Util.ts_get_text_between(buf,node_start,node_finish)
+ local start_range={node_start:range()}
+ local finish_range={node_finish:range()}
+ local whole_range={start_range[3],start_range[4],finish_range[1],finish_range[2]}
+ local middle_text=Util.buf_get_text(buf,whole_range)
+ return middle_text
 end
