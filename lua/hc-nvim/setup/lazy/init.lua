@@ -4,7 +4,7 @@ require("hc-nvim.setup.lazy.interload")
 require("hc-nvim.setup.lazy.orderload")
 local Specs={}
 for modname in Util.iter_mod({
- "hc-nvim.builtin.plugin",
+ "hc-nvim.config.plugin",
  "hc-nvim.user.plugin",
 }) do
  Util.try(function()

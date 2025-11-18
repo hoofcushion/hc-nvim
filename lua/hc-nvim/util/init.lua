@@ -29,6 +29,7 @@ Util.lazy(function() return require("hc-nvim.util.reference") end,function(t) Ut
 Util.lazy(function() return require("hc-nvim.util.register") end,function(t) Util.Register=t end)
 Util.lazy(function() return require("hc-nvim.util.sheet") end,function(t) Util.Sheet=t end)
 Util.lazy(function() return require("hc-nvim.util.task_sequence") end,function(t) Util.TaskSequence=t end)
+Util.lazy(function() return require("hc-nvim.util.ts_proxy") end,function(t) Util.TSProxy=t end)
 Util.lazy(function() return require("hc-nvim.util.type") end,function(t) Util.Type=t end)
 Util.lazy(function() return require("hc-nvim.util.wrapper") end,function(t) Util.Wrapper=t end)
 return Util

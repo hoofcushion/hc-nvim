@@ -3,14 +3,14 @@ local Interface=Util.Interface.new()
 Util.track("interface")
 Util.try(
  function()
-  local specs=Util.BufferCache.require("hc-nvim.builtin.interface")
+  local specs=Util.BufferCache.require("hc-nvim.config.interface")
   Interface:extend(specs)
  end,
  Util.ERROR
 )
 Util.track()
 for modname,modpath in Util.iter_mod({
- "hc-nvim.builtin.mapping",
+ "hc-nvim.config.mapping",
  "hc-nvim.user.mapping",
 }) do
  Util.try(function()

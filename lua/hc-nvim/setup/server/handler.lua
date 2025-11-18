@@ -142,7 +142,7 @@ end
 local ConfigTab=Util.Cache.table(function(modname)
  local info=Util.find_mod(
   ("hc-nvim.user.server.%s"):format(modname),
-  ("hc-nvim.builtin.server.%s"):format(modname)
+  ("hc-nvim.config.server.%s"):format(modname)
  )
  if info then
   return require(info.modname)

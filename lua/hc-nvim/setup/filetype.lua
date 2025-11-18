@@ -27,7 +27,7 @@ function FileType.check(s)
  end
 end
 for modname,modpath in Util.iter_mod({
- "hc-nvim.builtin.filetype",
+ "hc-nvim.config.filetype",
  "hc-nvim.user.filetype",
 }) do
  Util.try(

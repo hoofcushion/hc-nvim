@@ -3,7 +3,7 @@ local Util=require("hc-nvim.util")
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
 local Mappings=require("hc-nvim.setup.mapping")
-local preset_modmap=Util.create_modmap("hc-nvim.builtin.preset")
+local preset_modmap=Util.create_modmap("hc-nvim.config.preset")
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
  local fields=preset_modmap[name]

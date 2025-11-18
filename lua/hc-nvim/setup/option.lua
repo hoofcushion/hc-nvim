@@ -1,6 +1,6 @@
 local Util=require("hc-nvim.util")
 for modname in Util.iter_mod({
- "hc-nvim.builtin.option",
+ "hc-nvim.config.option",
  "hc-nvim.user.option",
 }) do
  Util.try(
