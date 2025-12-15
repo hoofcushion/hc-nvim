@@ -35,6 +35,7 @@ function deque.new()
 end
 return {
  options={
+  globalstatus=true,
   component_separators={left="",right=""},
   section_separators={left="",right=""},
   refresh={
@@ -222,92 +223,92 @@ return {
      return Util.is_visualmode()
     end,
    },
-   -- {(function()
-   --  local chars=deque.new()
-   --  vim.api.nvim_create_autocmd("InsertCharPre",{
-   --   callback=function()
-   --    local char=vim.v.char
-   --    if char==nil then
-   --     return
-   --    end
-   --    chars:append({char,os.clock()})
-   --   end,
-   --  })
-   --  local function get_cpm()
-   --   local cur=os.clock()
-   --   for i=chars.s,chars.e do
-   --    local v=chars.l[i]
-   --    if cur-v[2]>60 then
-   --     chars:pophead()
-   --    else
-   --     break
-   --    end
-   --   end
-   --   return chars:len()
-   --  end
-   --  return function()
-   --   if chars:len()==0 then
-   --    return ""
-   --   end
-   --   --- auto hide in 5 s
-   --   if os.clock()-chars:tail()[2]>5 then
-   --    return ""
-   --   end
-   --   return get_cpm().."c/m"
-   --  end
-   -- end)()},
-   -- {(function()
-   --  local moves=deque.new()
-   --  local last_pos
-   --  vim.api.nvim_create_autocmd("WinEnter",{
-   --   callback=function(ev)
-   --    if ev.file=="" or vim.bo[ev.buf].buftype=="nofile" then
-   --     return
-   --    end
-   --    last_pos=vim.fn.getpos(".")
-   --   end,
-   --  })
-   --  vim.api.nvim_create_autocmd({"CursorMoved","CursorMovedI"},{
-   --   callback=function(ev)
-   --    if ev.file=="" or vim.bo[ev.buf].buftype=="nofile" then
-   --     return
-   --    end
-   --    local current_pos=vim.fn.getpos(".")
-   --    if last_pos==nil then
-   --     last_pos=current_pos
-   --     return
-   --    end
-   --    local cur=os.clock()
-   --    local row_dist=math.abs(current_pos[2]-last_pos[2])
-   --    local col_dist=math.abs(current_pos[3]-last_pos[3])
-   --    local distance=row_dist+col_dist
-   --    moves:append({distance,cur})
-   --    last_pos=current_pos
-   --   end,
-   --  })
-   --  local function get_speed()
-   --   local cur=os.clock()
-   --   local total_chars=0
-   --   for i=moves.s,moves.e do
-   --    local v=moves.l[i]
-   --    if cur-v[2]>60 then
-   --     moves:pophead()
-   --    else
-   --     total_chars=total_chars+v[1]
-   --    end
-   --   end
-   --   return math.floor(total_chars)
-   --  end
-   --  return function()
-   --   if moves:len()==0 then
-   --    return ""
-   --   end
-   --   if os.clock()-moves:tail()[2]>5 then
-   --    return ""
-   --   end
-   --   return get_speed().."b/m"
-   --  end
-   -- end)()},
+   {(function()
+    local chars=deque.new()
+    vim.api.nvim_create_autocmd("InsertCharPre",{
+     callback=function()
+      local char=vim.v.char
+      if char==nil then
+       return
+      end
+      chars:append({char,Util.clock()})
+     end,
+    })
+    local function get_cpm()
+     local cur=Util.clock()
+     for i=chars.s,chars.e do
+      local v=chars.l[i]
+      if cur-v[2]>60 then
+       chars:pophead()
+      else
+       break
+      end
+     end
+     return chars:len()
+    end
+    return function()
+     if chars:len()==0 then
+      return ""
+     end
+     --- auto hide in 5 s
+     if Util.clock()-chars:tail()[2]>5 then
+      return ""
+     end
+     return get_cpm().."c/m"
+    end
+   end)()},
+   {(function()
+    local moves=deque.new()
+    local last_pos
+    vim.api.nvim_create_autocmd("WinEnter",{
+     callback=function(ev)
+      if ev.file=="" or vim.bo[ev.buf].buftype=="nofile" then
+       return
+      end
+      last_pos=vim.fn.getpos(".")
+     end,
+    })
+    vim.api.nvim_create_autocmd({"CursorMoved","CursorMovedI"},{
+     callback=function(ev)
+      if ev.file=="" or vim.bo[ev.buf].buftype=="nofile" then
+       return
+      end
+      local current_pos = {vim.fn.line("."),vim.fn.virtcol(".")}
+      if last_pos==nil then
+       last_pos=current_pos
+       return
+      end
+      local cur=Util.clock()
+      local row_dist=math.abs(current_pos[1]-last_pos[1])
+      local col_dist=math.abs(current_pos[2]-last_pos[2])
+      local distance=row_dist+col_dist
+      moves:append({distance,cur})
+      last_pos=current_pos
+     end,
+    })
+    local function get_speed()
+     local cur=Util.clock()
+     local total_chars=0
+     for i=moves.s,moves.e do
+      local v=moves.l[i]
+      if cur-v[2]>60 then
+       moves:pophead()
+      else
+       total_chars=total_chars+v[1]
+      end
+     end
+     return math.floor(total_chars)
+    end
+    return function()
+     if moves:len()==0 then
+      return ""
+     end
+     if Util.clock()-moves:tail()[2]>5 then
+      return ""
+     end
+     return get_speed().."b/m"
+    end
+   end)()},
    --- Line and column progreass
    {Util.when({
     event={"CursorMoved","CursorMovedI"},

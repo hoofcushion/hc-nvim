@@ -9,13 +9,12 @@ return {
  {"folke/which-key.nvim",                      event="SafeState"},
 
  {"rcarriga/nvim-notify"},
- {"stevearc/dressing.nvim"},
  {"echasnovski/mini.nvim"},
 
 
  --- Information
  {"nvim-lualine/lualine.nvim",                 event=Events.File},
- {"Bekaboo/dropbar.nvim",                      event=Events.File},
+ -- {"Bekaboo/dropbar.nvim",                      event=Events.File},
  {"kevinhwang91/nvim-ufo",                     event=Events.File},
  {"chentoast/marks.nvim",                      event=Events.File},
  {"rainbowhxch/beacon.nvim",                   event=Events.File},
@@ -49,7 +48,7 @@ return {
  -- {"chrisgrieser/nvim-various-textobjs"},
  {"nvim-neo-tree/neo-tree.nvim",               ft="directory"},
  {"nvim-pack/nvim-spectre"},
- -- {"s1n7ax/nvim-window-picker"},
+ {"s1n7ax/nvim-window-picker"},
  --- Profiller
  {"dstein64/vim-startuptime"},
 
