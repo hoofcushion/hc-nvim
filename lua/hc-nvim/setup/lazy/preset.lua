@@ -16,45 +16,50 @@ local PluginPresets=Util.Cache.table(function(name)
   end
  end)
 end)
---- hook after specific plugin
-local Hook={
- ---@alias pluginName string
- --- Track if a specific pluginName is already checked.
- ---@type table<pluginName,boolean>
- checked={},
- ---@alias hook {cond:table<pluginName,boolean>,func:function}
- ---@alias hookspec {[1]:table<pluginName,boolean>,[2]:function}
- --- The hook list.
- ---@type table<integer,hook>
- hooks={},
-}
----@param hooks hookspec[]
-function Hook.add(hooks)
- local checked=Hook.checked
- for _,v in ipairs(hooks) do
-  local cond={}
-  for _,name in pairs(v[1]) do
-   if checked[name]~=true then
-    cond[name]=true
-   end
+local Hook={}
+local event_to_hook_set={}
+local function strong_remove(parent,keys,ck)
+ for _,key in ipairs(keys) do
+  local child=parent[key]
+  child[ck]=nil
+  if next(child)==nil then
+   parent[key]=nil
   end
-  local hook={cond=cond,func=v[2]}
-  table.insert(Hook.hooks,hook)
  end
 end
-function Hook.check(name)
- local checked=Hook.checked
- checked[name]=true
- --- update hooks
- local hooks=Hook.hooks
- for k,hook in pairs(hooks) do
-  local cond=hook.cond
-  if cond[name]~=nil then
-   cond[name]=nil
-   if next(cond)==nil then
-    hook.func()
-    hooks[k]=nil
-   end
+local function strong_set(parent,keys,ck)
+ for _,key in ipairs(keys) do
+  local child=parent[key]
+  if child==nil then
+   child={}
+   parent[key]=child
+  end
+  child[ck]=true
+ end
+end
+local hook_to_status={}
+function Hook.add(hook)
+ local hook_status={}
+ hook_to_status[hook]=hook_status
+ for _,event in ipairs(hook[1]) do
+  hook_status[event]=true
+ end
+ strong_set(event_to_hook_set,hook[1],hook)
+end
+function Hook.check(event)
+ local hook_set=event_to_hook_set[event]
+ if not hook_set then
+  return
+ end
+ for hook in pairs(hook_set) do
+  local status=hook_to_status[hook]
+  if status then
+   status[event]=nil
+  end
+  if not next(status) then
+   hook_to_status[hook]=nil
+   strong_remove(event_to_hook_set,hook[1],hook)
+   hook[2]()
   end
  end
 end
@@ -89,6 +94,7 @@ local PresetGetter={
  end,
  config=function(plugin,field,value,preset,name)
   if plugin.config or plugin.opts then
+   Hook.check(plugin.name,plugin)
    Loader.config(plugin)
   end
   if preset.keyimp then
@@ -102,11 +108,6 @@ local PresetGetter={
   if preset.after then
    Util.eval(preset.after,plugin)
   end
-  if preset.hook then
-   Hook.add(preset.hook)
-  end
-  Hook.check(name)
-  Hook.check(plugin.name)
  end,
 }
 -- local priority=2^10
@@ -138,6 +139,9 @@ function Preset.apply(specs)
     return ret
    end
   end
+  if preset.hook then
+   Hook.add(preset.hook)
+  end
   -- equalize dependencies
   if spec.dependencies~=nil then
    spec={spec,spec.dependencies}
@@ -148,9 +152,9 @@ function Preset.apply(specs)
   --  spec.priority=priority
   --  priority=priority-1
   -- end
- --  if spec.auto==true then
- --   spec.lazy=vim.fn.argc()==0
- --  end
+  --  if spec.auto==true then
+  --   spec.lazy=vim.fn.argc()==0
+  --  end
  end)
 end
 return Preset

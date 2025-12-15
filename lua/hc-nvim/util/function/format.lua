@@ -2,12 +2,7 @@ local Config=require("hc-nvim.config")
 local Util=require("hc-nvim.util")
 local LocalEnv=Util.LocalEnv.new()
 local click=0
-local function format_reindent(opts)
- vim.lsp.buf.format(opts)
- local view=vim.fn.winsaveview()
- vim.api.nvim_command("silent norm! gg=G")
- vim.fn.winrestview(view)
-end
+local format=vim.lsp.buf.format
 --- @param opts? vim.lsp.buf.format.Opts
 local function format_raw(opts)
  click=0
@@ -28,13 +23,13 @@ local function format_raw(opts)
   return
  end
  if #clients==1 then
-  format_reindent(vim.tbl_extend("force",opts,{name=clients[1].name}))
+  format(vim.tbl_extend("force",opts,{name=clients[1].name}))
   return
  end
  if LocalEnv.buffer.lsp_format_choice then
   local valid_choice=vim.lsp.get_clients({name=LocalEnv.buffer.lsp_format_choice})[1]~=nil
   if valid_choice then
-   format_reindent(vim.tbl_extend("force",opts,{name=LocalEnv.buffer.lsp_format_choice}))
+   format(vim.tbl_extend("force",opts,{name=LocalEnv.buffer.lsp_format_choice}))
    return
   else
    LocalEnv.buffer.lsp_format_choice=nil
@@ -43,17 +38,17 @@ local function format_raw(opts)
  Util.async(function()
   local choice=Util.await(function(resume)
    vim.ui.select(clients,{
-    prompt="Select formatting client:",
-    format_item=function(item)
-     return string.format("%s (%s)",item.name,item.id)
-    end,
-   },resume)
+                  prompt="Select formatting client:",
+                  format_item=function(item)
+                   return string.format("%s (%s)",item.name,item.id)
+                  end,
+                 },resume)
   end)
   if not choice then
    return
   end
   LocalEnv.buffer.lsp_format_choice=choice.name
-  format_reindent(vim.tbl_extend("force",opts,{name=choice.name}))
+  format(vim.tbl_extend("force",opts,{name=choice.name}))
  end)
 end
 local format_d=Util.debounce(200,vim.schedule_wrap(format_raw))

@@ -1,6 +1,6 @@
 return {
  {
-  {"lualine.nvim","fittencode.nvim"},
+  {"lualine.nvim"},
   function()
    local fapi=require("fittencode.api").api
    local sections={

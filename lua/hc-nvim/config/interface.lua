@@ -116,10 +116,6 @@ return Util.parse_override({
   {name=NS.nvim_lspconfig_lspinfo,lhs="<leader>lI",desc="Lspinfo"},
  },
  {
-  override={tags="nvim-navbuddy"},
-  {name=NS.nvim_navbuddy_open,lhs="<leader>ln",desc="Navbuddy"},
- },
- {
   override={tags="yanky"},
   {name=NS.yanky_put_after,                    lhs="p",   mode={"n","x"}},
   {name=NS.yanky_put_before,                   lhs="P",   mode={"n","x"}},
@@ -334,21 +330,11 @@ return Util.parse_override({
   },
  },
  {
-  override={tags="Comment"},
-  {index="opleader.line", value="gb", desc="Comment toggle linewise (visual)", mode="x"},
-  {index="opleader.line", value="gb", desc="Comment toggle linewise"},
-  {index="opleader.block",value="gb", desc="Comment toggle blockwise (visual)",mode="x"},
-  {index="opleader.block",value="gb", desc="Comment toggle blockwise"},
-  {index="toggler.line",  value="gcc",desc="Comment toggle current line"},
-  {index="toggler.block", value="gbb",desc="Comment toggle current block"},
-  {index="extra.above",   value="gcO",desc="Comment insert above"},
-  {index="extra.below",   value="gco",desc="Comment insert below"},
-  {index="extra.eol",     value="gcA",desc="Comment insert end of line"},
- },
- {
-  override={tags="tabout"},
-  {index="tabkey",          value="<c-s>",desc="Tabout",         mode="i"},
-  {index="backwards_tabkey",value="<c-b>",desc="Tabout backward",mode="i"},
+  override={tags="mini-comment"},
+  {index="mappings.comment",       value="gc", desc="Comment toggle"},
+  {index="mappings.comment_line",  value="gcc",desc="Comment toggle linewise"},
+  {index="mappings.comment_visual",value="gc", desc="Comment toggle blockwise (visual)",mode="x"},
+  {index="mappings.textobject",    value="gc", desc="Comment toggle textobject"},
  },
  {
   wkspec={"<leader>g",group="Git"},
@@ -533,10 +519,6 @@ return Util.parse_override({
   {name=NS.tsj_toggle,lhs="<leader>K"},
  },
  {
-  override={tags="nvim-treesitter-context"},
-  {name=NS.goto_treesitter_context,lhs="[["},
- },
- {
   override={tags="nvim-ufo"},
   {name=NS.ufo_open_all_folds,        lhs="zR"},
   {name=NS.ufo_open_folds,            lhs="zr"},
@@ -562,11 +544,6 @@ return Util.parse_override({
   {name=NS.todo_comments_telescope,    lhs="<leader>Dt"},
   {name=NS.todo_comments_prev,         lhs="[e"},
   {name=NS.todo_comments_next,         lhs="]e"},
- },
- {
-  override={tags="binary-swap"},
-  {name=NS.swap_operand,              lhs="<leader>sz"},
-  {name=NS.swap_operand_with_operator,lhs="<leader>sx"},
  },
  {
   wkspec={"<leader>s",group="Swap"},
@@ -726,12 +703,6 @@ return Util.parse_override({
    {mode="n",               lhs=op.sort:gsub(".$","%0%0"),    desc="Sort line"},
   }
  end)(),
- {
-  wkspec={"<leader>m",group="Mini"},
-  override={tags="mini-trailspace"},
-  {name=NS.mini_trailspace_trim,           lhs="<leader>m "},
-  {name=NS.mini_trailspace_trim_last_lines,lhs="<leader>ml"},
- },
  (function()
   local lhss={
    add           ="xa",

@@ -1,11 +1,14 @@
 return {
  {
-  {"Comment.nvim","nvim-ts-context-commentstring"},
+  {"mini.comment"},
   function()
-   local opts={
-    pre_hook=require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
-   }
-   require("Comment").setup(opts)
+   require("mini.comment").setup({
+    options={
+     custom_commentstring=function()
+      return require("ts_context_commentstring").calculate_commentstring() or vim.bo.commentstring
+     end,
+    },
+   })
   end,
  },
 }

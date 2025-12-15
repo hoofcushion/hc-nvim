@@ -1,6 +1,6 @@
 return {
  {
-  {"LuaSnip","nvim-cmp"},
+  {"nvim-cmp"},
   function()
    local cmp=require("cmp")
    local luasnip=require("luasnip")
@@ -14,7 +14,7 @@ return {
   end,
  },
  {
-  {"LuaSnip","blink.cmp"},
+  {"blink.cmp"},
   function()
    local blink_cmp_config=require("blink.cmp.config")
    blink_cmp_config.merge_with({
