@@ -37,7 +37,7 @@ return {
  {"echasnovski/mini.align",                    virtual=true},
  {"echasnovski/mini.surround",                 virtual=true},
  {"echasnovski/mini.comment",                  virtual=true},
- -- {"gbprod/yanky.nvim"},
+ {"gbprod/yanky.nvim"},
  -- {"monaqa/dial.nvim"},
 
  --- Tools
@@ -78,7 +78,7 @@ return {
  -- {"zbirenbaum/copilot.lua"},
  {"luozhiya/fittencode.nvim",                  event="InsertEnter"},
  --- Git
- -- {"sindrets/diffview.nvim"},
+ {"sindrets/diffview.nvim"},
  {"lewis6991/gitsigns.nvim",                   event=Events.RootPattern(".git")},
  {"NeogitOrg/neogit"},
  -- {"kdheepak/lazygit.nvim"},
@@ -114,6 +114,5 @@ return {
  {"MeanderingProgrammer/markdown.nvim",        ft="markdown"},
 
  --- Libraries
- -- {"nvim-tree/nvim-web-devicons"},
  {"echasnovski/mini.icon",                     virtual=true},
 }

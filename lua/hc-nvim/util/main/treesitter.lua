@@ -55,3 +55,30 @@ function Util.ts_get_text_between(buf,node_start,node_finish)
  local middle_text=Util.buf_get_text(buf,whole_range)
  return middle_text
 end
+---@type table<string,string[]>
+local parser_files=setmetatable({},{
+ __index=function(tbl,key)
+  rawset(tbl,key,vim.api.nvim_get_runtime_file("parser/"..key..".*",false))
+  return rawget(tbl,key)
+ end,
+})
+---@param ft string
+---@return string?
+function Util.ft_to_lang(ft)
+ local lang=vim.treesitter.language.get_lang(ft)
+  or vim.treesitter.language.get_lang(vim.split(ft,".",{plain=true})[1])
+  or ft
+ return lang~="" and lang or nil
+end
+---@param buf integer
+---@return string?
+function Util.buf_get_lang(buf)
+ local ft=vim.bo[buf].filetype
+ return Util.ft_to_lang(ft)
+end
+---@param buf integer
+---@return boolean
+function Util.ts_has_parser(buf)
+ local lang=Util.buf_get_lang(buf)
+ return lang and vim._ts_has_language(lang) or #parser_files[lang]>0
+end

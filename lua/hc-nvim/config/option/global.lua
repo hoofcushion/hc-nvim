@@ -4,7 +4,7 @@ return {
   localmapleader="\\",
   mapleader=" ",
  },
- go={
+ o={
   --- Position ---
   number=true,         -- Display line numbers
   relativenumber=true, -- Display relative line numbers

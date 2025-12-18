@@ -50,24 +50,12 @@ M.File=Util.Event.create({
   end,
  },
 })
-local parser_files=setmetatable({},{
- __index=function(tbl,key)
-  rawset(tbl,key,vim.api.nvim_get_runtime_file("parser/"..key..".*",false))
-  return rawget(tbl,key)
- end,
-})
 M.Treesitter=Util.Event.create({
  name="Treesitter",
  any={
   event="FileType",
   cond=function(ev)
-   local ts=vim.treesitter
-   local ft=vim.bo[ev.buf].filetype
-   local lang=ts.language.get_lang(ft)
-    or ts.language.get_lang(vim.split(ft,".",{plain=true})[1])
-    or ft
-   local has_lang=lang and #lang>0 and (vim._ts_has_language(lang) or #parser_files[lang]>0)
-   return has_lang
+   return Util.ts_has_parser(ev.buf)
   end,
  },
 })

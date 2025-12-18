@@ -1,7 +1,7 @@
 ---@alias StringOrTable string|table<string,string>|string[]
 ---@alias ValidScope string
 ---@alias Options table<string, any>
----@alias ScopeOptions table<string, Options>
+---@alias ScopeOpts table<string, Options>
 
 ---将值转换为选项字符串
 ---@param value StringOrTable
@@ -95,41 +95,39 @@ end
 ---@field event string|string[]? 触发事件
 ---@field pattern string|string[]? 匹配模式
 ---@field scheduled boolean? 是否调度执行
----@field options ScopeOptions 选项配置
+---@field options ScopeOpts 选项配置
 
----@alias OptSpec AutoOptsSpec|ScopeOptions|OptSpec[]
+---@alias OptSpec AutoOptsSpec|ScopeOpts|OptSpec[]
 
 local Option={}
----设置选项
----@param opts OptSpec 选项配置
-function Option.set(opts)
- -- 处理数组形式的配置
- if #opts~=0 then
-  for _,v in ipairs(opts) do
-   Option.set(v)
-  end
-  return
+---@param opts OptSpec
+local function set_list(opts)
+ for _,v in ipairs(opts) do
+  Option.set(v)
  end
- if opts.pattern and opts.options then
-  local event=opts.event or "FileType"
-  local function local_set(buf,options)
-   local_do(buf,function()
-    Option.set(options)
-   end)
-  end
+end
+---@param opts AutoOptsSpec
+local function set_auto(opts)
+ local event=opts.event or "FileType"
+ local function local_set(buf,options)
+  local_do(buf,function()
+   Option.set(options)
+  end)
+ end
 
-  local callback=local_set
-  if opts.scheduled then
-   callback=vim.schedule_wrap(callback)
-  end
-  vim.api.nvim_create_autocmd(event,{
-   pattern=opts.pattern,
-   callback=function(env)
-    callback(env.buf,opts.options)
-   end,
-  })
-  return
+ local callback=local_set
+ if opts.scheduled then
+  callback=vim.schedule_wrap(callback)
  end
+ vim.api.nvim_create_autocmd(event,{
+  pattern=opts.pattern,
+  callback=function(env)
+   callback(env.buf,opts.options)
+  end,
+ })
+end
+---@param opts ScopeOpts
+local function set_scoped(opts)
  for scope,options in pairs(opts) do
   if VALID_SCOPES[scope] then
    for name,value in pairs(options) do
@@ -137,5 +135,15 @@ function Option.set(opts)
    end
   end
  end
+end
+---@param opts OptSpec 选项配置
+function Option.set(opts)
+ if #opts~=0 then
+  return set_list(opts)
+ end
+ if opts.pattern and opts.options then
+  return set_auto(opts)
+ end
+ set_scoped(opts)
 end
 return Option
