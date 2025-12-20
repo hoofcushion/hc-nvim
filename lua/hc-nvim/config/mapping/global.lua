@@ -104,10 +104,11 @@ return {
   {
    name=NS.global_option_treesitter,
    rhs=function()
-    if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] then
-     vim.treesitter.stop()
+    local buf=vim.api.nvim_get_current_buf()
+    if vim.treesitter.highlighter.active[buf] then
+     vim.treesitter.stop(buf)
     else
-     vim.treesitter.start()
+     vim.treesitter.start(buf)
     end
    end,
   },

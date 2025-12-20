@@ -80,5 +80,7 @@ end
 ---@return boolean
 function Util.ts_has_parser(buf)
  local lang=Util.buf_get_lang(buf)
- return lang and vim._ts_has_language(lang) or #parser_files[lang]>0
+ if lang then
+  return vim._ts_has_language(lang) or #parser_files[lang]>0
+ end
 end
