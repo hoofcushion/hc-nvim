@@ -112,6 +112,7 @@ return {
  --- Notebook
  {"zk-org/zk-nvim",                            event=Events.RootPattern(".zk")},
  {"MeanderingProgrammer/markdown.nvim",        ft="markdown"},
+ {"iamcco/markdown-preview.nvim"},
 
  --- Libraries
  {"echasnovski/mini.icon",                     virtual=true},

@@ -67,7 +67,7 @@ add_strategy(
      space_after_comma="false",
      space_after_comma_in_for_statement="false",
      space_around_concat_operator="none",
-     align_call_args="true",
+     align_call_args="false",
      align_function_params="true",
      align_continuous_assign_statement="true",
      align_continuous_rect_table_field="true",

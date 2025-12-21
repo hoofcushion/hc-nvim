@@ -32,4 +32,5 @@ Util.lazy(function() return require("hc-nvim.util.task_sequence") end,      func
 Util.lazy(function() return require("hc-nvim.util.ts_proxy") end,           function(t) Util.TSProxy=t end)
 Util.lazy(function() return require("hc-nvim.util.type") end,               function(t) Util.Type=t end)
 Util.lazy(function() return require("hc-nvim.util.wrapper") end,            function(t) Util.Wrapper=t end)
+Util.lazy(function() return require("hc-nvim.util.relation_graph") end,     function(t) Util.RelationGraph=t end)
 return Util

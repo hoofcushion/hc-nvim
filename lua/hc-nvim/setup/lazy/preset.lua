@@ -17,49 +17,17 @@ local PluginPresets=Util.Cache.table(function(name)
  end)
 end)
 local Hook={}
-local event_to_hook_set={}
-local function strong_remove(parent,keys,ck)
- for _,key in ipairs(keys) do
-  local child=parent[key]
-  child[ck]=nil
-  if next(child)==nil then
-   parent[key]=nil
-  end
+local rg=Util.RelationGraph.new()
+function Hook.add(hooks)
+ for _,hook in ipairs(hooks) do
+  rg:extend_k(hook[2],hook[1])
  end
-end
-local function strong_set(parent,keys,ck)
- for _,key in ipairs(keys) do
-  local child=parent[key]
-  if child==nil then
-   child={}
-   parent[key]=child
-  end
-  child[ck]=true
- end
-end
-local hook_to_status={}
-function Hook.add(hook)
- local hook_status={}
- hook_to_status[hook]=hook_status
- for _,event in ipairs(hook[1]) do
-  hook_status[event]=true
- end
- strong_set(event_to_hook_set,hook[1],hook)
 end
 function Hook.check(event)
- local hook_set=event_to_hook_set[event]
- if not hook_set then
-  return
- end
- for hook in pairs(hook_set) do
-  local status=hook_to_status[hook]
-  if status then
-   status[event]=nil
-  end
-  if not next(status) then
-   hook_to_status[hook]=nil
-   strong_remove(event_to_hook_set,hook[1],hook)
-   hook[2]()
+ local callbacks=rg:del_k(event)
+ if callbacks then
+  for _,callback in ipairs(callbacks) do
+   callback()
   end
  end
 end
