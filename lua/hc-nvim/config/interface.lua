@@ -54,8 +54,8 @@ return Util.parse_override({
    {name=NS.global_edit_break_points,   lhs=vim.split(",.;+-=[]{}()#^*&<>",""),mode="i"},
    {name=NS.global_visual_indent,       lhs={"<",">"},                         mode="x"},
    {name=NS.operator_entire_buffer,     lhs="gG",                              mode={"x","o"}},
-   {name=NS.operator_straght_up,        lhs="gk",                              mode={"x","o"}},
-   {name=NS.operator_straght_down,      lhs="gj",                              mode={"x","o"}},
+   {name=NS.operator_straght_up,        lhs="<leader>k",                       mode={"x","o"}},
+   {name=NS.operator_straght_down,      lhs="<leader>j",                       mode={"x","o"}},
   },
   {
    override={mode={"n","x"}},

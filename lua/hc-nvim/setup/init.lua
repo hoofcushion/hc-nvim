@@ -19,8 +19,8 @@ local modules={
 for _,modname in ipairs(modules) do
  Util.track(modname)
  Util.try(function()
-           return require("hc-nvim.setup."..modname)
-          end,Util.ERROR)
+  return require("hc-nvim.setup."..modname)
+ end,Util.ERROR)
  Util.track()
 end
 -- :e for every file buffer

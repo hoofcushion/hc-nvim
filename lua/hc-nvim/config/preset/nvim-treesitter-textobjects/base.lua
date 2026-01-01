@@ -1,3 +1,3 @@
 return {
- main="nvim-treesitter.configs"
+ main="nvim-treesitter.configs",
 }

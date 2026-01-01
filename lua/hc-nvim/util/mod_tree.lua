@@ -1,5 +1,5 @@
 --- Travel filesystem in table.
-local  Util=require("hc-nvim.util.init_space")
+local Util=require("hc-nvim.util.init_space")
 local function modtree(tree,path,func)
  return setmetatable({},{
   __index=function(_,name)

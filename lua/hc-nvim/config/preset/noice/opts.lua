@@ -20,7 +20,7 @@ return vim.tbl_deep_extend(
     enabled=true,
    },
    signature={
-    enabled=true
+    enabled=true,
    },
    override={
     ["vim.lsp.util.convert_input_to_markdown_lines"]=true,

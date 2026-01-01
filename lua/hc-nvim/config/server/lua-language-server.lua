@@ -150,7 +150,7 @@ add_strategy(
     -- maxPreload=2^31,
     -- preloadFileSize=2^31,
     library={
-     -- vim.env.VIMRUNTIME,
+     vim.env.VIMRUNTIME,
      "${3rd}/luv/library",
      "${3rd}/busted/library",
     },

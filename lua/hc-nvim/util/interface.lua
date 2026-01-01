@@ -298,8 +298,8 @@ end
 function Mapping:delete()
  if self.autocmd_id~=nil then
   Util.try(function()
-            api.nvim_del_autocmd(self.autocmd_id)
-           end,Util.ERROR)
+   api.nvim_del_autocmd(self.autocmd_id)
+  end,Util.ERROR)
   self.autocmd_id=nil
  end
  if next(self.instances)~=nil then

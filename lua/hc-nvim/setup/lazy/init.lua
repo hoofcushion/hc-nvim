@@ -8,9 +8,9 @@ for modname in Util.iter_mod({
  "hc-nvim.user.plugin",
 }) do
  Util.try(function()
-           local spec=require(modname)
-           table.insert(Specs,spec)
-          end,Util.ERROR)
+  local spec=require(modname)
+  table.insert(Specs,spec)
+ end,Util.ERROR)
 end
 local Presets=require("hc-nvim.setup.lazy.preset")
 Presets.apply(Specs)

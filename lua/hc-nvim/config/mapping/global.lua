@@ -150,7 +150,7 @@ return {
      end
     end
    end
-   return ""
+   return tostring(line_count-current_line).."j"
   end,
   opts={expr=true},
  },
@@ -159,7 +159,7 @@ return {
   rhs=function()
    local current_line=vim.fn.line(".")
    local display_col=vim.fn.virtcol(".")
-   for line=current_line-1,0,-1 do
+   for line=current_line-1,1,-1 do
     local line_content=vim.api.nvim_buf_get_lines(0,line-1,line,false)[1]
     local line_len=vim.fn.strdisplaywidth(line_content)
     if line_len<display_col then
@@ -171,7 +171,7 @@ return {
      end
     end
    end
-   return ""
+   return tostring(current_line-1).."k"
   end,
   opts={expr=true},
  },

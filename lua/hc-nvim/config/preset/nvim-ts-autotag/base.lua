@@ -16,5 +16,5 @@ return {
   "typescript",
   "vue",
   "xml",
- }
+ },
 }

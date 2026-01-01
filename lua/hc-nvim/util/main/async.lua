@@ -1,19 +1,41 @@
 ---@class hc_nvim.util
 Util=require("hc-nvim.util.init_space")
-function Util.async(func)
- local co=coroutine.create(func)
- coroutine.resume(co)
+local async_infos=setmetatable({},{__mode="k"})
+---@param block function
+function Util.async(block)
+ local co=coroutine.create(block)
+ async_infos[co]=true
+ local ok,err=coroutine.resume(co)
+ if not ok then
+  error(err,0)
+ end
+ return ok
 end
-function Util.await(func)
+---@alias job async fun(resume:function):...?
+
+---@param job job
+function Util.await(job)
  local co=coroutine.running()
- if not co then
-  error()
+ if not async_infos[co] then
+  error("await must be called in async block",2)
  end
+ local result
  local function resume(...)
-  coroutine.resume(co,...)
+  if not result then
+   result=Util.packlen(...)
+   coroutine.resume(co,...)
+  end
  end
- func(resume)
- return coroutine.yield()
+ local ok,err=pcall(function()
+  job(resume)
+ end)
+ if not ok then
+  error(err,2)
+ end
+ if not result then
+  coroutine.yield()
+ end
+ return Util.unpacklen(result)
 end
 function Util.await_work(env,job)
  return Util.await(function(resume)

@@ -38,11 +38,11 @@ local function format_raw(opts)
  Util.async(function()
   local choice=Util.await(function(resume)
    vim.ui.select(clients,{
-                  prompt="Select formatting client:",
-                  format_item=function(item)
-                   return string.format("%s (%s)",item.name,item.id)
-                  end,
-                 },resume)
+    prompt="Select formatting client:",
+    format_item=function(item)
+     return string.format("%s (%s)",item.name,item.id)
+    end,
+   },resume)
   end)
   if not choice then
    return

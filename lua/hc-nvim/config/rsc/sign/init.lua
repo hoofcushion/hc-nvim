@@ -4,7 +4,7 @@ local Sign={}
 ---@param signs sign
 ---@return sign|Sign
 function Sign.new(signs)
- local signs_str = {}
+ local signs_str={}
  for k,v in pairs(signs) do
   if type(k)=="string" then
    signs_str[k]=v

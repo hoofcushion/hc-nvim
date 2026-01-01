@@ -73,13 +73,13 @@ function M.report()
  local lines={
   "=== Resource Usage Report ===",
   string.format("Current: autocmds=%d, commands=%d, keymaps=%d, namespaces=%d",
-                latest.autocmds,latest.commands,latest.keymaps,latest.namespaces),
+   latest.autocmds,latest.commands,latest.keymaps,latest.namespaces),
  }
  if diff then
   table.insert(
    lines,
    string.format("Change: autocmds=%+d, commands=%+d, keymaps=%+d, namespaces=%+d",
-                 diff.autocmds,diff.commands,diff.keymaps,diff.namespaces)
+    diff.autocmds,diff.commands,diff.keymaps,diff.namespaces)
   )
  end
  return table.concat(lines,"\n")

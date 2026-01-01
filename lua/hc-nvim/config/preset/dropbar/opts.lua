@@ -13,5 +13,5 @@ return {
  },
  bar={
   update_debounce=Config.performance.debounce,
- }
+ },
 }

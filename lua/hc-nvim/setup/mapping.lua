@@ -14,12 +14,12 @@ for modname,modpath in Util.iter_mod({
  "hc-nvim.user.mapping",
 }) do
  Util.try(function()
-           local mapping=Util.path_require(modname,modpath)
-           if mapping then
-            Interface.forspecs(mapping,function(spec)
-             Interface:add(spec):create()
-            end)
-           end
-          end,Util.ERROR)
+  local mapping=Util.path_require(modname,modpath)
+  if mapping then
+   Interface.forspecs(mapping,function(spec)
+    Interface:add(spec):create()
+   end)
+  end
+ end,Util.ERROR)
 end
 return Interface

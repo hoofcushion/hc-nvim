@@ -36,7 +36,7 @@ TogglerAu:add({
  {{"BufEnter","BufWrite"},{
   callback=function(event)
    for name,func in pairs(Function.funcs) do
-    local status = func.status
+    local status=func.status
     if not (name=="toggler"
      or status.enable==false
      or status.suspend==true)
@@ -53,7 +53,7 @@ TogglerAu:add({
  {{"FocusLost","FocusGained"},{
   callback=function(event)
    for name,func in pairs(Function.funcs) do
-    local status = func.status
+    local status=func.status
     if name=="toggler"
     or status.enable==false
     or TogglerRules[name].auto_suspend==false

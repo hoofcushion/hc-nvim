@@ -90,7 +90,6 @@ return function(_,opts)
    src.buffer:with({max_item_count=5}),
   },
  })
- 
  require("hc-nvim.config.preset.nvim-cmp.path")
  cmp.setup({
   sources={

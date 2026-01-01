@@ -76,9 +76,9 @@ return {
 
   --- Performance ---
   synmaxcol=500,   -- Syntax highlighting column limit
-  updatetime=1000,  -- swap file write interval
+  updatetime=1000, -- swap file write interval
   timeoutlen=500,  -- map key sequence timeouts
-  ttimeoutlen=50, -- key code timeouts
+  ttimeoutlen=50,  -- key code timeouts
 
   linespace=0,     -- No extra line spacing
   conceallevel=0,  -- Disable conceal for faster rendering

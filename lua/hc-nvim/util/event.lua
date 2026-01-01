@@ -104,10 +104,10 @@ function Event.create(step_t)
  --- delay
  if step_t.delay then
   vim.defer_fn(function()
-                local _step_t=vim.deepcopy(step_t)
-                _step_t.delay=nil
-                Event.create(_step_t)
-               end,step_t.delay)
+   local _step_t=vim.deepcopy(step_t)
+   _step_t.delay=nil
+   Event.create(_step_t)
+  end,step_t.delay)
   return {event="User",pattern=step_t.name}
  end
  --- exec autocmd
@@ -175,8 +175,8 @@ function Event.create(step_t)
    if step_t.callback then
     if step_t.wait then
      vim.defer_fn(function()
-                   step_t.callback(ev)
-                  end,step_t.wait)
+      step_t.callback(ev)
+     end,step_t.wait)
     else
      step_t.callback(ev)
     end
@@ -196,10 +196,10 @@ function Event.sequence(steps_t)
  -- Handle delay if specified
  if steps_t.delay then
   vim.defer_fn(function()
-                local _steps=vim.deepcopy(steps_t)
-                _steps.delay=nil
-                Event.sequence(_steps)
-               end,steps_t.delay)
+   local _steps=vim.deepcopy(steps_t)
+   _steps.delay=nil
+   Event.sequence(_steps)
+  end,steps_t.delay)
   return {event="User",pattern=steps_t.name}
  end
  local i,e=1,#steps_t.steps
@@ -218,8 +218,8 @@ function Event.sequence(steps_t)
     if steps_t.callback then
      if steps_t.wait then
       vim.defer_fn(function()
-                    steps_t.callback(ev)
-                   end,steps_t.wait)
+       steps_t.callback(ev)
+      end,steps_t.wait)
      else
       steps_t.callback(ev)
      end

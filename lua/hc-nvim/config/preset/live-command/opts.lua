@@ -1,7 +1,7 @@
 return {
  commands={
   Norm={
-   cmd="normal"
+   cmd="normal",
   },
  },
 }

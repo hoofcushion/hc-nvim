@@ -2,7 +2,7 @@ return {
  cmd={
   "LspInfo",
  },
- init = function (ev)
+ init=function(ev)
   vim.opt.rtp:append(ev.dir)
- end
+ end,
 }

@@ -15,7 +15,7 @@ return {
  --- Information
  {"nvim-lualine/lualine.nvim",                 event=Events.File},
  -- {"Bekaboo/dropbar.nvim",                      event=Events.File},
- {"kevinhwang91/nvim-ufo",                     event=Events.File},
+ -- {"kevinhwang91/nvim-ufo",                     event=Events.File},
  {"chentoast/marks.nvim",                      event=Events.File},
  {"rainbowhxch/beacon.nvim",                   event=Events.File},
 

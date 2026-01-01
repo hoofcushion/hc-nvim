@@ -273,7 +273,7 @@ return {
       if ev.file=="" or vim.bo[ev.buf].buftype=="nofile" then
        return
       end
-      local current_pos = {vim.fn.line("."),vim.fn.virtcol(".")}
+      local current_pos={vim.fn.line("."),vim.fn.virtcol(".")}
       if last_pos==nil then
        last_pos=current_pos
        return
