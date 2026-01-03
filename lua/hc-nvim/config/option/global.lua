@@ -58,9 +58,9 @@ return {
   clipboard="unnamedplus",           -- Sync with system clipboard -- Use system clipboard for copy and paste
 
   --- Indentation ---
-  tabstop=1,         -- How many spaces that tab expand for
-  shiftwidth=1,      -- How many spaces that a indentation needs
-  expandtab=true,    -- Use spaces instead of tabs for indentation
+  tabstop=4,         -- How many spaces that tab expand for
+  shiftwidth=4,      -- How many spaces that a indentation needs
+  -- expandtab=false,    -- Use spaces instead of tabs for indentation
   autoindent=true,   -- Automatically indent new lines based on previous lines
   smartindent=false, -- Smart indent new lines by context
 

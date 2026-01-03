@@ -1,4 +1,5 @@
 return {
+ name="null-ls",
  main="null-ls",
  dependencies={
   "plenary.nvim",
