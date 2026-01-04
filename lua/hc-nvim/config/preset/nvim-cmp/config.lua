@@ -43,7 +43,10 @@ return function(_,opts)
    get_bufnrs=function()
     local res={}
     for _,buf in ipairs(vim.api.nvim_list_bufs()) do
-     if vim.fn.bufname(buf)~="" and vim.fn.bufwinid(buf)~=-1 then
+     if  vim.api.nvim_buf_is_loaded(buf)
+     and vim.fn.bufname(buf)~=""
+     and vim.fn.bufwinid(buf)~=-1
+     then
       table.insert(res,buf)
      end
     end
