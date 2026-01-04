@@ -48,8 +48,10 @@ function TimerTrack.setup_timer_gc()
      return function(self,timeout,_repeat,fn)
       return f(self,timeout,_repeat,function()
        local ok,msg=pcall(fn)
-       if to_close and not timer:is_closing() then
-        timer:close()
+       if to_close then
+        if not timer:is_closing() then
+         timer:close()
+        end
        end
        if not ok then
         error(msg)
@@ -61,9 +63,11 @@ function TimerTrack.setup_timer_gc()
    local ud=newproxy(true)
    getmetatable(ud).__gc=function()
     TimerTrack.leak[src]=(TimerTrack.leak[src] or 0)+1
-    to_close=true
-    if not timer:is_active() and not timer:is_closing() then
-     timer:close()
+    if not timer:is_active() or timer:get_repeat()~=0 then
+     to_close=true
+     if not timer:is_closing() then
+      timer:close()
+     end
     end
    end
    local cached={}

@@ -177,7 +177,7 @@ function M.substitute(mark)
  local pattern=table.concat(mark:yank().regcontents,"\\n")
  pattern="\\V"..vim.fn.escape(pattern,"/\\")
  local cmd=string.format(":s/%s/",pattern)
- M.Util.feedkeys(cmd,"nx")
+ M.Util.feedkeys(cmd,"n")
 end
 ---@param vmode visualmode
 function M.substitute_opfunc(vmode)
