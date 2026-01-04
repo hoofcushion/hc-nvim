@@ -1,6 +1,7 @@
 TimerTrack={}
-TimerTrack.record={}
-TimerTrack.leak={}
+TimerTrack.record={}  -- normal records
+TimerTrack.leak={}    -- records of leaking timer collected by lua gc
+TimerTrack.repeats={} -- records of leaking timer with repeat
 local weekt=setmetatable({},{__mode="k"})
 local function replace_self(real,fake,fn)
  return function(self,...)
@@ -34,13 +35,17 @@ function TimerTrack.setup_timer_gc()
    -- Track memory leak
    local info=debug.getinfo(2)
    local src=info.source..":"..info.currentline
+   local traceback=debug.traceback()
    TimerTrack.record[src]=(TimerTrack.record[src] or 0)+1
    local to_close=false
    local timer=assert(new_timer())
    local hooks={
     close=function(f)
      return function(...)
-      TimerTrack.record[src]=(TimerTrack.record[src] or 1)-1
+      if timer:get_repeat()~=0 then
+       TimerTrack.repeats[src]=math.max(TimerTrack.repeats[src] or 0,1)-1
+      end
+      TimerTrack.record[src]=math.max(TimerTrack.record[src] or 1,1)-1
       return f(...)
      end
     end,
@@ -50,6 +55,7 @@ function TimerTrack.setup_timer_gc()
        local ok,msg=pcall(fn)
        if to_close then
         if not timer:is_closing() then
+         TimerTrack.leak[src]=(TimerTrack.leak[src] or 0)+1
          timer:close()
         end
        end
@@ -62,11 +68,18 @@ function TimerTrack.setup_timer_gc()
    }
    local ud=newproxy(true)
    getmetatable(ud).__gc=function()
-    TimerTrack.leak[src]=(TimerTrack.leak[src] or 0)+1
-    if not timer:is_active() or timer:get_repeat()~=0 then
-     to_close=true
-     if not timer:is_closing() then
+    local is_active=timer:is_active()
+    local is_repeat=timer:get_repeat()~=0
+    local is_closing=timer:is_closing()
+    -- ignore the repeating timer
+    if is_repeat then
+     TimerTrack.repeats[src]=(TimerTrack.repeats[src] or 0)+1
+    else
+     if not is_active then
+      to_close=true
+     elseif not is_closing then
       timer:close()
+      TimerTrack.leak[src]=(TimerTrack.leak[src] or 0)+1
      end
     end
    end
@@ -194,8 +207,12 @@ function TimerTrack.diff(i,e)
 end
 TimerTrack.setup_timer_gc()
 --- test
--- local timer=vim.uv.new_timer()
--- timer:start(1,0,function() end)
--- vim.uv.timer_stop(timer)
--- timer:close()
+-- local wrap_test=assert(vim.uv.new_timer())
+-- wrap_test:start(1000,0,function() end)
+-- wrap_test:close()
+-- local repeat_test=assert(vim.uv.new_timer())
+-- repeat_test:start(0,1e9,function() end)
+-- local leak_test=assert(vim.uv.new_timer())
+-- leak_test:start(1000,0,function() end)
+-- collectgarbage("collect")
 TimerTrack.start_auto_snapshot(5000)

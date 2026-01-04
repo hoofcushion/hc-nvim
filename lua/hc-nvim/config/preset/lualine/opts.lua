@@ -157,7 +157,7 @@ return {
      if Config.ui.sign=="hanzi" then
       return ("拓:%s 映:%s 坝:%s"):format(
        vim.api.nvim_get_current_tabpage(),
-       vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
+       vim.api.nvim_get_current_win(),vim.api.nvim_get_current_buf()
       )
      else
       return ("T:%s W:%s B:%s"):format(
@@ -212,13 +212,12 @@ return {
  },
  tabline={
   lualine_a={
-   {
-    "filename",
-    path=1,
-   },
   },
-  lualine_b={"buffers"},
+  lualine_b={
+   {"buffers"},
+  },
   lualine_c={
+   {"filename",path=1},
   },
   lualine_x={
    {"windows"},

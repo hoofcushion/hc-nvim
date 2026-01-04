@@ -1,5 +1,6 @@
 local Config=require("hc-nvim.config")
 local Rsc=require("hc-nvim.config.rsc")
+vim.g.snacks_animate = false
 local opts=vim.tbl_deep_extend(
  "force",
  {
