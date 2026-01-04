@@ -6,15 +6,15 @@ vim.opt.rtp:append(Util.root_path)
 _G.NS=Util.namespace
 -- load modules
 local modules={
- "i18n",
- "option",
- "basic",
- "event",
- "mapping",
- "filetype",
- "lazy",
- "vscode",
- "server",
+ "i18n",     -- load language packs
+ "option",   -- set neovim options
+ "basic",    -- run basic setup scripts
+ "filetype", -- load custom filetypes
+ "event",    -- register custom events
+ "mapping",  -- register keymaps
+ "lazy",     -- load lazy.nvim plugin configs
+ "vscode",   -- load extra vscode-neovim setting
+ "server",   -- load language tools settings
 }
 for _,modname in ipairs(modules) do
  Util.track(modname)

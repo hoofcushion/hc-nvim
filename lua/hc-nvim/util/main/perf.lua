@@ -9,7 +9,7 @@ end
 --- Greatly improve lualine speed.
 ---@generic F
 ---@param opts {
---- event:vim.api.keyset.events|vim.api.keyset.events[],
+--- event:vim.api.keyset.events|vim.api.keyset.events[]|string|string[],
 --- filter:(fun(data):boolean),
 --- func:F,
 --- pattern:string?,
@@ -59,27 +59,30 @@ end
 ---@param fn F
 ---@return F
 function Util.debounce(delay,fn)
- local timer=assert(vim.uv.new_timer())
  delay=math.max(delay or 0,0)
- return function()
-  timer:stop()
+ local timer=assert(vim.uv.new_timer())
+ -- manage timer with lua gc by userdata with __gc metamethod
+ local ud=newproxy(true)
+ local mt=getmetatable(ud)
+ local to_close=false
+ mt.__call=function()
   timer:start(delay,0,function()
-   fn()
+   local ok,msg=pcall(fn)
+   if to_close and not timer:is_closing() then
+    timer:close()
+   end
+   if not ok then
+    error(msg)
+   end
   end)
  end
-end
-local queue={}
----@param id any
----@param time integer
----@param fn function
-function Util.debounce_with_id(id,time,fn)
- if not queue[id] then
-  queue[id]=Util.debounce(time,function()
-   Util.try(fn,Util.ERROR)
-   queue[id]=nil
-  end)
+ mt.__gc=function()
+  to_close=true
+  if not timer:is_active() and not timer:is_closing() then
+   timer:close()
+  end
  end
- queue[id]()
+ return ud
 end
 ---@generic T
 ---@param init fun():T

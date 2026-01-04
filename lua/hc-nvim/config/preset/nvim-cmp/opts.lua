@@ -23,6 +23,8 @@ return {
   documentation={
    border=Rsc.border[Config.ui.border],
    winblend=Config.ui.blend,
+   max_height=30,
+   max_width=40,
   },
  },
  formatting={
@@ -64,7 +66,21 @@ return {
   end)(),
  },
  performance={
+  -- debounce=60,
+  -- throttle=30,
+  -- fetching_timeout=500,
+  -- filtering_context_budget=3,
+  -- confirm_resolve_timeout=80,
+  -- async_budget=1,
+  -- max_view_entries=200,
+
+  -- realtime adjustment
   debounce=30,
   throttle=15,
+  fetching_timeout=100,
+  filtering_context_budget=1,
+  confirm_resolve_timeout=50,
+  async_budget=1,
+  max_view_entries=50,
  },
 }

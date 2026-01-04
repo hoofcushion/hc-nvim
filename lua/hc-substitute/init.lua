@@ -1,33 +1,26 @@
-local api=vim.api
-local fn=vim.fn
-local function feedkeys(keys,mode)
- vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys,true,false,true),mode,false)
-end
 local Util=require("hc-nvim.util")
-local Config=require("hc-substitute.config")
---- ---
---- OpFunc imp.
---- ---
-local OpFunc={}
-function OpFunc.set(opfunc,args)
- if args~=nil then
-  local _=opfunc
-  opfunc=function(vmode)
-   _(vmode,unpack(args))
-  end
- end
- _G.opfunc=opfunc
- vim.o.opfunc=[[v:lua.opfunc]]
-end
---- Set opfunc then start operator mode with a initial motion
-function OpFunc.start(opfunc,motion,...)
- OpFunc.set(opfunc,{...})
- feedkeys("g@"..(motion or ""),"n")
-end
 --- ---
 --- Main
 --- ---
-local M={}
+local M=require("hc-substitute.init_space")
+---@generic T
+---@param init fun():T
+---@param set fun(t:T)
+local function lazy(init,set)
+ set=set or Util.empty_f
+ local t=setmetatable({},{
+  __index=function(_,k)
+   local _t=init()
+   set(_t)
+   return _t[k]
+  end,
+ })
+ set(t)
+end
+lazy(function() return require("hc-substitute.config") end,function(t) M.Config=t end)
+lazy(function() return require("hc-substitute.util") end,function(t) M.Util=t end)
+lazy(function() return require("hc-substitute.opfunc") end,function(t) M.OpFunc=t end)
+lazy(function() return require("hc-substitute.commands") end,function(t) M.Command=t end)
 local opfunc_vmode_map={
  char="v",
  line="V",
@@ -38,9 +31,9 @@ local opfunc_vmode_map={
 ---@param hl_group string
 ---@param hl_opts vim.api.keyset.highlight
 local function blink(marks,delay,hl_group,hl_opts)
- local ns=api.nvim_create_namespace("hc-substitute-blink")
+ local ns=vim.api.nvim_create_namespace("hc-substitute-blink")
  local callback=vim.schedule_wrap(function()
-  api.nvim_buf_clear_namespace(0,ns,0,-1)
+  vim.api.nvim_buf_clear_namespace(0,ns,0,-1)
  end)
  local timer=vim.uv.new_timer()
  if timer~=nil then
@@ -49,7 +42,7 @@ local function blink(marks,delay,hl_group,hl_opts)
    timer:close()
   end)
  else
-  api.nvim_create_autocmd(
+  vim.api.nvim_create_autocmd(
    {"CursorHold","CursorHoldI","CursorMoved","CursorMovedI"},
    {once=true,callback=callback}
   )
@@ -62,7 +55,7 @@ blink=vim.schedule_wrap(blink)
 ---@param mark RangeMark
 ---@param opts Substitute.config.paste?
 function M.paste(mark,opts)
- opts=Config.get(Config.current.paste,opts)
+ opts=M.Config.get(M.Config.current.paste,opts)
  local reg=Util.Register.current
  mark:put(reg)
  if opts.highlight.enabled then
@@ -84,11 +77,11 @@ function M.paste_opfunc(vmode,opts)
 end
 ---@param opts Substitute.config.paste?
 function M.paste_op(opts)
- OpFunc.start(M.paste_opfunc,nil,opts)
+ M.OpFunc.start(M.paste_opfunc,nil,opts)
 end
 ---@param opts Substitute.config.paste?
 function M.paste_eol(opts)
- OpFunc.start(M.paste_opfunc,"$",opts)
+ M.OpFunc.start(M.paste_opfunc,"$",opts)
 end
 ---@param opts Substitute.config.paste?
 function M.paste_line(opts)
@@ -100,9 +93,9 @@ end
 ---@param opts Substitute.config.paste?
 function M.paste_visual(opts)
  M.paste(Util.RangeMark:get_selection(),opts)
- feedkeys("<esc>","nx")
+ M.Util.feedkeys("<esc>","nx")
 end
-local exchange_ns=api.nvim_create_namespace("hc-substitute-exchange")
+local exchange_ns=vim.api.nvim_create_namespace("hc-substitute-exchange")
 ---@type RangeMark?
 local mark_start=nil
 ---@param mark RangeMark
@@ -112,7 +105,7 @@ function M.exchange(mark,opts)
   M.exchange_cancel()
   return false
  end
- opts=Config.get(Config.current.exchange,opts)
+ opts=M.Config.get(M.Config.current.exchange,opts)
  if mark_start==nil then
   mark_start=mark
   if opts.highlight.enabled then
@@ -150,7 +143,7 @@ function M.exchange(mark,opts)
 end
 function M.exchange_cancel()
  mark_start=nil
- api.nvim_buf_clear_namespace(0,exchange_ns,0,-1)
+ vim.api.nvim_buf_clear_namespace(0,exchange_ns,0,-1)
 end
 ---@param vmode visualmode
 ---@param opts Substitute.config.exchange?
@@ -159,11 +152,11 @@ function M.exchange_opfunc(vmode,opts)
 end
 ---@param opts Substitute.config.exchange?
 function M.exchange_op(opts)
- OpFunc.start(M.exchange_opfunc,nil,opts)
+ M.OpFunc.start(M.exchange_opfunc,nil,opts)
 end
 ---@param opts Substitute.config.exchange?
 function M.exchange_eol(opts)
- OpFunc.start(M.exchange_opfunc,"$",opts)
+ M.OpFunc.start(M.exchange_opfunc,"$",opts)
 end
 ---@param opts Substitute.config.exchange?
 function M.exchange_line(opts)
@@ -176,67 +169,34 @@ end
 function M.exchange_visual(opts)
  local ok=M.exchange(Util.RangeMark:get_selection(),opts)
  if ok then
-  feedkeys("<esc>","nx")
+  M.Util.feedkeys("<esc>","nx")
  end
 end
 ---@param mark RangeMark
 function M.substitute(mark)
  local pattern=table.concat(mark:yank().regcontents,"\\n")
- pattern="\\V"..fn.escape(pattern,"/\\")
+ pattern="\\V"..vim.fn.escape(pattern,"/\\")
  local cmd=string.format(":s/%s/",pattern)
- feedkeys(cmd,"nx")
+ M.Util.feedkeys(cmd,"nx")
 end
 ---@param vmode visualmode
 function M.substitute_opfunc(vmode)
  M.substitute(Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode]))
 end
 function M.substitute_op()
- OpFunc.start(M.substitute_opfunc)
+ M.OpFunc.start(M.substitute_opfunc)
 end
 function M.substitute_visual()
  M.substitute(Util.RangeMark:get_selection())
 end
-local commands={
- {"HCPaste",
-  function(cmd)
-   if cmd.args~="" then
-    OpFunc.start(M.paste_opfunc,cmd.args)
-   elseif cmd.range~=0 then
-    M.paste(Util.RangeMark:get_line(cmd.line1-1,cmd.line2-cmd.line1))
-   end
-  end,
-  {nargs="?",range=true}},
- {"HCExchange",
-  function(cmd)
-   if cmd.args~="" then
-    OpFunc.start(M.exchange_opfunc,cmd.args)
-   elseif cmd.range~=0 then
-    M.exchange(Util.RangeMark:get_line(cmd.line1-1,cmd.line2-cmd.line1))
-   end
-  end,
-  {nargs="?",range=true}},
-}
-local Command={}
-function Command.setup()
- --- 1. paste_op if has arg
- --- 2, paste_visual if has range
- for _,cmd in ipairs(commands) do
-  api.nvim_create_user_command(cmd[1],cmd[2],cmd[3])
- end
-end
-function Command.fini()
- for _,cmd in ipairs(commands) do
-  api.nvim_del_user_command(cmd[1])
- end
-end
 --- setup is optional since default options works perfectly
 ---@param opts Substitute.config
 function M.setup(opts)
- Config.setup(opts)
- Command.setup()
+ M.Config.setup(opts)
+ M.Command.setup()
 end
 function M.fini()
- Config.fini()
- Command.fini()
+ M.Config.fini()
+ M.Command.fini()
 end
 return M

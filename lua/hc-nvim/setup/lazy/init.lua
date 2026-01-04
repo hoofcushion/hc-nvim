@@ -1,4 +1,5 @@
 local Util=require("hc-nvim.util")
+---HACK
 require("hc-nvim.setup.lazy.handler")
 require("hc-nvim.setup.lazy.interload")
 require("hc-nvim.setup.lazy.orderload")

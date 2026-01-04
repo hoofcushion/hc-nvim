@@ -44,7 +44,7 @@ local PresetGetter={
  event=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
   value=Plugin._values(plugin,{[field]=value},field,false)
-  value=Util.Event.events_normalize(value) or {}
+  value=Util.Event.normalize_event_list(value) or {}
   if value~=nil and next(value)~=nil then
    return value
   end
