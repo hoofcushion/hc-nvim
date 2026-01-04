@@ -1,4 +1,4 @@
-if vim.g.vscode ==nil then
+if vim.g.vscode==nil then
  return
 end
 local Config=require("lazy.core.config")

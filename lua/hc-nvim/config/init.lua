@@ -20,10 +20,8 @@ M.locale.fallbacks={
  M.locale.current,
  M.locale.default,
 }
-local uname=vim.uv.os_uname()
 M.platform={
- uname=uname,
- is_windows=uname.sysname:find("Windows",nil,true)~=nil,
+ is_windows=vim.fn.has("win32"),
  is_gui=vim.fn.has("gui_running"),
  is_vscode=vim.g.vscode==1,
  is_neovide=vim.g.neovide==1,
@@ -51,7 +49,8 @@ M.ui={
  ---| "shadow"  # shadow effect
  ---| "block"   # block border
  border="single",
- window={
+ blend=10,
+ size={
   -- side window
   vertical=0.25,
   horizontal=0.25,
@@ -75,7 +74,7 @@ M.ui={
   ---@type table<"horizontal"|"vertical"|"width"|"height",string>
   percentage=setmetatable({},{
    __index=function(_,k)
-    local factor=M.ui.window[k]
+    local factor=M.ui.size[k]
     return string.format("%d%%",factor*100)
    end,
   }),
@@ -83,7 +82,9 @@ M.ui={
 }
 M.performance={
  refresh=500,
- throttle=100,
+ throttle=200,
+ debounce=200,
+ timeout=500,
  plugin={
   --- Duration (ms) to wait, when loading plugin continuously.
   --- Set to 0 to disable.
@@ -110,9 +111,6 @@ M.performance={
   },
  },
 }
---- spec[1] is the mason name of the server, specify it to download the server.
---- spec[2] is the setup name for the server, specify it to setup the server.
---- e.g, lua language server has name lua-language-server as mason package, but lua_ls in nvim-lspconfig's setup function.
 M.server={
  vscode=false,
  ensure_installed=true,
@@ -120,27 +118,29 @@ M.server={
  auto_setup=true,
  list={
   --- lspconfig
-  {name="ast-grep",            setup="ast_grep"},
-  {name="bash-language-server",setup="bashls"},
+  -- {name="ast-grep",            main="ast_grep"},
+  {name="lua-language-server", main="lua_ls"},
+  {name="bash-language-server",main="bashls"},
   {name="clangd"},
-  {name="deno",                setup="denols"},
-  {name="json-lsp",            setup="jsonls"},
-  {name="lua-language-server", setup="lua_ls"},
+  {name="deno",                main="denols"},
+  {name="json-lsp",            main="jsonls"},
   {name="marksman"},
   {name="pyright"},
-  {name="rust-analyzer",       setup="rust_analyzer"},
+  {name="rust-analyzer",       main="rust_analyzer"},
   {name="taplo"},
-  {name="vim-language-server", setup="vimls"},
+  {name="vim-language-server", main="vimls"},
   {name="vls"},
-  {name="yaml-language-server",setup="yamlls"},
+  {name="yaml-language-server",main="yamlls"},
   {name="zk"},
   {name="zls"},
+  -- {name="llm-ls"},
   --- null-ls
   {name="cbfmt"},
   {name="prettier"},
-  {name="stylua",              setup="formatting.stylua"},
-  {name="codespell",           setup="diagnostic.stylua"},
-  {name="write-good",          setup="write_good"},
+  {name="black",               main="formatting.black"},
+  {name="stylua",              main="formatting.stylua"},
+  -- {name="codespell",           main="diagnostics.codespell"},
+  {name="write-good",          main="write_good"},
   -- {nil,                   "spell"},
  },
 }

@@ -1,22 +1,25 @@
 local Util=require("hc-nvim.util")
-Util.track("interface")
 local Interface=Util.Interface.new()
-Interface:extend(require("hc-nvim.builtin.interface"))
-Util.track()
-vim.api.nvim_create_autocmd("VimEnter",{
- once=true,
- callback=function()
-  for modname in Util.iter_mod({
-   "hc-nvim.builtin.mapping",
-   "hc-nvim.user.mapping",
-  }) do
-   local mapping=require(modname)
-   if mapping then
-    Interface.forspecs(mapping,function(spec)
-     Interface:add(spec):start()
-    end)
-   end
-  end
+Util.track("interface")
+Util.try(
+ function()
+  local specs=Util.BufferCache.require("hc-nvim.config.interface")
+  Interface:extend(specs)
  end,
-})
+ Util.ERROR
+)
+Util.track()
+for modname,modpath in Util.iter_mod({
+ "hc-nvim.config.mapping",
+ "hc-nvim.user.mapping",
+}) do
+ Util.try(function()
+  local mapping=Util.path_require(modname,modpath)
+  if mapping then
+   Interface.forspecs(mapping,function(spec)
+    Interface:add(spec):create()
+   end)
+  end
+ end,Util.ERROR)
+end
 return Interface

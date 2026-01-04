@@ -1,10 +1,11 @@
---- ---
---- hc-nvim/lua/hc-nvim/init.lua
---- ---
---- warn user to not load this file as a lazy.nvim plugin
---- ---
 local M={}
+M.Config=require("hc-nvim.config")
+M.Util=require("hc-nvim.util")
 function M.setup()
- vim.notify([[You should import hc-nvim by using {"hoofcushion/hc-nvim",import="hc-nvim.export"}]])
+ HCNvim=M
+ require("hc-nvim.setup")
+end
+function M.export()
+ return require("hc-nvim.setup.lazy")
 end
 return M

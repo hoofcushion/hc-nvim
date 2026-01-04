@@ -1,11 +1,11 @@
-local function refesh_codelens(...)
+local Util=require("hc-nvim.util")
+local LocalEnv=Util.LocalEnv.new()
+local CodeLensAu=Util.ConductedAutocmd.new()
+local function refesh_codelens(opts)
  if vim.lsp.get_clients({bufnr=0,method="textDocument/codeLens"}) then
-  vim.lsp.codelens.refresh(...)
+  vim.lsp.codelens.refresh(opts)
  end
 end
-local Util=require("hc-nvim.util")
-local env=Util.LocalEnv.new()
-local CodeLensAu=Util.Autocmd.new()
 CodeLensAu:add({
  {"BufWritePre",{
   callback=function(event)
@@ -16,7 +16,7 @@ CodeLensAu:add({
  }},
  {{"InsertLeave","BufEnter","CursorHold"},{
   callback=function(event)
-   local b=vim.b
+   local b=LocalEnv.buffer
    if b.changedtick~=b.lastchangedtick then
     refesh_codelens({bufnr=event.buf})
    end
@@ -32,10 +32,10 @@ function M.deactivate()
  CodeLensAu:deactivate()
 end
 function M.enable()
- CodeLensAu:create()
+ CodeLensAu:enable()
 end
 function M.disable()
- CodeLensAu:delete()
- env:reset()
+ CodeLensAu:disable()
+ LocalEnv:reset()
 end
 return M

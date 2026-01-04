@@ -1,5 +1,5 @@
 local Config=require("hc-nvim.config")
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 ---@class I18nSpec
 local I18nSpec={
  language="en",
@@ -19,11 +19,12 @@ local Translation={
  map={},
 }
 function Translation.new()
- return Util.Class.new(Translation)
+ local obj=setmetatable({},{__index=Translation})
+ return obj
 end
 function Translation:get()
  for _,locale in ipairs(Config.locale.fallbacks) do
-  local ret=Util.tbl_index(self.map,locale.language,locale.country)
+  local ret=Util.tbl_get(self.map,{locale.language,locale.country})
   if ret then
    return ret
   end
@@ -35,14 +36,14 @@ end
 local function extend(ret,language,country,translations)
  if type(translations)=="table" then
   for k,translation in pairs(translations) do
-   local t=Util.tbl_check(ret,k,function ()
+   local t=Util.tbl_check(ret,k,function()
     return {map={}}
    end)
    extend(t,language,country,translation)
   end
  elseif type(translations)=="string" then
   Util.tbl_check(ret.map,language)[country]=translations
-  Util.Class.set(ret,Translation)
+  setmetatable(ret,{__index=Translation})
  else
   vim.notify("Invalid translation type",vim.log.levels.WARN)
  end
@@ -61,8 +62,8 @@ function I18n.load(spec)
   spec.translations
  )
 end
-function I18n.get(...)
- local trans=Util.tbl_index(I18n.map,...)
+function I18n.get(keys)
+ local trans=Util.tbl_get(I18n.map,keys)
  if trans then
   return trans:get()
  end

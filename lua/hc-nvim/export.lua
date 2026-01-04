@@ -3,5 +3,6 @@
 --- ---
 --- import this file in lazy.nvim to use hc-nvim as a plugin source
 --- ---
-require("hc-nvim.setup")
-return require("hc-nvim.setup.lazy")
+local hcnvim=require("hc-nvim")
+hcnvim.setup()
+return hcnvim.export()

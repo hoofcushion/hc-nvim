@@ -1,5 +1,0 @@
-return {
- matchup={
-  enable=true,
- },
-}

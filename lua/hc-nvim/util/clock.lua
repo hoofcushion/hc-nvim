@@ -1,7 +1,7 @@
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 local Clock={}
 function Clock.new(max_ms)
- local obj=Util.Class.new(Clock)
+ local obj=setmetatable({},{__index=Clock})
  obj:reset()
  obj.max_ms=max_ms
  return obj

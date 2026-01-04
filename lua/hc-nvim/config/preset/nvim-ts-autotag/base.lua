@@ -1,0 +1,20 @@
+return {
+ main="nvim-treesitter.configs",
+ ft={
+  "astro",
+  "glimmer",
+  "handlebars",
+  "html",
+  "javascript",
+  "jsx",
+  "markdown",
+  "php",
+  "rescript",
+  "svelte",
+  "tsx",
+  "twig",
+  "typescript",
+  "vue",
+  "xml",
+ },
+}

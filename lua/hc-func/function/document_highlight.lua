@@ -1,8 +1,8 @@
 local Config=require("hc-func.config")
 local Util=require("hc-nvim.util")
 local Options=Config.options.document_highlight
-local DocHLAu=Util.Autocmd.new()
-local Timer=Util.Timer.new()
+local DocHLAu=Util.ConductedAutocmd.new()
+local Timer=Util.ConductedTimer.new()
 local method="textDocument/documentHighlight"
 local is_doc_hl={
  LspReferenceText=true,
@@ -52,7 +52,7 @@ function M.enable()
  local event=Options.autocmd.enter
  local callback
  if Options.timer.enabled==true then
-  local timer=Timer:new_timer()
+  local timer=Timer:get()
   local landing,delay=Options.timer.landing,Options.timer.delay
   callback=function()
    if timer:is_active() then
@@ -66,7 +66,7 @@ function M.enable()
  end
  DocHLAu:add({{event,{callback=callback}}})
  DocHLAu:add({{Options.autocmd.clear,{callback=vim.lsp.buf.clear_references}}})
- DocHLAu:create()
+ DocHLAu:enable()
 end
 function M.disable()
  DocHLAu:fini()

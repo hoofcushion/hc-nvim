@@ -1,3 +1,0 @@
-return {
- updatetime=50,
-}

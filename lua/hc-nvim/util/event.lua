@@ -1,187 +1,324 @@
-local Util=require("hc-nvim.util")
----@class EventSpec
----@field event string
----@field pattern string[]?
+---
+--- Complex Event Control Module
+---
+--- `all` means *all* events must happen
+--- `any` means *any* of the events happens
+--- `wait` means when all conditions are met, *wait* for a while, then trigger
+---
 
---- User LazyDone -> {event="User",pattern={"LazyDone"}}
---- BufEnter *.lua,*.txt -> {event="BufEnter",pattern={"*.lua","*.txt"}}
----@param event string|EventSpec
----@return EventSpec?
-local function parse_event(event)
- if Util.is_empty(event) then
-  return
- end
+if false then
+ ---@class EventDefinition
+ local _EventDefinition={
+  event="FileType", ---@type string
+  pattern="lua", ---@type string|string[]|nil
+  cond=function() return true end, ---@type fun(ev: table): boolean?|nil
+ }
+ ---@class StepOptions
+ local _StepOptions={
+  wait=0, ---@type integer?
+  delay=5, ---@type integer?
+  group="", ---@type string|integer?
+  name="", ---@type string
+  callback=function() end, ---@type fun(ev: table): boolean?|nil
+  once=nil, ---@type boolean?
+  calm=false, ---@type boolean?
+ }
+ ---@class StepConfig : StepOptions
+ local _StepConfig={
+  all={}, ---@type EventDefinition[]|string|string[]
+  any={}, ---@type EventDefinition[]|string|string[]
+ }
+ ---@class SequenceConfig : StepOptions
+ local _SequenceConfig={
+  steps={}, ---@type StepConfig[]
+ }
+end
+--- ---
+-- Module Definition
+--- ---
+local Event={}
+--- ---
+-- Internal Constants & State
+--- ---
+local META_TABLE_KEY="__event_meta"
+--- ---
+-- Event Definition Normalization
+--- ---
+
+---Normalize a single event definition
+---@param event string|table
+---@return table
+function Event.normalize_single_event(event)
  if type(event)=="string" then
-  local pos=event:find(" ")
-  if pos then
-   local e,p=Util.split_at(event,pos)
-   event={event=e,pattern=vim.split(p,",")}
-  else
-   event={event=event}
-  end
+  local parts=vim.split(event," ")
+  local normalized={
+   event=parts[1],
+   pattern=parts[2] and parts[2]~="" and vim.split(parts[2],",") or nil,
+  }
+  return normalized
  end
  return event
 end
----@class Event
----@field specs EventSpec[]
-local Event={
- specs={},
-}
----@param events string|EventSpec|(string|EventSpec)[]?
----@return Event
-function Event.new(events)
- local obj=Util.Class.new(Event)
- obj.specs={}
- if events then
-  obj:extend(events)
+---Normalize multiple event definitions
+---@param events string|string[]|table|table[]
+---@return table[]|nil
+function Event.normalize_event_list(events)
+ if type(events)=="string" then
+  local event_def=Event.normalize_single_event(events)
+  return {event_def}
  end
- return obj
-end
----@param event string|EventSpec|string[]|EventSpec[]
----@return EventSpec[]
-function Event.parse(event)
- if type(event)=="string"
- or type(event)=="table" and event[1]==nil
- then
-  event={event}
- end
- local ret={}
- for _,v in ipairs(event) do
-  table.insert(ret,parse_event(v) or nil)
- end
- return ret
-end
----@param spec string|EventSpec
-function Event:add(spec)
- table.insert(self.specs,spec)
-end
----@param events string|EventSpec|(string|EventSpec)[]
-function Event:extend(events)
- for _,spec in ipairs(Event.parse(events)) do
-  self:add(spec)
- end
-end
-local function stack_callback(callback,any,id)
- return function(ev)
-  local done=callback(ev)
-  if done and any then
-   vim.api.nvim_del_augroup_by_id(id)
-  end
-  return done
- end
-end
-local function get_group_id(group)
- if type(group)=="number" then
-  return group
- end
- if group==nil then
-  group="Unnamed: "..tostring(Util.clock())
- end
- return vim.api.nvim_create_augroup(group,{clear=true})
-end
-function Event:create_autocmd(opts,any)
- opts=opts~=nil and vim.deepcopy(opts) or {}
- if any then
-  local id=get_group_id(opts.group)
-  opts.group=id
-  opts.callback=stack_callback(opts.callback,any,id)
- end
- for event,pattern in self:pairs() do
-  opts.pattern=pattern
-  vim.api.nvim_create_autocmd(event,opts)
- end
-end
-function Event:lazyevents()
- return vim.deepcopy(self.specs)
-end
-function Event:pairs()
- local i=0
- local specs=self.specs
- return function()
-  i=i+1
-  local spec=specs[i]
-  if spec then
-   return spec.event,spec.pattern
+ if type(events)=="table" then
+  -- Array-style table
+  if events[1]~=nil then
+   local event_list={}
+   for _,event in ipairs(events) do
+    table.insert(event_list,Event.normalize_single_event(event))
+   end
+   return event_list
+   -- Single event definition
+  elseif next(events)~=nil then
+   return {events}
   end
  end
 end
-function Event:getname(group)
- local cat={}
- for event,pattern in self:pairs() do
-  local name=event
-  if pattern then
-   name=name.." "..table.concat(pattern,", ")
-  end
-  table.insert(cat,name)
+--- ---
+-- Step Configuration Normalization
+--- ---
+
+---Normalize a single step configuration
+---@param step_config table
+---@return table
+function Event.normalize_step_config(step_config)
+ step_config=step_config or {}
+ -- Generate unique name if not provided
+ if not step_config.name or step_config.name=="" then
+  step_config.name="event_step_"..tostring({})
  end
- local ret=table.concat(cat,"; ")
- if group then
-  ret=("%s: %s"):format(group,ret)
+ -- Create augroup if group name is provided
+ if type(step_config.group)=="string" and step_config.group~="" then
+  step_config.group=vim.api.nvim_create_augroup(step_config.group,{clear=true})
  end
- return ret
+ -- Normalize event lists
+ if step_config.all then
+  step_config.all=Event.normalize_event_list(step_config.all)
+ end
+ if step_config.any then
+  step_config.any=Event.normalize_event_list(step_config.any)
+ end
+ return step_config
 end
----@param name string
----@param opts {clear:boolean,once:boolean,trigger:fun(ev):boolean?}
----@return EventSpec
-function Event:create_user_event(name,opts)
- if opts==nil then
-  opts={}
+---Normalize a sequence configuration
+---@param sequence_config table
+---@return table
+function Event.normalize_sequence_config(sequence_config)
+ sequence_config=sequence_config or {}
+ sequence_config.steps=sequence_config.steps or {}
+ -- Generate unique name if not provided
+ if not sequence_config.name or sequence_config.name=="" then
+  sequence_config.name="event_sequence_"..tostring({})
  end
- if opts.trigger==nil then
-  opts.trigger=function(_) return true end
+ -- Create augroup if group name is provided
+ if type(sequence_config.group)=="string" and sequence_config.group~="" then
+  sequence_config.group=vim.api.nvim_create_augroup(sequence_config.group,{clear=true})
  end
- local id=get_group_id(name)
- self:create_autocmd({
-  group=id,
-  callback=function(event)
-   local ok=opts.trigger(event)
-   if ok then
-    vim.api.nvim_exec_autocmds("User",{pattern=name})
-    if opts.clear then
-     vim.api.nvim_del_augroup_by_id(id)
+ -- Normalize all steps
+ for i,step in ipairs(sequence_config.steps) do
+  sequence_config.steps[i]=Event.normalize_step_config(step)
+ end
+ return sequence_config
+end
+--- ---
+-- Event Execution Management
+--- ---
+
+---Execute autocmds with optional scheduling
+---@param step_config table
+local function _execute_autocmds(step_config)
+ if step_config.calm then
+  vim.schedule(function()
+   vim.api.nvim_exec_autocmds("User",{pattern=step_config.name})
+  end)
+ else
+  vim.api.nvim_exec_autocmds("User",{pattern=step_config.name})
+ end
+end
+
+---Handle "any" condition events
+---@param step_config table
+local function _setup_any_conditions(step_config)
+ local remaining_count=1 -- Start with 1 to trigger when any condition is met
+ local autocmd_ids={}
+ ---Clear all registered autocmds
+ local function clear_autocmds()
+  for _,id in ipairs(autocmd_ids) do
+   vim.api.nvim_del_autocmd(id)
+  end
+ end
+
+ for _,event_def in ipairs(step_config.any) do
+  local id=vim.api.nvim_create_autocmd(event_def.event,{
+   group=step_config.group,
+   pattern=event_def.pattern,
+   callback=function(ev)
+    if type(event_def.cond)~="function" or event_def.cond(ev) then
+     remaining_count=remaining_count-1
+     if remaining_count<=0 then
+      _execute_autocmds(step_config)
+      clear_autocmds()
+     end
+     return true
+    end
+   end,
+  })
+  table.insert(autocmd_ids,id)
+ end
+end
+
+---Handle "all" condition events
+---@param step_config table
+local function _setup_all_conditions(step_config)
+ local remaining_count=#step_config.all
+ for _,event_def in ipairs(step_config.all) do
+  vim.api.nvim_create_autocmd(event_def.event,{
+   group=step_config.group,
+   pattern=event_def.pattern,
+   callback=function(ev)
+    if type(event_def.cond)~="function" or event_def.cond(ev) then
+     remaining_count=remaining_count-1
+     if remaining_count<=0 then
+      _execute_autocmds(step_config)
+     end
+     return true
+    end
+   end,
+  })
+ end
+end
+
+---Register the callback autocmd for a step
+---@param step_config table
+local function _register_callback_handler(step_config)
+ vim.api.nvim_create_autocmd("User",{
+  group=step_config.group,
+  pattern=step_config.name,
+  callback=function(ev)
+   if step_config.callback then
+    if step_config.wait then
+     vim.defer_fn(function()
+      step_config.callback(ev)
+     end,step_config.wait)
+    else
+     step_config.callback(ev)
     end
    end
-   if ok and opts.once then
-    return true
+   -- Recreate if not "once"
+   if not step_config.once then
+    Event.create(step_config)
    end
-  end,
- })
- return {event="User",pattern=name}
-end
----@param specs EventSpec[]
----@param name string
-local function sequence(specs,name)
- local spec=table.remove(specs,1)
- if spec==nil then
-  vim.api.nvim_exec_autocmds("User",{pattern=name})
-  return
- end
- Event.new(spec):create_autocmd({
-  once=true,
-  callback=function()
-   sequence(specs,name)
+   return true
   end,
  })
 end
----@return EventSpec
-function Event:sequence()
- local name=self:getname("Sequence")
- sequence(vim.deepcopy(self.specs),name)
- return {event="User",pattern=name}
-end
-function Event:all_happen(opts)
- opts=opts or {}
- local name=self:getname("AllHappen")
- local done={}
- for event in self:pairs() do
-  done[event]=true
+
+--- ---
+-- Public API
+--- ---
+
+---Create a complex event trigger
+---@param step_config table
+---@return table
+function Event.create(step_config)
+ -- Normalize configuration
+ step_config=Event.normalize_step_config(step_config)
+ -- Handle delay
+ if step_config.delay then
+  vim.defer_fn(function()
+   local delayed_config=vim.deepcopy(step_config)
+   delayed_config.delay=nil
+   Event.create(delayed_config)
+  end,step_config.delay)
+  return {event="User",pattern=step_config.name}
  end
- opts.trigger=function(ev)
-  done[ev.event]=nil
-  if next(done)==nil then
+ -- Setup condition handlers
+ if step_config.any then
+  _setup_any_conditions(step_config)
+ end
+ if step_config.all then
+  _setup_all_conditions(step_config)
+ end
+ -- Register callback handler
+ _register_callback_handler(step_config)
+ return {event="User",pattern=step_config.name}
+end
+---Create a sequence of event steps
+---@param sequence_config table
+---@return table
+function Event.sequence(sequence_config)
+ -- Normalize configuration
+ sequence_config=Event.normalize_sequence_config(sequence_config)
+ -- Handle delay
+ if sequence_config.delay then
+  vim.defer_fn(function()
+   local delayed_config=vim.deepcopy(sequence_config)
+   delayed_config.delay=nil
+   Event.sequence(delayed_config)
+  end,sequence_config.delay)
+  return {event="User",pattern=sequence_config.name}
+ end
+ local current_step=1
+ local total_steps=#sequence_config.steps
+ ---Process the next step in the sequence
+ local function process_next_step()
+  if current_step>total_steps then
+   -- Execute sequence callback when all steps are done
+   if sequence_config.callback then
+    if sequence_config.wait then
+     vim.defer_fn(function()
+      sequence_config.callback()
+     end,sequence_config.wait)
+    else
+     sequence_config.callback()
+    end
+   end
+   -- Restart sequence if not "once"
+   if not sequence_config.once then
+    current_step=1
+    process_next_step()
+   end
+   return
+  end
+  local step=vim.deepcopy(sequence_config.steps[current_step])
+  local original_callback=step.callback
+  step.group=sequence_config.group
+  step.once=true
+  -- Wrap the callback to advance to next step
+  step.callback=function(ev)
+   if type(original_callback)=="function" then
+    original_callback(ev)
+   end
+   current_step=current_step+1
+   process_next_step()
    return true
   end
+  -- Create the current step
+  Event.create(step)
  end
- return self:create_user_event(name,opts)
+
+ -- Start processing
+ process_next_step()
+ return {event="User",pattern=sequence_config.name}
 end
+---Create an event from an initialization function
+---@param name string
+---@param init_function function
+---@return table
+function Event.from(name,init_function)
+ init_function(function()
+  vim.api.nvim_exec_autocmds("User",{pattern=name})
+ end)
+ return {event="User",pattern=name}
+end
+--- ---
+-- Module Export
+--- ---
 return Event

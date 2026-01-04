@@ -1,8 +1,8 @@
 local Util=require("hc-nvim.util")
-local Validate=require("hc-nvim.util.validate")
-local function empty_fn() end
+local Type=Util.Type
+local Config={}
 ---@class HCFunc.options
-local default_options={
+Config.default={
  cursorword={
   enabled=true,
   pattern=(function()
@@ -32,6 +32,7 @@ local default_options={
   hl_group="CursorWord",
   hl_opts={underline=true},
   autocmd={
+   ---@type vim.api.keyset.events|vim.api.keyset.events[]
    enter={
     "CursorMoved",
     "CursorMovedI",
@@ -39,6 +40,7 @@ local default_options={
     "CursorHoldI",
     "WinEnter",
    },
+   ---@type vim.api.keyset.events|vim.api.keyset.events[]
    clear={"WinLeave"},
   },
   timer={
@@ -56,8 +58,8 @@ local default_options={
    enabled=true,
    event={"CursorMoved","CursorMovedI"},
    interval=3,
-   loopover=360,
-   refresh={"CursorMoved","CursorMovedI"},
+   loopover=360/3,
+   refresh=true,
   },
   timer={
    enabled=true,
@@ -77,6 +79,7 @@ local default_options={
    ---@field filetype table<string,boolean>
    ---@field size_kb {[1]:number,[2]:number}
    ---@field cond (fun(buf:integer):boolean)|nil
+   ---@field auto_suspend boolean|nil
    ---@field event {["on"|"off"|"rec"]:string}[]
    default={
     buftype={["*"]=true},
@@ -119,10 +122,10 @@ local valitab={
   enabled="boolean",
   pattern="function",
   hl_group="string",
-  hl_opts=Validate.mkdict("string","any"),
+  hl_opts=Type.dict("string","any"),
   autocmd={
-   enter=Validate.mklist("string"),
-   clear=Validate.mklist("string"),
+   enter=Type.list("string"),
+   clear=Type.list("string"),
   },
   timer={
    enabled="boolean",
@@ -131,28 +134,32 @@ local valitab={
   },
  },
  rainbowcursor={
-  colors=Validate.mkunion("integer",Validate.mklist("string")),
+  colors=Type.any({"integer",Type.list("string")}),
   enabled="boolean",
   hl_group="string",
+  throttle="positive",
   autocmd={
    enabled="boolean",
-   event=Validate.mkunion("false",Validate.mklist("string")),
+   event=Type.any({"false",Type.list("string")}),
+   interval=Type.any({"false","integer"}),
    loopover="integer",
-   interval=Validate.mkunion("false","integer"),
+   refresh=Type.optional("boolean"),
   },
   timer={
    enabled="boolean",
-   interval=Validate.mkunion("false","integer"),
-   refresh=Validate.mkunion("false","integer"),
+   interval=Type.any({"false","integer"}),
    loopover="integer",
+   refresh=Type.any({"false","integer"}),
   },
  },
  toggler={
   enabled="boolean",
-  rule=Validate.mkdict("string",{
-   filetype=Validate.mkoptional(Validate.mkdict("string","boolean")),
-   size_kb=Validate.mkoptional({"number","number"}),
-   cond=Validate.mkoptional("function"),
+  rule=Type.dict("string",{
+   buftype=Type.optional(Type.dict("string","boolean")),
+   filetype=Type.optional(Type.dict("string","boolean")),
+   size_kb=Type.optional({"number","number"}),
+   cond=Type.optional("function"),
+   auto_suspend=Type.optional("boolean"),
   }),
  },
  auto_format={
@@ -162,8 +169,8 @@ local valitab={
  document_highlight={
   enabled="boolean",
   autocmd={
-   enter=Validate.mklist("string"),
-   clear=Validate.mklist("string"),
+   enter=Type.list("string"),
+   clear=Type.list("string"),
   },
   timer={
    enabled="boolean",
@@ -175,15 +182,22 @@ local valitab={
   enabled="boolean",
  },
 }
-local M={}
-local current_options=default_options
-M.options=Util.Reference.get(function() return current_options end)
-function M.fini()
- current_options=default_options
+if UnitTest then
+ UnitTest:add_case({name="hc-func",expect=true,test=function() return Type.check_type(valitab,"config",Config.default) end})
 end
-function M.setup(opts)
- local new_options=vim.tbl_deep_extend("force",default_options,opts)
- Validate.validate_assert("<hc-func.config>.options",new_options,valitab)
- current_options=new_options
+Config.current=Config.default
+Config.options=Util.Reference.get(function() return Config.current end)
+function Config.fini()
+ Config.current=Config.default
 end
-return M
+function Config.setup(opts)
+ local new_options=vim.tbl_deep_extend("force",Config.current,opts)
+ Util.try(
+  function()
+   assert(Type.check_type(valitab,"<hc-func.config>.options",new_options))
+  end,
+  Util.ERROR
+ )
+ Config.current=new_options
+end
+return Config

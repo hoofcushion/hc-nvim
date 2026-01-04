@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 local Fallback={}
 --- return a table that will try to index `tbl` and using `default` as fallback
 function Fallback.create(default,tbl)

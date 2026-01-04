@@ -1,3 +1,4 @@
+local Util=require("hc-nvim.util.init_space")
 ---@class Wrapper
 local M={}
 function M.modifier(opts,fn)
@@ -6,33 +7,22 @@ function M.modifier(opts,fn)
   return opts
  end
 end
-function M.fn_cond(cond,fn1,fn2)
- if fn2==nil then
-  return function()
-   if cond() then
-    return fn1()
-   end
-  end
- end
+---@param cond fun():boolean
+---@param lhs function?
+---@param rhs function?
+function M.fn_cond(cond,lhs,rhs)
  return function()
   if cond() then
-   return fn1()
+   return lhs and lhs() or nil
   else
-   return fn2()
+   return rhs and rhs() or nil
   end
  end
 end
-function M.fn(fn,arg1,arg2)
- if arg1==nil then
-  return fn
- end
- if arg2==nil then
-  return function()
-   return fn(arg1)
-  end
- end
+function M.fn_with(fn,...)
+ local args=Util.packlen(...)
  return function()
-  return fn(arg1,arg2)
+  return fn(Util.unpacklen(args))
  end
 end
 function M.fn_states(fn,state)
@@ -56,14 +46,9 @@ end
 ---@param val any
 ---@return function
 function M.self(val)
- local t=type(val)
- if t=="table" then
-  return function()
-   return vim.deepcopy(val)
-  end
- end
+ val=Util.deepcopy(val)
  return function()
-  return val
+  return Util.deepcopy(val)
  end
 end
 ---@param fn function
@@ -86,26 +71,19 @@ function M.fn_eval(fn,expr,oppo)
   return fn(expr())
  end
 end
-function M.method(fn,obj,opts)
- if opts==nil then
-  return function()
-   return fn(obj)
+function M.method(obj,fn)
+ return function(...)
+  return fn(obj,...)
+ end
+end
+function M.combine(...)
+ local fns={...}
+ return function()
+  for _,fn in ipairs(fns) do
+   if type(fn)=="function" then
+    fn()
+   end
   end
- end
- return function()
-  return fn(obj,opts)
- end
-end
-function M.fn2(fn1,fn2)
- return function()
-  fn1()
-  fn2()
- end
-end
-function M.fn_it(fn,prompt)
- return function()
-  local input=vim.fn.input(prompt)
-  return fn(input)
  end
 end
 ---@param name string

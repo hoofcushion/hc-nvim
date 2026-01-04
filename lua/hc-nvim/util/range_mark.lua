@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 --- ---
 --- RangeMark imp.
 --- ---
@@ -48,24 +48,33 @@ end
 ---@return RangeMark
 function RangeMark:new(start,finish,indexed,vmode,winid,bufnr)
  local new=setmetatable({},{__index=self})
- start=vim.deepcopy(start)
- finish=vim.deepcopy(finish)
+ -- raw start & finish
+ local raw_s=Util.deepcopy(start)
+ local raw_e=Util.deepcopy(finish)
  if indexed~=nil then
   local line,col=indexed[1],indexed[2]
-  start[1]=start[1]-line
-  finish[1]=finish[1]-line
-  start[2]=start[2]-col
-  finish[2]=finish[2]-col
+  raw_s[1]=raw_s[1]-line
+  raw_e[1]=raw_e[1]-line
+  raw_s[2]=raw_s[2]-col
+  raw_e[2]=raw_e[2]-col
  end
- new.cursor_s=start
- new.cursor_e=finish
- start=vim.deepcopy(start)
- finish=vim.deepcopy(finish)
- if CursorPos.is_after(start,finish) then
-  start,finish=finish,start
+ new.cursor_s=raw_s
+ new.cursor_e=raw_e
+ -- absolute start & finish
+ local abs_s=Util.deepcopy(raw_s)
+ local abs_e=Util.deepcopy(raw_e)
+ -- line_s after line_e
+ if abs_s[1]>abs_e[1] then
+  abs_s,abs_e=abs_e,abs_s
  end
- new.start=start
- new.finish=finish
+ -- same line and col_s after col_e
+ if  abs_s[1]==abs_e[1]
+ and abs_s[2]>abs_e[2]
+ then
+  abs_s[2],abs_e[2]=abs_e[2],abs_s[2]
+ end
+ new.start=abs_s
+ new.finish=abs_e
  if winid~=nil then
   new.winid=winid
  end
@@ -89,14 +98,6 @@ function RangeMark:is_overlap(rhs)
  end
  return true
 end
---- Check if the RangeMark is after `rhs`.
----@param rhs RangeMark
-function RangeMark:is_after(rhs)
- if is_after(self.start,rhs.start) then
-  return true
- end
- return false
-end
 ---
 --- Get the '`label1`,'`label2` RangeMark.
 ---@param mark1 string
@@ -117,7 +118,7 @@ end
 ---@param vmode? visualmode
 function RangeMark:get_selection(vmode)
  local s,e=vim.fn.getpos("v"),vim.fn.getpos(".")
- s,e={s[2],s[3]},{e[2],e[3]}
+ s,e={s[2],s[3]+s[4]},{e[2],e[3]+e[4]}
  return RangeMark:new(s,e,{1,1},vmode)
 end
 --- Get the RangeMark of specific line.
@@ -135,6 +136,7 @@ function RangeMark:get_line(line,height)
   "V"
  )
 end
+--- return new pos with a offset by `line` and `column`
 ---@param line integer
 ---@param column integer
 ---@return position
@@ -160,6 +162,7 @@ function RangeMark:get_height()
 end
 ---
 --- Reset the width of the RangeMark.
+--- Starting point at left-top
 ---@param width integer
 function RangeMark:set_width(width)
  local left,right=self.cursor_s,self.cursor_e
@@ -173,6 +176,9 @@ function RangeMark:set_width(width)
  local finish=self.finish
  finish[2]=newcol
 end
+---
+--- Reset the height of the RangeMark.
+--- Starting point at left-top
 function RangeMark:set_height(height)
  local up,down=self.cursor_s,self.cursor_e
  if up[1]>down[1] then
@@ -187,7 +193,6 @@ function RangeMark:set_size(height,width)
  self:set_height(height)
  self:set_width(width)
 end
----
 --- Move the RangeMark by `line` and `column`.
 function RangeMark:move(line,column)
  local start=self.start
@@ -271,9 +276,9 @@ function RangeMark:swap(rhs)
  local vreg1=lhs:yank()
  local vreg2=rhs:yank()
  local vhit1=lhs:get_height()
- local vhit2=rhs:height()
+ local vhit2=rhs:get_height()
  local vlen1=lhs:get_width()
- local vlen2=rhs:len()
+ local vlen2=rhs:get_width()
  lhs:put(vreg2)
  local vmode=rhs.vmode
  if
@@ -304,12 +309,37 @@ function RangeMark:highlight(hl_group,hl_opts,ns)
  local s=self:get_pos("start",0,0)
  local e=self:get_pos("finish",0,0)
  if self.vmode=="" then
-  local sc,ec=s[2],e[2]
-  for l=s[1],e[1] do
-   vim.highlight.range(0,ns,hl_group,{l,sc},{l,ec},{inclusive=true,regtype="v"})
+  local start_col,end_col=s[2],e[2]
+  for linenr=s[1],e[1] do
+   local line=vim.api.nvim_buf_get_lines(self.bufnr,linenr,linenr+1,true)[1]
+   local len=#line
+   local ext_end_row=(end_col>=len and linenr+1 or linenr)
+   local ext_end_col=(end_col>=len and 0 or end_col+1)
+   vim.api.nvim_buf_set_extmark(self.bufnr,ns,linenr,start_col,{
+    hl_group=hl_group,
+    end_row=ext_end_row,
+    end_col=ext_end_col,
+    priority=vim.highlight.priorities.user,
+    strict=false,
+   })
+   if end_col>len then
+    local blank_start=math.min(end_col,len)
+    local blank_width=start_col-blank_start
+    local block_start=blank_start+math.max(blank_width,0)
+    local block_width=end_col-block_start+1
+    vim.api.nvim_buf_set_extmark(self.bufnr,ns,linenr,blank_start,{
+     priority=vim.highlight.priorities.user,
+     strict=false,
+     virt_text_pos="overlay",
+     virt_text={
+      {(" "):rep(blank_width)},
+      {(" "):rep(block_width),hl_group},
+     },
+    })
+   end
   end
  else
-  vim.highlight.range(0,ns,hl_group,s,e,{inclusive=true,regtype=self.vmode})
+  vim.highlight.range(self.bufnr,ns,hl_group,s,e,{inclusive=true,regtype=self.vmode})
  end
 end
 ---@param rhs RangeMark
@@ -319,6 +349,14 @@ function RangeMark:exchange(rhs)
  if lhs:is_overlap(rhs) then
   vim.notify(
    "The two selection is overlap, try another region.",
+   vim.log.levels.WARN,
+   {title="RangeMark"}
+  )
+  return false
+ end
+ if lhs:get_height()~=rhs:get_height() then
+  vim.notify(
+   "The height of two selection doesn't match, try another region",
    vim.log.levels.WARN,
    {title="RangeMark"}
   )

@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 local Lazy={}
 local trimmed={
  [".lua"]=true,
