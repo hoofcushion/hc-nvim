@@ -24,9 +24,9 @@ function M.random_filter(factor)
  M.NeovimFilter.apply_to_all(function(r,g,b)
   local rgb={r,g,b}
   local rng={unpack(rgb)}
-  rng[1]=rng[1]*(1+(math.random(2)==1 and 1 or -1)*(1-math.random())*factor)
-  rng[2]=rng[2]*(1+(math.random(2)==1 and 1 or -1)*(1-math.random())*factor)
-  rng[3]=rng[3]*(1+(math.random(2)==1 and 1 or -1)*(1-math.random())*factor)
+  rng[1]=rng[1]*(1+(math.random(2)==1 and 1 or -1)*((1-math.random())*factor*3*0.2126))
+  rng[2]=rng[2]*(1+(math.random(2)==1 and 1 or -1)*((1-math.random())*factor*3*0.7152))
+  rng[3]=rng[3]*(1+(math.random(2)==1 and 1 or -1)*((1-math.random())*factor*3*0.0722))
   return unpack(M.RGBFormat.rgb_to_normalize(rng))
  end,{fg=true,bg=true})
 end

@@ -1,8 +1,12 @@
 local M=require("hc-filter.init_space")
 ---@class ColorFilter
 local ColorFilter={}
-ColorFilter.grayscale=function(rgb)
+ColorFilter.grayscale_ntsc=function(rgb)
  local gray=math.floor(rgb[1]*0.299+rgb[2]*0.587+rgb[3]*0.114+0.5)
+ return {gray,gray,gray}
+end
+ColorFilter.grayscale_srgb=function(rgb)
+ local gray=math.floor(rgb[1]*0.2126+rgb[2]*0.7152+rgb[3]*0.0722+0.5)
  return {gray,gray,gray}
 end
 ColorFilter.saturation=function(rgb,factor)
