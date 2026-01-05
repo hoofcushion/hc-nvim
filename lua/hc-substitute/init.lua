@@ -2,25 +2,28 @@ local Util=require("hc-nvim.util")
 --- ---
 --- Main
 --- ---
+---@class HC-Substitute
 local M=require("hc-substitute.init_space")
 ---@generic T
 ---@param init fun():T
----@param set fun(t:T)
-local function lazy(init,set)
- set=set or Util.empty_f
- local t=setmetatable({},{
+---@param set? fun(t:T)
+---@return T
+function M.lazy(init,set)
+ set=set or function() end
+ local l=setmetatable({},{
   __index=function(_,k)
-   local _t=init()
-   set(_t)
-   return _t[k]
+   local t=init()
+   set(t)
+   return t[k]
   end,
  })
- set(t)
+ set(l)
+ return l
 end
-lazy(function() return require("hc-substitute.config") end,function(t) M.Config=t end)
-lazy(function() return require("hc-substitute.util") end,function(t) M.Util=t end)
-lazy(function() return require("hc-substitute.opfunc") end,function(t) M.OpFunc=t end)
-lazy(function() return require("hc-substitute.commands") end,function(t) M.Command=t end)
+M.lazy(function() return require("hc-substitute.config") end,function(t) M.Config=t end)
+M.lazy(function() return require("hc-substitute.util") end,function(t) M.Util=t end)
+M.lazy(function() return require("hc-substitute.opfunc") end,function(t) M.OpFunc=t end)
+M.lazy(function() return require("hc-substitute.commands") end,function(t) M.Command=t end)
 local opfunc_vmode_map={
  char="v",
  line="V",

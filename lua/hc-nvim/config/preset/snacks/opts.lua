@@ -1,6 +1,6 @@
 local Config=require("hc-nvim.config")
 local Rsc=require("hc-nvim.config.rsc")
-vim.g.snacks_animate = false
+vim.g.snacks_animate=false
 local opts=vim.tbl_deep_extend(
  "force",
  {
@@ -38,15 +38,15 @@ local opts=vim.tbl_deep_extend(
   indent={
    indent={
     enabled=true,
-    hl=require("hc-nvim.util.rainbow").create(7,25,50),
+    hl=require("hc-nvim.util.rainbow").create(7,16,33),
    },
    scope={
     enabled=true,
-    hl=require("hc-nvim.util.rainbow").create(7,25,50),
+    hl=require("hc-nvim.util.rainbow").create(7,66,66),
    },
    chunk={
     enabled=true,
-    hl=require("hc-nvim.util.rainbow").create(7,25,50),
+    hl=require("hc-nvim.util.rainbow").create(7,66,66),
     char={
      corner_top="┌",
      corner_bottom="└",

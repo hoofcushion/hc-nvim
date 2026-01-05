@@ -5,9 +5,11 @@ local TogglerAu=Util.ConductedAutocmd.new()
 local Options=Config.options.toggler
 --- Short cut to get entries from functionalities name
 ---@type HCFunc.toggler.rule
-local TogglerRules=Util.Cache.table(function(name)
- return Util.Fallback.create(Options.rule.default,Options.rule[name])
-end)
+local TogglerRules=setmetatable({},{
+ __index=function(t,name)
+  return Util.Fallback.create(Options.rule.default,Options.rule[name])
+ end
+})
 local function check_bo(rules,name)
  return rules[name][vim.bo[name]]~=false
 end
@@ -37,9 +39,9 @@ TogglerAu:add({
   callback=function(event)
    for name,func in pairs(Function.funcs) do
     local status=func.status
-    if not (name=="toggler"
-     or status.enable==false
-     or status.suspend==true)
+    if name=="toggler"
+    or status.enable==false
+    or status.suspend==true
     then
      goto continue
     end
