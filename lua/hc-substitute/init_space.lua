@@ -1,1 +1,2 @@
+---@class HC-Substitute
 return {}

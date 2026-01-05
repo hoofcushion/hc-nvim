@@ -9,7 +9,7 @@
 if false then
  ---@class EventDefinition
  local _EventDefinition={
-  event="FileType", ---@type string
+  event="FileType", ---@type vim.api.keyset.events|vim.api.keyset.events[]
   pattern="lua", ---@type string|string[]|nil
   cond=function() return true end, ---@type fun(ev: table): boolean?|nil
  }
@@ -37,10 +37,6 @@ end
 -- Module Definition
 --- ---
 local Event={}
---- ---
--- Internal Constants & State
---- ---
-local META_TABLE_KEY="__event_meta"
 --- ---
 -- Event Definition Normalization
 --- ---

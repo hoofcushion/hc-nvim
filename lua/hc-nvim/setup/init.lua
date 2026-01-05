@@ -23,3 +23,7 @@ for _,modname in ipairs(modules) do
  end,Util.ERROR)
  Util.track()
 end
+vim.api.nvim_create_autocmd({"ColorScheme"},{
+ callback=function ()
+ end
+})

@@ -3,6 +3,7 @@
 local Events=require("hc-nvim.setup.event")
 ---@type LazySpec
 return {
+ {"hoofcushion/hc-filter",                     lazy=false,                                  config=true,      virtual=true, main="hc-filter"},
  {"folke/tokyonight.nvim",                     lazy=false},
  {"folke/noice.nvim",                          lazy=false},
  {"folke/snacks.nvim",                         lazy=false,                                  version="*"},
@@ -38,6 +39,7 @@ return {
  {"echasnovski/mini.surround",                 virtual=true},
  {"echasnovski/mini.comment",                  virtual=true},
  {"gbprod/yanky.nvim"},
+ {"NMAC427/guess-indent.nvim",                 config=true,                                 event=Events.File},
  -- {"monaqa/dial.nvim"},
 
  --- Tools
