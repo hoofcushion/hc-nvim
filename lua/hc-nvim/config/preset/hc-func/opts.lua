@@ -27,14 +27,6 @@ end)({
    rainbowcursor={
     auto_suspend=true,
    },
-   default={
-    size_kb={0,512},
-    filetype={
-     ["neo-tree"]=false,
-     ["lazy"]=false,
-     ["mason"]=false,
-    },
-   },
   },
  },
 })
