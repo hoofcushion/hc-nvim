@@ -2,6 +2,9 @@ return {
  language="zh",
  country="CN",
  translations={
+  format_template={
+   lualine_bwt_info="拓:%s 映:%s 坝:%s",
+  },
   modemap={
    R      ="替换模式",
    Rc     ="替换模式 + 补全",

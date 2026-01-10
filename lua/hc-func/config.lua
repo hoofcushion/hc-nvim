@@ -1,5 +1,4 @@
 local Util=require("hc-nvim.util")
-local Type=Util.Type
 local Config={}
 ---@class HCFunc.options
 Config.default={
@@ -72,7 +71,7 @@ Config.default={
   enabled=true,
   ---@class HCFunc.toggler.rule
   ---@field default HCFunc.toggler.rule.entry
-  ---@field [HCFunc.function.modname] HCFunc.toggler.rule.entry
+  ---@field [string] HCFunc.toggler.rule.entry
   rule={
    ---@class HCFunc.toggler.rule.entry
    ---@field buftype table<string,boolean>
@@ -122,10 +121,10 @@ local valitab={
   enabled="boolean",
   pattern="function",
   hl_group="string",
-  hl_opts=Type.dict("string","any"),
+  hl_opts=Util.Type.dict("string","any"),
   autocmd={
-   enter=Type.list("string"),
-   clear=Type.list("string"),
+   enter=Util.Type.list("string"),
+   clear=Util.Type.list("string"),
   },
   timer={
    enabled="boolean",
@@ -134,32 +133,32 @@ local valitab={
   },
  },
  rainbowcursor={
-  colors=Type.any({"integer",Type.list("string")}),
+  colors=Util.Type.any({"integer",Util.Type.list("string")}),
   enabled="boolean",
   hl_group="string",
   throttle="positive",
   autocmd={
    enabled="boolean",
-   event=Type.any({"false",Type.list("string")}),
-   interval=Type.any({"false","integer"}),
+   event=Util.Type.any({"false",Util.Type.list("string")}),
+   interval=Util.Type.any({"false","integer"}),
    loopover="integer",
-   refresh=Type.optional("boolean"),
+   refresh=Util.Type.optional("boolean"),
   },
   timer={
    enabled="boolean",
-   interval=Type.any({"false","integer"}),
+   interval=Util.Type.any({"false","integer"}),
    loopover="integer",
-   refresh=Type.any({"false","integer"}),
+   refresh=Util.Type.any({"false","integer"}),
   },
  },
  toggler={
   enabled="boolean",
-  rule=Type.dict("string",{
-   buftype=Type.optional(Type.dict("string","boolean")),
-   filetype=Type.optional(Type.dict("string","boolean")),
-   size_kb=Type.optional({"number","number"}),
-   cond=Type.optional("function"),
-   auto_suspend=Type.optional("boolean"),
+  rule=Util.Type.dict("string",{
+   buftype=Util.Type.optional(Util.Type.dict("string","boolean")),
+   filetype=Util.Type.optional(Util.Type.dict("string","boolean")),
+   size_kb=Util.Type.optional({"number","number"}),
+   cond=Util.Type.optional("function"),
+   auto_suspend=Util.Type.optional("boolean"),
   }),
  },
  auto_format={
@@ -169,8 +168,8 @@ local valitab={
  document_highlight={
   enabled="boolean",
   autocmd={
-   enter=Type.list("string"),
-   clear=Type.list("string"),
+   enter=Util.Type.list("string"),
+   clear=Util.Type.list("string"),
   },
   timer={
    enabled="boolean",
@@ -183,7 +182,7 @@ local valitab={
  },
 }
 if UnitTest then
- UnitTest:add_case({name="hc-func",expect=true,test=function() return Type.check_type(valitab,"config",Config.default) end})
+ UnitTest:add_case({name="hc-func",expect=true,test=function() return Util.Type.check_type(valitab,"config",Config.default) end})
 end
 Config.current=Config.default
 Config.options=Util.Reference.get(function() return Config.current end)
@@ -194,7 +193,7 @@ function Config.setup(opts)
  local new_options=vim.tbl_deep_extend("force",Config.current,opts)
  Util.try(
   function()
-   assert(Type.check_type(valitab,"<hc-func.config>.options",new_options))
+   assert(Util.Type.check_type(valitab,"<hc-func.config>.options",new_options))
   end,
   Util.ERROR
  )

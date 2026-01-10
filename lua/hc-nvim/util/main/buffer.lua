@@ -22,12 +22,12 @@ end
 ---@param range range
 ---@return string[] text
 function Util.buf_get_text(buf,range)
- return table.concat(vim.api.nvim_buf_get_text(
+ return vim.api.nvim_buf_get_text(
   buf,
   range[1],
   range[2],
   range[3],
   range[4],
   {}
- ),"\n")
+ )
 end

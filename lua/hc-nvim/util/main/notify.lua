@@ -7,11 +7,11 @@ function Util.WARN(msg) vim.notify(msg,vim.log.levels.WARN) end
 function Util.ERROR(msg) vim.notify(msg,vim.log.levels.ERROR) end
 function Util.OFF(msg) vim.notify(msg,vim.log.levels.OFF) end
 ---@param fn function
----@param catch function
+---@param catch function?
 function Util.try(fn,catch)
- local ok,err=Util.pack_pcall(fn)
- if not ok then
-  (catch or error)(Util.unpacklen(err))
+ local pack=Util.packlen(pcall(fn))
+ if not pack[1] then
+  return (catch or error)(pack[2])
  end
- return Util.unpacklen(err)
+ return Util.unpacklen(pack,2)
 end

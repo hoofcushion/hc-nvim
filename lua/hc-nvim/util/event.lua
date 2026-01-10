@@ -7,6 +7,11 @@
 ---
 
 if false then
+ ---@class EventSignature
+ local _EventDefinition={
+  event="FileType", ---@type vim.api.keyset.events|vim.api.keyset.events[]
+  pattern="lua", ---@type string|string[]|nil
+ }
  ---@class EventDefinition
  local _EventDefinition={
   event="FileType", ---@type vim.api.keyset.events|vim.api.keyset.events[]
@@ -222,7 +227,7 @@ end
 
 ---Create a complex event trigger
 ---@param step_config table
----@return table
+---@return EventSignature
 function Event.create(step_config)
  -- Normalize configuration
  step_config=Event.normalize_step_config(step_config)
@@ -248,7 +253,7 @@ function Event.create(step_config)
 end
 ---Create a sequence of event steps
 ---@param sequence_config table
----@return table
+---@return EventSignature
 function Event.sequence(sequence_config)
  -- Normalize configuration
  sequence_config=Event.normalize_sequence_config(sequence_config)
@@ -307,7 +312,7 @@ end
 ---Create an event from an initialization function
 ---@param name string
 ---@param init_function function
----@return table
+---@return EventSignature
 function Event.from(name,init_function)
  init_function(function()
   vim.api.nvim_exec_autocmds("User",{pattern=name})

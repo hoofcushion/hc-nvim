@@ -1,27 +1,30 @@
-local function rgb_to_colorcode(r,g,b)
- return string.format("#%02x%02x%02x",r,g,b)
-end
 local Util=require("hc-nvim.util")
 local M={}
----@param hl ConductedHighlight
-local function init_rainbow(hl,a,s,l,name)
+local function init_rainbow_hl(name,layer,saturation,lightness)
  local groups={}
- for i=0,360,360/a do
-  i=math.floor(i)
-  local group={name.."_"..tostring(i),{fg=rgb_to_colorcode(Util.Color.hsl_to_rgb(i,s,l))}}
+ local i,e,s=0,360,360/layer
+ while i<e do
+  local rgb=Util.ColorFormat.hsl_to_rgb({math.floor(i),saturation,lightness})
+  local fg=Util.RGBFormat.rgb_to_hex(rgb)
+  local group={
+   name.."_"..tostring(math.floor(i)),
+   {fg=fg},
+  }
   table.insert(groups,group)
+  i=i+s
  end
- hl:extend(groups)
- return hl
+ return groups
 end
 ---@type table<string,ConductedHighlight>
 local Highlights={}
-function M.create(a,s,l)
- local name=string.format("Rainbow_HSL_%03d_%03d_%03d",a,s,l)
+function M.create(layer,saturation,lightness)
+ assert(saturation<1)
+ assert(lightness<1)
+ local name=string.format("Rainbow_HSL_%f_%f_%f",layer,saturation,lightness)
  local hl=Highlights[name]
  if not hl then
   hl=Util.ConductedHighlight.new()
-  init_rainbow(hl,a,s,l,name)
+  hl:extend(init_rainbow_hl(name,layer,saturation,lightness))
   hl:attach()
   Highlights[name]=hl
  end

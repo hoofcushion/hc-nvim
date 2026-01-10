@@ -1,4 +1,3 @@
 return {
  vscode=false,
- version="*",
 }

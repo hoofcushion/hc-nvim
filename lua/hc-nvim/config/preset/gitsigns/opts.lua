@@ -12,9 +12,9 @@ return {
  current_line_blame=true,
  preview_config={border=require("hc-nvim.config.rsc").border[Config.ui.border]},
  on_attach=(function()
-  local mapping=require("hc-nvim.setup.mapping"):export("gitsigns")
+  local interface_gitsigns=require("hc-nvim.setup.mapping").Interface:export("gitsigns")
   return function(bufnr)
-   mapping:create(bufnr)
+   interface_gitsigns:create(bufnr)
   end
  end)(),
 }

@@ -280,3 +280,24 @@ end
 function Util.parse_override(raws)
  return parse_override({},raws)
 end
+---@param tbl table
+---@return integer
+function Util.count(tbl)
+ local count=0
+ for _ in pairs(tbl) do
+  count=count+1
+ end
+ return count
+end
+---@param tbl table
+---@return boolean
+function Util.is_list(tbl)
+ local i=0
+ for _ in pairs(tbl) do
+  i=i+1
+  if tbl[i]==nil then
+   return false
+  end
+ end
+ return true
+end

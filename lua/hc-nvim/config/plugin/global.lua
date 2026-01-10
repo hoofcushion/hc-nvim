@@ -3,22 +3,24 @@
 local Events=require("hc-nvim.setup.event")
 ---@type LazySpec
 return {
- {"hoofcushion/hc-filter",                     lazy=false,                                  config=true,      virtual=true, main="hc-filter"},
- {"folke/tokyonight.nvim",                     lazy=false},
- {"folke/noice.nvim",                          lazy=false},
- {"folke/snacks.nvim",                         lazy=false,                                  version="*"},
+ -- Init
+ {"folke/tokyonight.nvim",                     event="SafeState"},
  {"folke/which-key.nvim",                      event="SafeState"},
+ {"folke/snacks.nvim",                         lazy=false},
+ {"folke/noice.nvim",                          lazy=false},
+ {"hoofcushion/hc-filter",                     name="hc-filter",                            main="hc-filter",    virtual=true,event="SafeState",config=true},
 
- {"rcarriga/nvim-notify"},
+ -- {"rcarriga/nvim-notify"},
+
  {"echasnovski/mini.nvim"},
-
+ {"hoofcushion/hc-nvim"},
 
  --- Information
  {"nvim-lualine/lualine.nvim",                 event=Events.File},
  -- {"Bekaboo/dropbar.nvim",                      event=Events.File},
  -- {"kevinhwang91/nvim-ufo",                     event=Events.File},
- {"chentoast/marks.nvim",                      event=Events.File},
- {"rainbowhxch/beacon.nvim",                   event=Events.File},
+ -- {"chentoast/marks.nvim",                      event=Events.File},
+ -- {"rainbowhxch/beacon.nvim",                   event=Events.File},
 
  {"smjonas/live-command.nvim",                 event="CmdlineEnter"},
  {"nacro90/numb.nvim",                         event="CmdlineEnter"},
@@ -28,23 +30,23 @@ return {
  {"nvim-telescope/telescope.nvim"},
 
  --- Motions
- {"chrisgrieser/nvim-spider"},
+ -- {"chrisgrieser/nvim-spider"},
  {"echasnovski/mini.ai",                       virtual=true},
  {"echasnovski/mini.operators",                virtual=true},
  {"folke/flash.nvim"},
 
  --- Edit
- {"hoofcushion/hc-substitute",                 virtual=true},
+ {"hoofcushion/hc-substitute",                 name="hc-substitute",                        main="hc-substitute",virtual=true},
  {"echasnovski/mini.align",                    virtual=true},
  {"echasnovski/mini.surround",                 virtual=true},
  {"echasnovski/mini.comment",                  virtual=true},
- {"gbprod/yanky.nvim"},
- {"NMAC427/guess-indent.nvim",                 config=true,                                 event=Events.File},
+ -- {"gbprod/yanky.nvim"},
+ {"NMAC427/guess-indent.nvim",                 event=Events.File,                           config=true},
  -- {"monaqa/dial.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",                       virtual=true,                                event=Events.File,main="hc-func"},
- {"hoofcushion/hc-analyzer",                   virtual=true,                                lazy=false,       config=true,  main="hc-analyzer"},
+ {"hoofcushion/hc-func",                       name="hc-func",                              main="hc-func",      virtual=true,event=Events.File},
+ {"hoofcushion/hc-analyzer",                   name="hc-analyzer",                          main="hc-analyzer",  virtual=true},
  -- {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  -- {"chrisgrieser/nvim-various-textobjs"},
@@ -52,7 +54,7 @@ return {
  {"nvim-pack/nvim-spectre"},
  {"s1n7ax/nvim-window-picker"},
  --- Profiller
- {"dstein64/vim-startuptime"},
+ -- {"dstein64/vim-startuptime"},
 
 
  --- Completions
@@ -93,15 +95,16 @@ return {
  {"nvimtools/none-ls.nvim"},
 
  --- LSP tools
- {"Wansmer/symbol-usage.nvim",                 event="LspAttach"},
+ -- {"Wansmer/symbol-usage.nvim",                 event="LspAttach"},
 
  -- Neovim develop
  {"folke/lazydev.nvim",                        event=Events.NeoConfig},
 
  --- Treesitter
  {"nvim-treesitter/nvim-treesitter",           event=Events.Treesitter},
- {"andymass/vim-matchup",                      event=Events.Treesitter},
- {"JoosepAlviste/nvim-ts-context-commentstring"},
+
+ -- {"andymass/vim-matchup",                      event=Events.Treesitter},
+ -- {"JoosepAlviste/nvim-ts-context-commentstring"},
  -- {"folke/ts-comments.nvim"},
  {"mizlan/iswap.nvim"},
  {"nvim-treesitter/nvim-treesitter-textobjects"},
@@ -114,7 +117,7 @@ return {
  --- Notebook
  {"zk-org/zk-nvim",                            event=Events.RootPattern(".zk")},
  {"MeanderingProgrammer/markdown.nvim",        ft="markdown"},
- {"iamcco/markdown-preview.nvim"},
+ -- {"iamcco/markdown-preview.nvim"},
 
  --- Libraries
  {"echasnovski/mini.icon",                     virtual=true},

@@ -1,4 +1,5 @@
-local Util=require("hc-nvim.util")
+local N=require("hc-nvim.init_space")
+---@class HC-Nvim.FileType
 local FileType={
  detectors={},
 }
@@ -10,7 +11,7 @@ function FileType.add(ftspec)
  if type(ftspec)~="table" then
   error("table expected")
  end
- if not Util.is_list(ftspec) then
+ if not N.Util.is_list(ftspec) then
   error("list expected")
  end
  for _,v in ipairs(ftspec) do
@@ -26,18 +27,21 @@ function FileType.check(s)
   end
  end
 end
-for modname,modpath in Util.iter_mod({
- "hc-nvim.config.filetype",
- "hc-nvim.user.filetype",
-}) do
- Util.try(
-  function()
-   local filetypes=Util.path_require(modname,modpath)
-   FileType.add(filetypes)
-  end,
-  Util.ERROR
- )
+function FileType.setup()
+ for modname,modpath in N.Util.iter_mod({
+  "hc-nvim.config.filetype",
+  "hc-nvim.user.filetype",
+ }) do
+  N.Util.try(
+   function()
+    local filetypes=N.Util.path_require(modname,modpath)
+    FileType.add(filetypes)
+   end,
+   N.Util.ERROR
+  )
+ end
+ vim.api.nvim_create_autocmd("BufEnter",{
+  callback=FileType.check,
+ })
 end
-vim.api.nvim_create_autocmd("BufEnter",{
- callback=FileType.check,
-})
+return FileType

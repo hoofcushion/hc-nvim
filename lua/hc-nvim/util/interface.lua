@@ -19,6 +19,9 @@ local function _del(buffer,mode,lhs)
  api.nvim_del_keymap(mode,lhs)
 end
 
+local function handle(err) vim.notify(err,vim.log.levels.ERROR) end
+local function try(fn) xpcall(fn,handle) end
+
 ---@param buffer integer?
 ---@param mode string[]
 ---@param lhs string[]
@@ -63,9 +66,7 @@ local function keymap_set(buffer,mode,lhs,rhs,opts,fallback)
     end
     opts.callback=cb
    end
-   pcall(function()
-    _set(buffer,_mode,_lhs,_rhs,opts)
-   end)
+   try(function() _set(buffer,_mode,_lhs,_rhs,opts) end)
   end
  end
 end
@@ -76,9 +77,7 @@ end
 local function keymap_del(buffer,mode,lhs)
  for _,l in Util.pipairs(lhs) do
   for _,m in Util.pipairs(mode) do
-   pcall(function()
-    _del(buffer,m,l)
-   end)
+   try(function() _del(buffer,m,l) end)
   end
  end
 end
@@ -149,7 +148,6 @@ local function get_desc(name)
 end
 local _Spec={__index=Spec}
 --- 将原始规范转换为处理后的规范
---- 将原始规范转换为处理后的规范
 ---@param raw RawSpec
 ---@return Spec
 function Spec.new(raw)
@@ -179,7 +177,7 @@ function Spec.new(raw)
   for _,l in Util.pipairs(raw.lhs) do
    table.insert(lhs,Util.concat(prefix,l,suffix))
   end
-  spec.lhs=Util.to_fat_table(lhs)
+  spec.lhs=Util.try_to_list_else_nil(lhs)
  end
  local desc=raw.desc or (get_desc(raw.name))
  spec.opts={noremap=true,silent=true,desc=desc}
@@ -297,9 +295,7 @@ function Mapping:create(buffer)
 end
 function Mapping:delete()
  if self.autocmd_id~=nil then
-  Util.try(function()
-   api.nvim_del_autocmd(self.autocmd_id)
-  end,Util.ERROR)
+  try(function() api.nvim_del_autocmd(self.autocmd_id) end)
   self.autocmd_id=nil
  end
  if next(self.instances)~=nil then

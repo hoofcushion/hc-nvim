@@ -27,6 +27,15 @@ end)({
    rainbowcursor={
     auto_suspend=true,
    },
+   default={
+    buftype={
+     ["*"]=true,
+    },
+    filetype={
+     ["*"]=true,
+     ["neo-tree"]=false,
+    },
+   },
   },
  },
 })

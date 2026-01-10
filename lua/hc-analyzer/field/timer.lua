@@ -1,7 +1,15 @@
 TimerTrack={}
-TimerTrack.record={}  -- normal records
-TimerTrack.leak={}    -- records of leaking timer collected by lua gc
-TimerTrack.repeats={} -- records of leaking timer with repeat
+local function count_tab()
+ return setmetatable({},{
+  __index=function(t,k)
+   return rawget(t,k) or 0
+  end,
+ })
+end
+TimerTrack.record=count_tab()  -- normal records
+TimerTrack.leak=count_tab()    -- records of leaking timer collected by lua gc
+TimerTrack.repeats=count_tab() -- records of leaking timer with repeat
+TimerTrack.tracebacks={}
 local weekt=setmetatable({},{__mode="k"})
 local function replace_self(real,fake,fn)
  return function(self,...)
@@ -10,6 +18,17 @@ local function replace_self(real,fake,fn)
   end
   return fn(self,...)
  end
+end
+local function slide(list,size)
+ while #list>size do
+  table.remove(list,1)
+ end
+end
+local function pindex(t,k,e)
+ if not t[k] then
+  t[k]=e()
+ end
+ return t[k]
 end
 function TimerTrack.setup_timer_gc()
  ---@class uv
@@ -35,17 +54,20 @@ function TimerTrack.setup_timer_gc()
    -- Track memory leak
    local info=debug.getinfo(2)
    local src=info.source..":"..info.currentline
-   local traceback=debug.traceback()
-   TimerTrack.record[src]=(TimerTrack.record[src] or 0)+1
+   -- local tracebacks=pindex(TimerTrack.tracebacks,src,function() return {} end)
+   -- local traceback=debug.traceback()
+   -- table.insert(tracebacks,traceback)
+   -- slide(tracebacks,100)
+   TimerTrack.record[src]=TimerTrack.record[src]+1
    local to_close=false
    local timer=assert(new_timer())
    local hooks={
     close=function(f)
      return function(...)
       if timer:get_repeat()~=0 then
-       TimerTrack.repeats[src]=math.max(TimerTrack.repeats[src] or 0,1)-1
+       TimerTrack.repeats[src]=math.max(TimerTrack.repeats[src],1)-1
       end
-      TimerTrack.record[src]=math.max(TimerTrack.record[src] or 1,1)-1
+      TimerTrack.record[src]=math.max(TimerTrack.record[src],1)-1
       return f(...)
      end
     end,
@@ -55,7 +77,7 @@ function TimerTrack.setup_timer_gc()
        local ok,msg=pcall(fn)
        if to_close then
         if not timer:is_closing() then
-         TimerTrack.leak[src]=(TimerTrack.leak[src] or 0)+1
+         TimerTrack.leak[src]=TimerTrack.leak[src]+1
          timer:close()
         end
        end
@@ -73,13 +95,13 @@ function TimerTrack.setup_timer_gc()
     local is_closing=timer:is_closing()
     -- ignore the repeating timer
     if is_repeat then
-     TimerTrack.repeats[src]=(TimerTrack.repeats[src] or 0)+1
+     TimerTrack.repeats[src]=TimerTrack.repeats[src]+1
     else
      if not is_active then
       to_close=true
      elseif not is_closing then
       timer:close()
-      TimerTrack.leak[src]=(TimerTrack.leak[src] or 0)+1
+      TimerTrack.leak[src]=TimerTrack.leak[src]+1
      end
     end
    end
@@ -119,9 +141,7 @@ end
 TimerTrack.snapshots={}
 function TimerTrack.snapshot()
  table.insert(TimerTrack.snapshots,vim.deepcopy(TimerTrack.record))
- while #TimerTrack.snapshots>100 do
-  table.remove(TimerTrack.snapshots,1)
- end
+ slide(TimerTrack.snapshots,100)
 end
 -- 每秒记录一个 snapshot 的 timer
 TimerTrack.auto_snapshot_timer=nil
@@ -205,7 +225,10 @@ end
 function TimerTrack.diff(i,e)
  TimerTrack.print_diff(TimerTrack.diff_snapshots(i,e))
 end
-TimerTrack.setup_timer_gc()
+function TimerTrack.setup()
+ TimerTrack.setup_timer_gc()
+ TimerTrack.start_auto_snapshot(5000)
+end
 --- test
 -- local wrap_test=assert(vim.uv.new_timer())
 -- wrap_test:start(1000,0,function() end)
@@ -215,4 +238,4 @@ TimerTrack.setup_timer_gc()
 -- local leak_test=assert(vim.uv.new_timer())
 -- leak_test:start(1000,0,function() end)
 -- collectgarbage("collect")
-TimerTrack.start_auto_snapshot(5000)
+return  TimerTrack

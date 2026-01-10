@@ -1,0 +1,2 @@
+---@class HC-Func
+return {}

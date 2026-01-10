@@ -1,3 +1,4 @@
+local Util=require("hc-nvim.util")
 ---@class TSProxy
 ---@operator call:TSNode?
 ---@operator concat:TSProxy

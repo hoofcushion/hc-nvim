@@ -1,3 +1,4 @@
+local Util=require("hc-nvim.util")
 local M=require("hc-substitute.init_space")
 local commands={
  {"HCPaste",

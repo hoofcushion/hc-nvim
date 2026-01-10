@@ -1,5 +1,5 @@
 local Util=require("hc-nvim.util")
----@class Events
+---@class HC-Nvim.Event
 local M={}
 function M.RootPattern(pattern)
  return Util.Event.create({

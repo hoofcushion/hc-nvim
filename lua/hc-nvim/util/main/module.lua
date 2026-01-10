@@ -10,35 +10,16 @@ Util.paths={
  Util.root_path,
  vim.fn.stdpath("config"),
 }
-do
- local opts={paths=Util.paths,rtp=false}
- local function _find_local_mod(modname)
-  return vim.loader.find(modname,opts)[1]
- end
- function Util.find_local_mod(...)
-  return Util.batch(_find_local_mod,...)
- end
-end
---- Similar to `require`, but slightly faster
---- It only search module in `Util.paths`
-function Util.local_require(modname)
- local info=Util.find_local_mod(modname)
- if info then
-  local ret=assert(loadfile(info.modpath))() or true
-  package.loaded[modname]=ret
-  return ret
- end
- return nil
-end
 ---@return unknown
-function Util.path_require(modname,modpath)
- local ret=assert(loadfile(modpath))() or true
+Util.path_require=Util.lua_ls_alias(require,function(modname,modpath)
+ local fn=assert(loadfile(modpath))
+ local ret=fn()
+ if not ret then
+  ret=true
+ end
  package.loaded[modname]=ret
  return ret
-end
-if false then
- Util.path_require=require
-end
+end)
 do
  local function _find_file(modname)
   return vim.loader.find(modname,{patterns={""}})[1]

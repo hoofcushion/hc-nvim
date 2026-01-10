@@ -2,7 +2,7 @@ local Config=require("hc-nvim.config")
 local Util=require("hc-nvim.util")
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
-local Mappings=require("hc-nvim.setup.mapping")
+local Interface=require("hc-nvim.setup.mapping").Interface
 local preset_modmap=Util.create_modmap("hc-nvim.config.preset")
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
@@ -36,7 +36,7 @@ local PresetGetter={
  keys=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
   value=Plugin._values(plugin,{[field]=value},field,false)
-  Mappings:export(name):lazykeys(value)
+  Interface:export(name):lazykeys(value)
   if value~=nil and next(value)~=nil then
    return value
   end
@@ -55,7 +55,7 @@ local PresetGetter={
  opts=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
   value=Plugin._values(plugin,{[field]=value},field,false)
-  Mappings:export(name):configure(value)
+  Interface:export(name):configure(value)
   if value~=nil and next(value)~=nil then
    return value
   end
@@ -68,8 +68,8 @@ local PresetGetter={
   if preset.keyimp then
    local specs=Util.eval(preset.keyimp,plugin)
    if specs~=nil then
-    Mappings.forspecs(specs,function(mapspec)
-     Mappings:add(mapspec):create()
+    Interface.forspecs(specs,function(mapspec)
+     Interface:add(mapspec):create()
     end)
    end
   end
@@ -78,7 +78,6 @@ local PresetGetter={
   end
  end,
 }
--- local priority=2^10
 local Preset={}
 function Preset.apply(specs)
  return Util.Lazy.foreach(specs,function(spec)
@@ -115,11 +114,6 @@ function Preset.apply(specs)
    spec={spec,spec.dependencies}
    spec.dependencies=nil
   end
-  -- -- add priority
-  -- if spec.priority==nil then
-  --  spec.priority=priority
-  --  priority=priority-1
-  -- end
   --  if spec.auto==true then
   --   spec.lazy=vim.fn.argc()==0
   --  end

@@ -1,4 +1,3 @@
--- This file is automatically loaded by lazyvim.config.init.
 local function augroup(name)
  return vim.api.nvim_create_augroup("HCNvim_"..name,{clear=true})
 end

@@ -1,3 +1,5 @@
+---@module "snacks"
+
 local Config=require("hc-nvim.config")
 local Rsc=require("hc-nvim.config.rsc")
 vim.g.snacks_animate=false
@@ -7,17 +9,18 @@ local opts=vim.tbl_deep_extend(
   bigfile={enabled=true},
   dashboard={enabled=vim.fn.argc()==0},
   explorer={enabled=false},
-  indent={enabled=true},
+  indent={enabled=false},
   input={enabled=true},
   picker={enabled=true},
-  notifier={enabled=false},
-  quickfile={enabled=true},
-  scope={enabled=true},
+  notifier={enabled=true},
+  quickfile={enabled=false},
+  scope={enabled=false},
   scroll={enabled=false},
   statuscolumn={enabled=false},
   words={enabled=false},
- },{
-
+ },
+ ---@type snacks.config
+ {
   dashboard={
    preset={
     header=(function()
@@ -38,15 +41,15 @@ local opts=vim.tbl_deep_extend(
   indent={
    indent={
     enabled=true,
-    hl=require("hc-nvim.util.rainbow").create(7,16,33),
+    hl=require("hc-nvim.util.rainbow").create(7,.75,.15),
    },
    scope={
     enabled=true,
-    hl=require("hc-nvim.util.rainbow").create(7,66,66),
+    hl=require("hc-nvim.util.rainbow").create(7,.75,.75),
    },
    chunk={
     enabled=true,
-    hl=require("hc-nvim.util.rainbow").create(7,66,66),
+    hl=require("hc-nvim.util.rainbow").create(7,.75,.75),
     char={
      corner_top="┌",
      corner_bottom="└",
@@ -56,10 +59,16 @@ local opts=vim.tbl_deep_extend(
     },
    },
   },
+  ---@type snacks.notifier.Config
   notifier={
+   timeout=5000,
    icons=Rsc.sign[Config.ui.sign]:prefix(" "),
    style="minimal",
    top_down=false,
+   padding=false,
+   width={min=0,max=0.5},
+   height={min=0,max=0.5},
+   margin={top=0,right=0,bottom=0},
   },
  },
  {

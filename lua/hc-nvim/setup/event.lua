@@ -1,16 +1,18 @@
-local Util=require("hc-nvim.util")
----@class Events
-local M={}
-for modname,modpath in Util.iter_mod({
- "hc-nvim.config.event",
- "hc-nvim.user.event",
-}) do
- Util.try(
-  function()
-   local events=Util.path_require(modname,modpath)
-   Util.tbl_extend(M,events)
-  end,
-  Util.ERROR
- )
+local N=require("hc-nvim.init_space")
+---@class HC-Nvim.Event
+local Event={}
+function Event.setup()
+ for modname,modpath in N.Util.iter_mod({
+  "hc-nvim.config.event",
+  "hc-nvim.user.event",
+ }) do
+  N.Util.try(
+   function()
+    local events=N.Util.path_require(modname,modpath)
+    N.Util.tbl_extend(Event,events)
+   end,
+   N.Util.ERROR
+  )
+ end
 end
-return M
+return Event

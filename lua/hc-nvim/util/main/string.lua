@@ -102,18 +102,18 @@ end
 ---@param str string
 ---@param pattern string
 ---@return string
-function Util.str_cut(str,pattern,plain)
+function Util.cut_before(str,pattern,plain)
  local pos=str:find(pattern,1,plain)
  if pos then
   return str:sub(1,pos-1)
  end
  return str
 end
---- 对 str，从左往右查找 pattern，并返回 sep 左侧的文字
+--- 对 str，从右往左查找 pattern，并返回 sep 右侧的文字
 --- 如果 rev 为 true，则从右往左查找，返回右侧的字符
 ---@param str string
 ---@param pattern string
 ---@return string
-function Util.str_cut_r(str,pattern,plain)
- return Util.str_cut(str:reverse(),pattern,plain):reverse()
+function Util.cut_after(str,pattern,plain)
+ return Util.cut_before(str:reverse(),pattern,plain):reverse()
 end

@@ -144,7 +144,9 @@ function BufferCache.require(modname)
   return require(modname)
  end
  local modpath=found.modpath
- return get_cached(modpath,function() return Util.path_require(modname,modpath) end)
+ return get_cached(modpath,function()
+  return Util.path_require(modname,modpath)
+ end)
 end
 -- 使用 Sheet.print 打印性能分析数据
 function BufferCache.print_stats()

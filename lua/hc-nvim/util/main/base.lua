@@ -6,23 +6,20 @@ local Util=require("hc-nvim.util.init_space")
 function Util.lua_ls_alias(_,obj)
  return obj
 end
+local function as_T(...) return ... end
+---@generic T
+---@param t T
+---@return fun(v:T):T
+function Util.from(t)
+ return as_T
+end
 function Util.packlen(...)
  return {n=select("#",...),...}
 end
-function Util.unpacklen(t)
- return Util.unpack(t,1,t.n)
-end
-function Util.pack_result(ok,...) return ok,Util.packlen(...) end
-function Util.pack_pcall(...)
- return Util.pack_result(pcall(...))
-end
-function Util.ok_or_nil(ok,...)
- if ok then
-  return ...
- end
-end
-function Util.nilpcall(...)
- return Util.ok_or_nil(pcall(...))
+---@param t table
+---@param s integer?
+function Util.unpacklen(t,s)
+ return Util.unpack(t,s or 1,t.n)
 end
 Util.unpack=unpack or table.unpack
 ---@generic T
@@ -38,9 +35,6 @@ function Util.redirect(t,...)
  t.n=n
  return ...
 end
-Util.prequire=Util.lua_ls_alias(require,function(modname)
- return Util.nilpcall(require,modname)
-end)
 function Util.empty_f() end
 Util.empty_t=setmetatable({},{__index=Util.empty_f,__newindex=Util.empty_f})
 function Util.batch(fn,...)

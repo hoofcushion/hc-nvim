@@ -2,6 +2,9 @@ return {
  language="en",
  country="US",
  translations={
+  format_template={
+   lualine_bwt_info="T:%s W:%s B:%s",
+  },
   modemap={
    R      ="Replace mode",
    Rc     ="Replace mode with completion",

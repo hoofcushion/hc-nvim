@@ -54,7 +54,6 @@ local I18n={
 }
 ---@param spec I18nSpec
 function I18n.load(spec)
- assert(type(spec)=="table","Expect table")
  extend(
   I18n.map,
   spec.language,

@@ -1,0 +1,2 @@
+---@class HC-Nvim
+return {}
