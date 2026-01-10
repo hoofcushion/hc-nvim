@@ -15,6 +15,10 @@ local function pindex(t,k)
  return ret
 end
 local Cache={}
+--- fancy function cache, supports:
+---  * special index
+---  * multiple index
+---  * multiple return values
 ---@generic T:function
 ---@param fn T
 ---@return T
@@ -37,15 +41,30 @@ function Cache.create(fn)
  end
  return retf
 end
+--- simple function cache
+--- only as backend of cached table
+---@generic T:function
+---@param fn T
+---@return T
+function Cache.create_simple(fn)
+ local cache={}
+ local function retf(k)
+  if cache[k]==nil then
+   cache[k]=fn(k)
+  end
+  return cache[k]
+ end
+ return retf
+end
 ---@generic K,V
 ---@param fn fun(K):V?
 ---@return table<K,V>
 function Cache.table(fn)
+ fn=Cache.create_simple(fn)
  return setmetatable({},{
-  __index=Cache.create(function(_,K)
-   local R=fn(K)
-   return R
-  end),
+  __index=function(_,K)
+   return fn(K)
+  end,
  })
 end
 return Cache

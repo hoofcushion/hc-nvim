@@ -10,8 +10,6 @@ return {
  {"folke/noice.nvim",                          lazy=false},
  {"hoofcushion/hc-filter",                     name="hc-filter",                            main="hc-filter",    virtual=true,event="SafeState",config=true},
 
- -- {"rcarriga/nvim-notify"},
-
  {"echasnovski/mini.nvim"},
  {"hoofcushion/hc-nvim"},
 

@@ -39,6 +39,30 @@ function Util.debounce(ms,fn,timer)
   end)
  end
 end
+---@generic F:function
+---@param ms_delay integer?          # delay in ms
+---@param ms_landing integer?          # delay in ms
+---@param fn F                 # function to debounce
+---@param timer uv.uv_timer_t? # pass a timer to bind multiple function in one debounce, and manage timer manually
+---@return F
+function Util.landing(ms_delay,ms_landing,fn,timer)
+ ms_delay=math.max(ms_delay or 0,0)
+ ms_landing=math.max(ms_landing or 0,0)
+ assert(type(fn)=="function","function expected")
+ timer=timer or Util.new_gc_timer()
+ return function(...)
+  local n=select("#",...)
+  local args={...}
+  local function f()
+   fn(unpack(args,1,n))
+  end
+  if timer:is_active() then
+   timer:start(ms_landing,0,f)
+   return
+  end
+  timer:start(ms_delay,0,f)
+ end
+end
 local function replace_self(real,fn)
  return function(_,...)
   return fn(real,...)

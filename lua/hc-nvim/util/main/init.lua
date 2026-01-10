@@ -14,6 +14,7 @@ collect(function() require("hc-nvim.util.main.table") end)
 collect(function() require("hc-nvim.util.main.treesitter") end)
 collect(function() require("hc-nvim.util.main.type") end)
 collect(function() require("hc-nvim.util.main.vim") end)
+collect(function() require("hc-nvim.util.main.workspace") end)
 for _,v in ipairs(res) do
  local ok,msg=v[1],v[2]
  if not ok then

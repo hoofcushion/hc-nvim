@@ -70,5 +70,6 @@ function M.enable()
 end
 function M.disable()
  DocHLAu:fini()
+ Timer:fini()
 end
 return M

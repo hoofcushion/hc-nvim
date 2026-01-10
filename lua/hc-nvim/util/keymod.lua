@@ -69,7 +69,6 @@ function InBlank.create(lhs,rhs)
  end
  return Base.create(lhs,rhs,cond)
 end
-local function empty_f() end
 local function cache(fn)
  local c={}
  return function(x,e,...)
@@ -81,6 +80,10 @@ local function cache(fn)
   end
   return ret
  end
+end
+---@return integer
+local function ms()
+ return vim.uv.hrtime()/1e6
 end
 ---@class hold_opts
 local default_opts={
@@ -111,15 +114,18 @@ function Hold.create(lhs,rhs,opts)
  --- ---
  if opts.init_speed>0 then
   local smooth=cache(opts.smooth)
-  local timer=assert(vim.uv.new_timer())
+  local last=ms()
+  local delay=0
   rhs=Base.create(nil,rhs,function()
-   if timer:is_active() then
+   local now=ms()
+   local skip=math.ceil(now-last)<delay
+   if skip then
     return false
    end
-   local delay=smooth(clock:elapsed(),acceleration_ms,init_interval_ms,max_interval_ms)
-   delay=math.floor(delay)
-   if delay>=1 then
-    timer:start(delay,0,empty_f)
+   last=now
+   local _delay=math.floor(smooth(clock:elapsed(),acceleration_ms,init_interval_ms,max_interval_ms))
+   if _delay>=1 then
+    delay=_delay
    end
    return true
   end)

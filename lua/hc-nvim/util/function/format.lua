@@ -51,7 +51,7 @@ local function format_raw(opts)
   format(vim.tbl_extend("force",opts,{name=choice.name}))
  end)
 end
-local format_d=Util.debounce(200,vim.schedule_wrap(format_raw))
+local format_d=Util.landing(150,0,vim.schedule_wrap(format_raw))
 ---@param opts? table Format options
 ---@return nil
 local function format(opts)
