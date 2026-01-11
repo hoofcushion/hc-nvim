@@ -4,7 +4,7 @@ local LocalEnv=Util.LocalEnv.new()
 local click=0
 local format=vim.lsp.buf.format
 --- @param opts? vim.lsp.buf.format.Opts
-local function format_raw(opts)
+local function format_with_choice(opts)
  click=0
  if Config.platform.is_vscode then
   return vim.lsp.buf.format(opts)
@@ -26,10 +26,11 @@ local function format_raw(opts)
   format(vim.tbl_extend("force",opts,{name=clients[1].name}))
   return
  end
- if LocalEnv.buffer.lsp_format_choice then
-  local valid_choice=vim.lsp.get_clients({name=LocalEnv.buffer.lsp_format_choice})[1]~=nil
+ local name=LocalEnv.buffer.lsp_format_choice
+ if name then
+  local valid_choice=vim.lsp.get_clients({name=name})[1]~=nil
   if valid_choice then
-   format(vim.tbl_extend("force",opts,{name=LocalEnv.buffer.lsp_format_choice}))
+   format(vim.tbl_extend("force",opts,{name=name}))
    return
   else
    LocalEnv.buffer.lsp_format_choice=nil
@@ -51,18 +52,17 @@ local function format_raw(opts)
   format(vim.tbl_extend("force",opts,{name=choice.name}))
  end)
 end
-local format_d=Util.landing(150,0,vim.schedule_wrap(format_raw))
+local format_debounced=Util.landing(175,0,vim.schedule_wrap(format_with_choice))
 ---@param opts? table Format options
 ---@return nil
-local function format(opts)
+local function format_double_click(opts)
  if not LocalEnv.buffer.lsp_format_choice then
-  return format_raw(opts)
+  return format_with_choice(opts)
  end
  click=math.min(2,click+1)
  if click==2 then
   LocalEnv.buffer.lsp_format_choice=false
  end
- format_d(opts)
+ format_debounced(opts)
 end
-
-return format
+return format_double_click
