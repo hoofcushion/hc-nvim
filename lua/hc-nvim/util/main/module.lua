@@ -11,7 +11,7 @@ Util.paths={
  vim.fn.stdpath("config"),
 }
 ---@return unknown
-Util.path_require=Util.lua_ls_alias(require,function(modname,modpath)
+function Util.path_require(modname,modpath)
  local fn=assert(loadfile(modpath))
  local ret=fn()
  if not ret then
@@ -19,7 +19,7 @@ Util.path_require=Util.lua_ls_alias(require,function(modname,modpath)
  end
  package.loaded[modname]=ret
  return ret
-end)
+end
 do
  local function _find_file(modname)
   return vim.loader.find(modname,{patterns={""}})[1]
@@ -74,12 +74,10 @@ end
 ---@return string[]
 local function get_relative_parts(full_path,base_path)
  local relative_path=full_path:sub(#base_path+2)
- local parts={}
- for part in relative_path:gmatch("[^/]+") do
-  table.insert(parts,part)
- end
+ local parts=Util.split(relative_path,"/")
  return parts
 end
+-- print(table.concat(Util.split(relative_path,"/"),"/"))
 ---@param modname string
 ---@return table
 function Util.create_modmap(modname)
@@ -89,17 +87,18 @@ function Util.create_modmap(modname)
   return {}
  end
  local modmap={}
- Util.scan(modpath,function(name,type,full_path)
+ Util.scan(modpath,function(_,type,full_path)
   local parts=get_relative_parts(full_path,modpath)
   local current_table=modmap
+  local len=#parts
   for i,part in ipairs(parts) do
-   if i==#parts and type=="file" then
-    local clean_name=part:gsub("%.lua$","")
+   if i==len and type=="file" then
+    local clean_name=Util.trimsuffix(part,".lua")
     current_table[clean_name]=full_path
-   else
-    current_table[part]=current_table[part] or {}
-    current_table=current_table[part]
+    break
    end
+   current_table[part]=current_table[part] or {}
+   current_table=current_table[part]
   end
  end)
  return modmap

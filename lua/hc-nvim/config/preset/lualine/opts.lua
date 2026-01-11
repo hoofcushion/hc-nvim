@@ -1,5 +1,6 @@
 local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
+local I18N=require("hc-nvim.setup.i18n")
 ---@class preset
 local preset={
  getter=function() end, ---@type function
@@ -25,7 +26,7 @@ local Presets={
      return
     end
     local fs_type=stat.type
-    return Util.I18n.get({"filetype",fs_type})
+    return I18N.instance:tbl_get({"filetype",fs_type})
    end,
   }),
   cond=function()
@@ -57,7 +58,7 @@ local Presets={
    event="OptionSet",
    pattern="foldenable,foldmethod,foldlevel",
    func=function()
-    return vim.o.foldenable and ("%s:%d"):format(Util.I18n.get({"foldmethod",vim.wo.foldmethod}),vim.wo.foldlevel) or ""
+    return vim.o.foldenable and ("%s:%d"):format(I18N.instance:tbl_get({"foldmethod",vim.wo.foldmethod}),vim.wo.foldlevel) or ""
    end,
   }),
   cond=function()
@@ -70,7 +71,7 @@ local Presets={
    pattern="wrap",
    func=function()
     local id=vim.wo.wrap and "wrap" or "nowrap"
-    return Util.I18n.get({"wrap",id})
+    return I18N.instance:tbl_get({"wrap",id})
    end,
   }),
  },
@@ -78,7 +79,7 @@ local Presets={
   getter=Util.Response.from_event({
    event=as_preset{"TabEnter","BufEnter","WinEnter"},
    func=function()
-    local format_template=Util.I18n.get({"format_template","lualine_bwt_info"})
+    local format_template=I18N.instance:tbl_get({"format_template","lualine_bwt_info"})
     return (format_template):format(
      vim.api.nvim_get_current_tabpage(),
      vim.api.nvim_get_current_win(),
@@ -143,7 +144,7 @@ local Presets={
  },
  buftype=as_preset{
   getter=function()
-   return Util.I18n.get({"buftype",vim.bo.buftype})
+   return I18N.instance:tbl_get({"buftype",vim.bo.buftype})
   end,
  },
  mode=as_preset{
@@ -151,11 +152,10 @@ local Presets={
   icons_enabled=true,
   fmt=Util.Cache.create(function()
    local raw=vim.fn.mode(1)
-   return table.concat({Util.I18n.get({"modemap",raw}),raw}," ")
+   return table.concat({I18N.instance:tbl_get({"modemap",raw}),raw}," ")
   end),
  },
 }
-print(Presets.buf_win_tab.getter())
 return {
  options={
   globalstatus=true,
@@ -165,6 +165,8 @@ return {
    statusline=Config.performance.refresh,
    tabline=Config.performance.refresh,
    winbar=Config.performance.refresh,
+   refresh_time=Config.performance.refresh,
+   events={"BufEnter"},
   },
  },
  ---@alias lualine.sections

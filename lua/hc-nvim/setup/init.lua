@@ -16,24 +16,28 @@ function Setup.setup()
  -- init NS for string reference
  _G.NS=N.Util.namespace
  -- load modules
- local modules={
-  "I18N",     -- load language packs
-  "Option",   -- set neovim options
-  "Basic",    -- run basic setup scripts
-  "FileType", -- load custom filetypes
-  "Event",    -- register custom events
-  "Mapping",  -- register keymaps
-  "Lazy",     -- load lazy.nvim plugin configs
-  "Vscode",   -- load extra vscode-neovim setting
-  "Server",   -- load language tools settings
+ local loaders={
+  {name="Option",  schedule=false,load=function() Setup.Option.setup() end},   -- set neovim options
+  {name="I18N",    schedule=false,load=function() Setup.I18N.setup() end},     -- load language packs
+  {name="Event",   schedule=false,load=function() Setup.Event.setup() end},    -- register custom events
+  {name="Mapping", schedule=false,load=function() Setup.Mapping.setup() end},  -- register keymaps
+  {name="Lazy",    schedule=false,load=function() Setup.Lazy.setup() end},     -- load lazy.nvim plugin configs
+  {name="Vscode",  schedule=false,load=function() Setup.Vscode.setup() end},   -- load extra vscode-neovim setting
+  {name="Basic",   schedule=true, load=function() Setup.Basic.setup() end},    -- run basic setup scripts
+  {name="FileType",schedule=true, load=function() Setup.FileType.setup() end}, -- load custom filetypes
+  {name="Server",  schedule=true, load=function() Setup.Server.setup() end},   -- load language tools settings
  }
- for _,key in ipairs(modules) do
-  N.Util.track(key)
-  N.Util.try(function()
-   local mod=Setup[key]
-    mod.setup()
-  end,N.Util.ERROR)
-  N.Util.track()
+ for _,spec in ipairs(loaders) do
+  local function load()
+   N.Util.track(spec.name)
+   N.Util.try(spec.load,N.Util.ERROR)
+   N.Util.track()
+  end
+  if spec.schedule then
+   vim.schedule(load)
+  else
+   load()
+  end
  end
 end
 return Setup

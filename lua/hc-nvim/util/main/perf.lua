@@ -63,6 +63,50 @@ function Util.landing(ms_delay,ms_landing,fn,timer)
   timer:start(ms_delay,0,f)
  end
 end
+function Util.callrate(interval_ms)
+ local stats={}
+ -- 生成ID的辅助函数
+ local function gen_id()
+  local info=debug.getinfo(3)
+  return info.source..":"..info.currentline
+ end
+
+ -- 清理过期数据
+ local function cleanup(window_ms)
+  window_ms=window_ms or interval_ms
+  local now=vim.uv.hrtime()/1e6
+  for id,data in pairs(stats) do
+   if now-data.t>window_ms then
+    stats[id]=nil
+   end
+  end
+ end
+
+ -- 计数函数
+ local function count(id)
+  if not id then id=gen_id() end
+  local now=vim.uv.hrtime()/1e6
+  stats[id]=stats[id] or {c=0,t=now}
+  stats[id].c=stats[id].c+1
+  stats[id].t=now
+  return stats[id].c
+ end
+
+ -- 获取统计数据
+ local function get(window_ms)
+  cleanup(window_ms or interval_ms)
+  local result={}
+  for id,data in pairs(stats) do
+   result[id]=data.c
+  end
+  return result
+ end
+
+ return {
+  count=count,
+  get=get,
+ }
+end
 local function replace_self(real,fn)
  return function(_,...)
   return fn(real,...)
@@ -145,7 +189,7 @@ end
 function Util.step(i,e,d,f,c)
  step(assert(vim.uv.new_timer()),i,e,d,f,c)
 end
-function Util.speed_test(time,fn)
+function Util.speed_test(time,fn,offset)
  local function empty() end
  -- calc offset of loop and empty function call
  local offset=vim.uv.hrtime()

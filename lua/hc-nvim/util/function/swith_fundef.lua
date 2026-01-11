@@ -1,26 +1,32 @@
 local Util=require("hc-nvim.util")
+local function try(fn)
+ xpcall(fn,function(err)
+  vim.notify(err,vim.log.levels.ERROR)
+ end)
+end
+local function find_assignment(node)
+ local found=pcall(function()
+  local proxy=Util.TSProxy.new(node)
+  assert(node:child_count()==3,                                   "unbalanced-assignments")
+  local var_list_node=proxy.variable_list()
+  assert(var_list_node,                                           "nil var list")
+  assert(var_list_node:child_count()==1,                          "zero var")
+  local exp_list_node=proxy.expression_list()
+  assert(exp_list_node,                                           "nil exp list")
+  assert(exp_list_node:child_count()==1,                          "zero exp")
+  assert(proxy.expression_list[1]():type()=="function_definition","function assignment")
+  local funstr_node=proxy.expression_list.function_definition["function"]()
+  assert(funstr_node)
+ end)
+ return found
+end
 local function switch(buf,win)
  buf=buf or vim.api.nvim_get_current_buf()
  win=win or vim.api.nvim_get_current_win()
- xpcall(function()
+ try(function()
   local cursor_node=Util.ts_get_cursor_node()
   assert(cursor_node,"cursor node not found")
-  local assign_node=Util.ts_lookup(cursor_node,function(node)
-   local ok=pcall(function()
-    local proxy=Util.TSProxy.new(node)
-    assert(node:child_count()==3,                                   "unbalanced-assignments")
-    local var_list_node=proxy.variable_list()
-    assert(var_list_node,                                           "nil var list")
-    assert(var_list_node:child_count()==1,                          "zero var")
-    local exp_list_node=proxy.expression_list()
-    assert(exp_list_node,                                           "nil exp list")
-    assert(exp_list_node:child_count()==1,                          "zero exp")
-    assert(proxy.expression_list[1]():type()=="function_definition","function assignment")
-    local funstr_node=proxy.expression_list.function_definition["function"]()
-    assert(funstr_node)
-   end)
-   return ok
-  end)
+  local assign_node=Util.ts_lookup(cursor_node,find_assignment)
   local declare_node=Util.ts_lookup(cursor_node,"function_declaration")
   if assign_node and declare_node then
    local cursor=vim.api.nvim_win_get_cursor(win)
@@ -36,7 +42,7 @@ local function switch(buf,win)
    end
   end
   if assign_node then
-   xpcall(function()
+   try(function()
     local proxy=Util.TSProxy.new(assign_node)
     local var_node=proxy.variable_list[1]()
     assert(var_node,     "nil var")
@@ -50,10 +56,10 @@ local function switch(buf,win)
     local var_text=vim.treesitter.get_node_text(var_node,buf)
     local repl_text="function "..var_text
     Util.buf_set_text(buf,repl_range,repl_text)
-   end,vim.notify)
+   end)
   end
   if declare_node then
-   xpcall(function()
+   try(function()
     local proxy=Util.TSProxy.new(declare_node)
     local name_node=proxy.name()
     assert(name_node,    "nil name")
@@ -65,9 +71,9 @@ local function switch(buf,win)
     local name_str=vim.treesitter.get_node_text(name_node,buf)
     local repl_text=("%s=function"):format(name_str)
     Util.buf_set_text(buf,repl_range,repl_text)
-   end,vim.notify)
+   end)
   end
- end,vim.notify)
+ end)
 end
 return {
  switch=switch,

@@ -117,3 +117,19 @@ end
 function Util.cut_after(str,pattern,plain)
  return Util.cut_before(str:reverse(),pattern,plain):reverse()
 end
+function Util.split(str,parttern,plain)
+ local parts={}
+ local pos=1
+ local len=#str
+ while pos<=len do
+  local s,e=string.find(str,parttern,pos,plain)
+  if s==nil then
+   table.insert(parts,str:sub(pos))
+   break
+  end
+  if e<s then e=s end
+  table.insert(parts,str:sub(pos,s-1))
+  pos=e+1
+ end
+ return parts
+end

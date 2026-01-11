@@ -15,11 +15,13 @@ local I18nSpec={
 }
 ---@class Translation
 local Translation={
- ---@type table<string,table<string,string>>
+ ---@type table<string,Translation>
  map={},
 }
+Translation.__index=Translation
 function Translation.new()
- local obj=setmetatable({},{__index=Translation})
+ local obj=setmetatable({},Translation)
+ obj.map={}
  return obj
 end
 function Translation:get()
@@ -36,35 +38,45 @@ end
 local function extend(ret,language,country,translations)
  if type(translations)=="table" then
   for k,translation in pairs(translations) do
-   local t=Util.tbl_check(ret,k,function()
-    return {map={}}
-   end)
+   local t=ret.map[k]
+   if not t then
+    t=Translation.new()
+    ret.map[k]=t
+   end
    extend(t,language,country,translation)
   end
  elseif type(translations)=="string" then
   Util.tbl_check(ret.map,language)[country]=translations
-  setmetatable(ret,{__index=Translation})
  else
   vim.notify("Invalid translation type",vim.log.levels.WARN)
  end
  return ret
 end
-local I18n={
- map={},
-}
 ---@param spec I18nSpec
-function I18n.load(spec)
+function Translation:load(spec)
  extend(
-  I18n.map,
+  self,
   spec.language,
   spec.country,
   spec.translations
  )
 end
-function I18n.get(keys)
- local trans=Util.tbl_get(I18n.map,keys)
+function Translation:tbl_get(keys)
+ local trans=self
+ for _,key in ipairs(keys) do
+  trans=trans.map[key]
+  if not trans then
+   error(table.concat(keys,"."))
+  end
+ end
  if trans then
   return trans:get()
  end
 end
-return I18n
+if LUAFILE then
+ local i18n=Translation.new()
+ i18n:load(I18nSpec)
+ vim.print(i18n.map.greet:get())
+ vim.print(i18n.map.msg.map.hello:format())
+end
+return Translation

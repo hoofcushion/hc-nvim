@@ -31,18 +31,19 @@ function Server.setup()
  end)
  -- use timer to prevent creating mappings multiple times
  local timer=assert(vim.uv.new_timer())
- local queue={}
+ local lsp_mapping_queue={}
+ local function create()
+  for buf in pairs(lsp_mapping_queue) do
+   lspMaps:create(buf)
+  end
+  lsp_mapping_queue={}
+ end
  vim.api.nvim_create_autocmd("LspAttach",{
   group=vim.api.nvim_create_augroup("LSPMappingCreater",{}),
   callback=function(ev)
-   queue[ev.buf]=true
+   lsp_mapping_queue[ev.buf]=true
    timer:start(100,0,function()
-    vim.schedule(function()
-     for buf in pairs(queue) do
-      lspMaps:create(buf)
-     end
-     queue={}
-    end)
+    vim.schedule(create)
    end)
   end,
  })

@@ -3,6 +3,8 @@ local N=require("hc-nvim.init_space")
 local I18N={}
 function I18N.setup()
  --- Load default language pack
+ local i18n=N.Util.I18n.new()
+ I18N.instance=i18n
  for modname,modpath in N.Util.iter_mod({
   "hc-nvim.config.language",
   "hc-nvim.user.language",
@@ -14,7 +16,7 @@ function I18N.setup()
      function()
       local spec=N.Util.BufferCache.require(modname)
       assert(type(spec)=="table",("LanguagePack<%s> Expect table"):format(modname))
-      N.Util.I18n.load(spec)
+      i18n:load(spec)
      end,
      N.Util.ERROR
     )

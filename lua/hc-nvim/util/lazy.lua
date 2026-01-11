@@ -19,7 +19,6 @@ function Lazy.normname(name)
  end
  return name
 end
-Lazy.normname=Util.Cache.create(Lazy.normname)
 ---@param spec table
 function Lazy.getname(spec)
  return spec.name

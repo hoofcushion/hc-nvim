@@ -139,11 +139,11 @@ local Spec={
  once=false,
  key_as_lhs=false,
 }
+local I18n=require("hc-nvim.setup.i18n").instance
 local function get_desc(name)
- local map=Util.I18n.map
- local trans=map.mapdesc[name]
- if trans then
-  return trans:get()
+ local ok,item=pcall(function() return assert(I18n.map.mapdesc.map[name]) end)
+ if ok then
+  return item:get()
  end
 end
 local _Spec={__index=Spec}

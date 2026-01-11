@@ -3,7 +3,7 @@ local Util=require("hc-nvim.util")
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
 local Interface=require("hc-nvim.setup.mapping").Interface
-local preset_modmap=Util.create_modmap("hc-nvim.config.preset")
+local preset_modmap; Util.lazy(function() return Util.create_modmap("hc-nvim.config.preset") end,function(t) preset_modmap=t end)
 ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
 local PluginPresets=Util.Cache.table(function(name)
  local fields=preset_modmap[name]
@@ -80,13 +80,15 @@ local PresetGetter={
 }
 local Preset={}
 function Preset.apply(specs)
- return Util.Lazy.foreach(specs,function(spec)
+ local normname=Util.Cache.create_simple(Util.Lazy.normname)
+ local getname=Util.Cache.create_simple(Util.Lazy.getname)
+ Util.Lazy.foreach(specs,function(spec)
   -- get preset
-  local name=Util.Lazy.getname(spec)
-  local modname=Util.Lazy.normname(name)
+  local name=getname(spec)
+  local modname=normname(name)
   local preset=PluginPresets[modname]
   local base=preset.base
-  if base and type(base)=="table" then
+  if type(base)=="table" then
    for k,v in pairs(base) do
     spec[k]=v
    end

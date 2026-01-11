@@ -6,8 +6,8 @@ return {
  -- Init
  {"folke/tokyonight.nvim",                     event="SafeState"},
  {"folke/which-key.nvim",                      event="SafeState"},
- {"folke/snacks.nvim",                         lazy=false},
- {"folke/noice.nvim",                          lazy=false},
+ {"folke/snacks.nvim",                         event="VimEnter"},
+ {"folke/noice.nvim",                          event="UIEnter"},
  {"hoofcushion/hc-filter",                     name="hc-filter",                            main="hc-filter",    virtual=true,event="SafeState",config=true},
 
  {"echasnovski/mini.nvim"},
