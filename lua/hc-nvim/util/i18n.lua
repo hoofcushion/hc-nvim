@@ -61,9 +61,12 @@ function Translation:load(spec)
   spec.translations
  )
 end
+---@param keys string[]
 function Translation:tbl_get(keys)
+ ---@type Translation
  local trans=self
  for _,key in ipairs(keys) do
+  ---@type Translation
   trans=trans.map[key]
   if not trans then
    error(table.concat(keys,"."))

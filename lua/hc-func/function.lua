@@ -81,7 +81,7 @@ function Function.suspend(name,target)
  Function.activate(name,target)
 end
 function Function.fini()
- for name,func in pairs(Function.togglers) do
+ for name in pairs(Function.togglers) do
   Function.enable(name,false)
   Function.activate(name,false)
  end

@@ -1,7 +1,6 @@
 local M=require("hc-filter.init_space")
 ---@class NeovimFilter
 local NeovimFilter={}
--- 内部工具函数
 local function decompose_rgb(color)
  if not color then return nil end
  local rgb=M.RGBFormat.num_to_rgb(color)
@@ -52,11 +51,22 @@ function NeovimFilter.apply_to_highlight(name,filter_func,options)
 end
 -- 批量处理高亮组
 function NeovimFilter.apply_to_all(filter_func,options)
- options=options or {}
- local highlights=vim.fn.getcompletion("","highlight")
- for _,name in ipairs(highlights) do
-  NeovimFilter.apply_to_highlight(name,filter_func,options)
- end
+ coroutine.wrap(function()
+  local co=coroutine.running()
+  local function resume_scheduled()
+   vim.schedule(function()
+    coroutine.resume(co)
+   end)
+   coroutine.yield()
+  end
+  coroutine.resume(co)
+  options=options or {}
+  local highlights=vim.fn.getcompletion("","highlight")
+  for _,name in ipairs(highlights) do
+   resume_scheduled()
+   NeovimFilter.apply_to_highlight(name,filter_func,options)
+  end
+ end)()
 end
 -- 处理多个特定高亮组
 function NeovimFilter.apply_to_names(names,filter_func,options)

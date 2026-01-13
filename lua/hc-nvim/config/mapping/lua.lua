@@ -3,13 +3,7 @@ return Util.parse_override({
  override={pattern="lua"},
  {
   lhs="<leader>luf",
-  rhs=function()
-   if false then LUAFILE=true end
-   local path=vim.fn.expand("%")
-   local fn=assert(loadfile(path))
-   setfenv(fn,setmetatable({LUAFILE=true},{__index=_G}))
-   fn()
-  end,
+  rhs=function() require("hc-nvim.setup.luafile").luafile() end,
   desc="Execute current lua script in Neovim runtime",
  },
  {lhs="<leader>lun",cmd="!nvim -l %",desc="!nvim -l %"},

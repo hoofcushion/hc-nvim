@@ -24,4 +24,10 @@ function I18N.setup()
   end
  end
 end
+if LUAFILE then
+ package.loaded["hc-nvim.util.i18n"]=nil
+ N.Util.I18n=require("hc-nvim.util.i18n")
+ I18N.setup()
+ print(I18N.instance:tbl_get({"buftype",vim.bo.buftype}))
+end
 return I18N

@@ -15,9 +15,23 @@ function Server.setup()
     for _,spec in ipairs(specs) do
      Handler.load(spec)
     end
-    if vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()) then
-     vim.cmd("e")
-    end
+    vim.schedule(function()
+     local reopens={}
+     for _,buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_get_name(buf) then
+       table.insert(reopens,buf)
+      end
+     end
+     if reopens then
+      vim.schedule(function()
+       for _,buf in ipairs(reopens) do
+        vim.api.nvim_buf_call(buf,function()
+         vim.api.nvim_command("edit")
+        end)
+       end
+      end)
+     end
+    end)
    end,
   })
  end

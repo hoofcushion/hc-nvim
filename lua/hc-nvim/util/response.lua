@@ -53,6 +53,7 @@ function Response.from_event(opts)
    end
   end,
  })
+ response.v=opts.func
  return function()
   return response:get_cached()
  end

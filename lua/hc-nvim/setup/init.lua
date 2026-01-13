@@ -1,6 +1,7 @@
 local N=require("hc-nvim.init_space")
 ---@class HC-Nvim.Setup
 local Setup=require("hc-nvim.setup.init_space")
+N.lazy(function() return require("hc-nvim.setup.luafile") end, function(t) Setup.Luafile=t end)
 N.lazy(function() return require("hc-nvim.setup.i18n") end,    function(t) Setup.I18N=t end)
 N.lazy(function() return require("hc-nvim.setup.option") end,  function(t) Setup.Option=t end)
 N.lazy(function() return require("hc-nvim.setup.basic") end,   function(t) Setup.Basic=t end)
@@ -17,6 +18,7 @@ function Setup.setup()
  _G.NS=N.Util.namespace
  -- load modules
  local loaders={
+  {name="Luafile", schedule=false,load=function() Setup.Luafile.setup() end},  -- set neovim options
   {name="Option",  schedule=false,load=function() Setup.Option.setup() end},   -- set neovim options
   {name="I18N",    schedule=false,load=function() Setup.I18N.setup() end},     -- load language packs
   {name="Event",   schedule=false,load=function() Setup.Event.setup() end},    -- register custom events
