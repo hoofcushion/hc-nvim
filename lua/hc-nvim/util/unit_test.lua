@@ -1,21 +1,21 @@
 if false then
  ---@class UnitTest.Case
  local case={
-  name=Lua.string,
-  test=Lua._function,
-  expect=Lua._function, ---@type fun(...):boolean
+  name=LuaTyped.string,
+  test=LuaTyped._function,
+  expect=LuaTyped._function, ---@type fun(...):boolean
  }
  ---@class UnitTest.Record
  local record={
-  status=Lua.union("passed","error","failed"),
-  result={Lua.boolean,Lua.list(Lua.any)},
-  expect=Lua._function, ---@type fun(...):boolean
+  status=LuaTyped.union("passed","error","failed"),
+  result={LuaTyped.boolean,LuaTyped.list(LuaTyped.any)},
+  expect=LuaTyped._function, ---@type fun(...):boolean
  }
  ---@class UnitTest
  local UnitTest={
-  cases=Lua.list(case), ---@private
-  records=Lua.list(record), ---@private
-  buf=Lua.integer, ---@private
+  cases=LuaTyped.list(case), ---@private
+  records=LuaTyped.list(record), ---@private
+  buf=LuaTyped.integer, ---@private
  }
 end
 ---@class UnitTest

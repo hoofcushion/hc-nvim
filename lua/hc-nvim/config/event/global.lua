@@ -44,7 +44,7 @@ end)
 M.File=Util.Event.create({
  name="File",
  any={
-  event={"BufEnter"},
+  event={"BufEnter","BufNewFile","VimEnter","BufReadPost"},
   cond=function(ev)
    return ev.file~=""
   end,

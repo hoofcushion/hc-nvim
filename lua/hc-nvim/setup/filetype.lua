@@ -43,5 +43,6 @@ function FileType.setup()
  vim.api.nvim_create_autocmd("BufEnter",{
   callback=FileType.check,
  })
+ N.Util.schedule_reattach_files()
 end
 return FileType

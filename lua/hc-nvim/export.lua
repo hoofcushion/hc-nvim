@@ -5,4 +5,4 @@
 --- ---
 local hcnvim=require("hc-nvim")
 hcnvim.setup()
-return hcnvim.export()
+return hcnvim.Setup.Lazy.Specs

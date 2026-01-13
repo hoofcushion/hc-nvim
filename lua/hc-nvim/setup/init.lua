@@ -1,24 +1,27 @@
 local N=require("hc-nvim.init_space")
 ---@class HC-Nvim.Setup
 local Setup=require("hc-nvim.setup.init_space")
-N.lazy(function() return require("hc-nvim.setup.luafile") end, function(t) Setup.Luafile=t end)
-N.lazy(function() return require("hc-nvim.setup.i18n") end,    function(t) Setup.I18N=t end)
-N.lazy(function() return require("hc-nvim.setup.option") end,  function(t) Setup.Option=t end)
+N.lazy(function() return require("hc-nvim.setup.luatyped") end,function(t) Setup.LuaTyped=t end)
 N.lazy(function() return require("hc-nvim.setup.basic") end,   function(t) Setup.Basic=t end)
-N.lazy(function() return require("hc-nvim.setup.filetype") end,function(t) Setup.FileType=t end)
 N.lazy(function() return require("hc-nvim.setup.event") end,   function(t) Setup.Event=t end)
-N.lazy(function() return require("hc-nvim.setup.mapping") end, function(t) Setup.Mapping=t end)
+N.lazy(function() return require("hc-nvim.setup.filetype") end,function(t) Setup.FileType=t end)
+N.lazy(function() return require("hc-nvim.setup.i18n") end,    function(t) Setup.I18N=t end)
 N.lazy(function() return require("hc-nvim.setup.lazy") end,    function(t) Setup.Lazy=t end)
-N.lazy(function() return require("hc-nvim.setup.vscode") end,  function(t) Setup.Vscode=t end)
+N.lazy(function() return require("hc-nvim.setup.luafile") end, function(t) Setup.Luafile=t end)
+N.lazy(function() return require("hc-nvim.setup.mapping") end, function(t) Setup.Mapping=t end)
+N.lazy(function() return require("hc-nvim.setup.option") end,  function(t) Setup.Option=t end)
 N.lazy(function() return require("hc-nvim.setup.server") end,  function(t) Setup.Server=t end)
+N.lazy(function() return require("hc-nvim.setup.vscode") end,  function(t) Setup.Vscode=t end)
 function Setup.setup()
+ N.Util.track("Setup")
  -- init plugin rtp
  vim.opt.rtp:append(N.Util.root_path)
  -- init NS for string reference
  _G.NS=N.Util.namespace
  -- load modules
  local loaders={
-  {name="Luafile", schedule=false,load=function() Setup.Luafile.setup() end},  -- set neovim options
+  {name="LuaTyped",schedule=false,load=function() Setup.LuaTyped.setup() end},
+  {name="Luafile", schedule=false,load=function() Setup.Luafile.setup() end},
   {name="Option",  schedule=false,load=function() Setup.Option.setup() end},   -- set neovim options
   {name="I18N",    schedule=false,load=function() Setup.I18N.setup() end},     -- load language packs
   {name="Event",   schedule=false,load=function() Setup.Event.setup() end},    -- register custom events
@@ -41,5 +44,6 @@ function Setup.setup()
    load()
   end
  end
+ N.Util.track()
 end
 return Setup

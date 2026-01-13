@@ -76,7 +76,7 @@ return vim.tbl_deep_extend(
    end)(),
    {
     hover={
-     position={row=0,col=4},
+     position={row=2,col=5},
     },
    },
 

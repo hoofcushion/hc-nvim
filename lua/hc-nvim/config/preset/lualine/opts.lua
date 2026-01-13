@@ -1,25 +1,21 @@
 local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
 local I18N=require("hc-nvim.setup.i18n")
----@class preset
-local preset={
+local Presets=LuaTyped.dict(LuaTyped.string,{
  getter=function() end, ---@type function
  cond=function() end, ---@type function
-}
---- Annotation
---- lua_ls will treat arg as `preset` to providing: rename, completion features etc.
-local as_preset=Util.from(preset)
+})
 --- Preset definition
-local Presets={
- filetype=as_preset{
+Presets={
+ filetype={
   getter=Util.Response.from_event({
    event="OptionSet",
    func=function() return vim.bo.filetype end,
   }),
  },
- filesystem_type=as_preset{
+ filesystem_type={
   getter=Util.Response.from_event({
-   event=as_preset{"BufReadPost","BufWritePost"},
+   event={"BufReadPost","BufWritePost"},
    func=function()
     local stat=vim.uv.fs_stat(vim.api.nvim_buf_get_name(0))
     if not stat then
@@ -33,7 +29,7 @@ local Presets={
    return vim.uv.fs_stat(vim.api.nvim_buf_get_name(0))~=nil
   end,
  },
- fileencoding=as_preset{
+ fileencoding={
   getter=function()
    return vim.bo.fileencoding
   end,
@@ -41,7 +37,7 @@ local Presets={
    return vim.api.nvim_buf_get_name(0)~="" and vim.bo.buftype~="nofile"
   end,
  },
- fileformat=as_preset{
+ fileformat={
   getter=function()
    local f=vim.bo.fileformat
    return f=="dos" and [[\r\n]]
@@ -53,7 +49,7 @@ local Presets={
    return vim.api.nvim_buf_get_name(0)~="" and vim.bo.buftype~="nofile"
   end,
  },
- fold_info=as_preset{
+ fold_info={
   getter=Util.Response.from_event({
    event="OptionSet",
    pattern="foldenable,foldmethod,foldlevel",
@@ -65,7 +61,7 @@ local Presets={
    return vim.api.nvim_buf_get_name(0)~="" and vim.bo.buftype~="nofile"
   end,
  },
- wrap_status=as_preset{
+ wrap_status={
   getter=Util.Response.from_event({
    event="OptionSet",
    pattern="wrap",
@@ -75,9 +71,9 @@ local Presets={
    end,
   }),
  },
- buf_win_tab=as_preset{
+ buf_win_tab={
   getter=Util.Response.from_event({
-   event=as_preset{"TabEnter","BufEnter","WinEnter"},
+   event={"TabEnter","BufEnter","WinEnter"},
    func=function()
     local format_template=I18N.instance:tbl_get({"format_template","lualine_bwt_info"})
     return (format_template):format(
@@ -88,9 +84,9 @@ local Presets={
    end,
   }),
  },
- visual_range=as_preset{
+ visual_range={
   getter=Util.Response.from_event({
-   event=as_preset{"CursorMoved","ModeChanged"},
+   event={"CursorMoved","ModeChanged"},
    func=function()
     local vmode=Util.get_vmode()
     local fn=vim.fn
@@ -107,9 +103,9 @@ local Presets={
    return Util.is_visualmode()
   end,
  },
- line_col_progress=as_preset{
+ line_col_progress={
   getter=Util.Response.from_event({
-   event=as_preset{"CursorMoved","CursorMovedI"},
+   event={"CursorMoved","CursorMovedI"},
    func=function()
     local fn=vim.fn
     local cl=fn.line(".")
@@ -126,15 +122,15 @@ local Presets={
    end,
   }),
  },
- searchcount=as_preset{
+ searchcount={
   getter="searchcount",
   cond=function() return vim.v.hlsearch==1 end,
  },
- marks=as_preset{
+ marks={
   getter=function()
    local marks=vim.fn.getmarklist("%")
    if next(marks)~=nil then
-    local list=as_preset{}
+    local list={}
     for _,v in ipairs(marks) do
      table.insert(list,v.mark:sub(-1))
     end
@@ -142,12 +138,12 @@ local Presets={
    end
   end,
  },
- buftype=as_preset{
+ buftype={
   getter=function()
    return I18N.instance:tbl_get({"buftype",vim.bo.buftype})
   end,
  },
- mode=as_preset{
+ mode={
   getter="mode",
   icons_enabled=true,
   fmt=Util.Cache.create(function()

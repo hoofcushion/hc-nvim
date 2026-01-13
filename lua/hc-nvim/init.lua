@@ -23,7 +23,4 @@ function M.setup()
  HCNvim=M
  M.Setup.setup()
 end
-function M.export()
- return M.Setup.Lazy.Specs
-end
 return M

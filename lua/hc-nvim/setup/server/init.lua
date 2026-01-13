@@ -6,34 +6,13 @@ function Server.setup()
   return
  end
  if N.Config.server.auto_setup then
-  vim.api.nvim_create_autocmd(N.Setup.Event.File.event,{
-   pattern=N.Setup.Event.File.pattern,
-   once=true,
-   callback=function()
-    local Handler=require("hc-nvim.setup.server.handler")
-    local specs=N.Config.server.list
-    for _,spec in ipairs(specs) do
-     Handler.load(spec)
-    end
-    vim.schedule(function()
-     local reopens={}
-     for _,buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_get_name(buf) then
-       table.insert(reopens,buf)
-      end
-     end
-     if reopens then
-      vim.schedule(function()
-       for _,buf in ipairs(reopens) do
-        vim.api.nvim_buf_call(buf,function()
-         vim.api.nvim_command("edit")
-        end)
-       end
-      end)
-     end
-    end)
-   end,
-  })
+  N.Util.schedule_reattach_files(function()
+   local Handler=require("hc-nvim.setup.server.handler")
+   local specs=N.Config.server.list
+   for _,spec in ipairs(specs) do
+    Handler.load(spec)
+   end
+  end)
  end
  local lspMaps
  N.Util.lazy(function()
