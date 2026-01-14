@@ -1,102 +1,145 @@
----@class LocalEnv.scope
-local Scope={}
+---@diagnostic disable: unused-local
+---@class LocalEnv.Scope
+local Scope={
+ env=nil, ---@type table<integer,table>
+ parent=nil, ---@type vim.var_accessor
+}
 -- validate id
 function Scope.validate(id) end
 -- get default id
 function Scope.default() return 0 end
--- register a cleanup function
+-- register a cleannup
 function Scope.register(env,id) end
-Scope.parent={} ---@type vim.var_accessor
----@type LocalEnv.scope
-local bufScope={
- parent=vim.b,
- validate=vim.api.nvim_buf_is_valid,
- default=vim.api.nvim_get_current_buf,
- register=function(env,id)
-  vim.api.nvim_create_autocmd("BufDelete",{
-   once=true,
-   buffer=id,
-   callback=function(event)
-    env[event.buf]=nil
-   end,
-  })
+Scope.__index=Scope
+-- a private table key
+local PRIVATE={}
+-- static metatable
+local vars_metamethod={
+ __index=function(t,k)
+  local self=rawget(t,PRIVATE)
+  local v=rawget(t,k)
+  if v==nil then
+   v=self.parent[k]
+  end
+  return v
  end,
 }
----@type LocalEnv.scope
-local winScope={
- parent=vim.w,
- validate=vim.api.nvim_win_is_valid,
- default=vim.api.nvim_get_current_win,
- register=function(env,id)
-  vim.api.nvim_create_autocmd("WinClosed",{
-   once=true,
-   pattern=id,
-   callback=function(event)
-    env[event.match]=nil
-   end,
-  })
+function Scope:vars(id)
+ local ret=self.env[id]
+ if not ret then
+  ret=setmetatable({[PRIVATE]=self},vars_metamethod)
+  self.env[id]=ret
+  self.register(self,id)
+ end
+ return ret
+end
+-- static metatable
+local scope_metatable={
+ __newindex=function(t,k,v)
+  local self=rawget(t,PRIVATE)
+  self:vars(self.default())[k]=v
+ end,
+ __index=function(t,k)
+  local self=rawget(t,PRIVATE)
+  if type(k)=="number" and self.validate(k) then
+   return self:vars(k)
+  end
+  return self:vars(self.default())[k]
  end,
 }
----@type LocalEnv.scope
-local tabScope={
- parent=vim.t,
- validate=vim.api.nvim_tabpage_is_valid,
- default=vim.api.nvim_get_current_tabpage,
- register=function(env,id)
-  vim.api.nvim_create_autocmd("TabClosed",{
-   once=true,
-   pattern=id,
-   callback=function(event)
-    env[event.match]=nil
-   end,
-  })
- end,
-}
----@alias LocalEnv.scope_names
----| "buffer"
----| "window"
----| "tab"
+-- generate a scope instance
+function Scope:setup()
+ self.env={}
+ return setmetatable({[PRIVATE]=self},scope_metatable)
+end
+-- to make Scope derivation
+function Scope.new()
+ return setmetatable({},Scope)
+end
+-- a autocmd callback window
+-- with a lua gc bind
+local function new_autocmd_window(events,opts)
+ local fns={}
+ opts.callback=function(ev)
+  for key,fn in pairs(fns) do
+   local ok,clear=pcall(fn,ev)
+   if not ok or clear then
+    fn[key]=nil
+   end
+  end
+ end
+ local id=vim.api.nvim_create_autocmd(events,opts)
+ if not id then error("Unreachable") end
+ local ud=newproxy(true)
+ getmetatable(ud).__gc=function()
+  pcall(vim.api.nvim_del_autocmd,id)
+ end
+ return {
+  [PRIVATE]=ud,
+  append=function(fn)
+   table.insert(fns,fn)
+  end,
+ }
+end
+
+--- initialize scopes
+
+---@type LocalEnv.Scope
+local bufScope=Scope.new(); do
+ bufScope.parent=vim.b
+ bufScope.validate=vim.api.nvim_buf_is_valid
+ bufScope.default=vim.api.nvim_get_current_buf
+ local buf_cleannup_window=new_autocmd_window("BufDelete",{
+  group=vim.api.nvim_create_augroup("LocalEnv_buffer_Cleannup",{}),
+ })
+ function bufScope:register(id)
+  buf_cleannup_window.append(function(event)
+   if id==tonumber(event.buf) then
+    self.env[id]=nil
+    return true
+   end
+  end)
+ end
+end
+---@type LocalEnv.Scope
+local winScope=Scope.new(); do
+ winScope.parent=vim.w
+ winScope.validate=vim.api.nvim_win_is_valid
+ winScope.default=vim.api.nvim_get_current_win
+ local window_cleannup_window=new_autocmd_window("WinClosed",{
+  group=vim.api.nvim_create_augroup("LocalEnv_window_Cleannup",{}),
+ })
+ function winScope:register(id)
+  window_cleannup_window.append(function(event)
+   if id==tonumber(event.match) then
+    self.env[id]=nil
+   end
+  end)
+ end
+end
+---@type LocalEnv.Scope
+local tabScope=Scope.new(); do
+ tabScope.parent=vim.t
+ tabScope.validate=vim.api.nvim_tabpage_is_valid
+ tabScope.default=vim.api.nvim_get_current_tabpage
+ local tab_cleannup_window=new_autocmd_window("TabClosed",{
+  group=vim.api.nvim_create_augroup("LocalEnv_tabState_Cleannup",{}),
+ })
+ function tabScope:register(id)
+  tab_cleannup_window.append(function(event)
+   if id==tonumber(event.match) then
+    self.env[id]=nil
+    return true
+   end
+  end)
+ end
+end
 --- LocalEnv give individual local environments for buffer, window and tabpage to replace viml traditional b: w: t:
----@type table<LocalEnv.scope_names,LocalEnv.scope>
 local scopes={
  buffer=bufScope,
  window=winScope,
  tabpage=tabScope,
 }
----@param scope LocalEnv.scope
-local function make_env(scope)
- ---@type table<integer,table>
- local env={}
- --- get vars table of that id in env
- local function vars(id)
-  local ret=env[id]
-  if not ret then
-   ret=setmetatable({},{
-    __index=function(t,k)
-     local v=rawget(t,k)
-     if v==nil then
-      v=scope.parent[k]
-     end
-     return v
-    end,
-   })
-   env[id]=ret
-   scope.register(env,id)
-  end
-  return ret
- end
- return setmetatable({},{
-  __newindex=function(_,k,v)
-   vars(scope.default())[k]=v
-  end,
-  __index=function(_,k)
-   if type(k)=="number" and scope.validate(k) then
-    return vars(k)
-   end
-   return vars(scope.default())[k]
-  end,
- })
-end
 ---@class LocalEnv
 local LocalEnv={}
 -- luals type annotations
@@ -105,14 +148,27 @@ if false then
  LocalEnv.window=vim.w
  LocalEnv.tabpage=vim.t
 end
+-- reset all scopes
 function LocalEnv:reset()
- for k,v in pairs(scopes) do
-  self[k]=make_env(v)
+ for name,scope in pairs(scopes) do
+  self[name]=scope:setup()
  end
 end
+-- get a new LocalEnv instance
+-- to read and write buffer local variable via LocalEnv.buffer.xxx = ...
+-- available scopes are `buffer` `window` `tabpage`
+-- to clear all scope, use `:reset()`
 function LocalEnv.new()
  local obj=setmetatable({},{__index=LocalEnv})
  obj:reset()
  return obj
+end
+if LUAFILE then
+ local localenv=LocalEnv.new()
+ local b=0
+ localenv.buffer[b].a=1
+ print(localenv.buffer[b].a)
+ localenv:reset()
+ print(localenv.buffer[b].a)
 end
 return LocalEnv

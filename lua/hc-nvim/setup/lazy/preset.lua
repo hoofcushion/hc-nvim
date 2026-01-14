@@ -17,7 +17,15 @@ local PluginPresets=Util.Cache.table(function(name)
  end)
 end)
 local Hook={}
+if false then
+ ---@class hook
+ local hook={
+  [1]=nil, ---@type string[]
+  [2]=nil, ---@type function
+ }
+end
 local rg=Util.RelationGraph.new()
+---@param hooks hook[]
 function Hook.add(hooks)
  for _,hook in ipairs(hooks) do
   rg:extend_k(hook[2],hook[1])

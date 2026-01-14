@@ -16,7 +16,7 @@ function Server.setup()
  end
  local lspMaps
  N.Util.lazy(function()
-  local interface_lsp=require("hc-nvim.setup.mapping").Interface:export("lsp")
+  local interface_lsp=N.Setup.Mapping.Interface:export("lsp")
   interface_lsp:extend(require("hc-nvim.setup.server.mappings"))
   return interface_lsp
  end,function(t)

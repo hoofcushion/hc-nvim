@@ -1,6 +1,6 @@
 local Util=require("hc-nvim.util")
 local Config={}
----@class HCFunc.options
+---@class HC-Func.options
 Config.default={
  cursorword={
   enabled=true,
@@ -69,11 +69,11 @@ Config.default={
  },
  toggler={
   enabled=true,
-  ---@class HCFunc.toggler.rule
-  ---@field default HCFunc.toggler.rule.entry
-  ---@field [string] HCFunc.toggler.rule.entry
+  ---@class HC-Func.toggler.rule
+  ---@field default HC-Func.toggler.rule.entry
+  ---@field [string] HC-Func.toggler.rule.entry
   rule={
-   ---@class HCFunc.toggler.rule.entry
+   ---@class HC-Func.toggler.rule.entry
    ---@field buftype table<string,boolean>
    ---@field filetype table<string,boolean>
    ---@field size_kb {[1]:number,[2]:number}

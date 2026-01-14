@@ -2,14 +2,14 @@ local N=require("hc-func.init_space")
 local Util=require("hc-nvim.util")
 local TogglerAu=Util.ConductedAutocmd.new()
 local Options=N.Config.options.toggler
----@type HCFunc.toggler.rule
+---@type HC-Func.toggler.rule
 local Rules=setmetatable({},{
  __index=function(t,name)
   return Util.Fallback.create(Options.rule.default,Options.rule[name])
  end,
 })
-local function check_bo(rules,name)
- return rules[name][vim.bo[name]]~=false
+local function check_bo(rule,name)
+ return rule[name][vim.bo[name]]~=false
 end
 local function get_target(func_name,buf)
  if vim.api.nvim_buf_is_loaded(buf)==false then
