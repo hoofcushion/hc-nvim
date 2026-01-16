@@ -3,6 +3,18 @@ local Util=require("hc-nvim.util.init_space")
 function Util.packlen(...)
  return {n=select("#",...),...}
 end
+function Util.packenxtend(pack1,pack2)
+ local new={n=0}
+ table.move(pack1,1,pack1.n,new.n+1,new); new.n=new.n+pack1.n
+ table.move(pack2,1,pack2.n,new.n+1,new); new.n=new.n+pack2.n
+ return new
+end
+(LUAFILEDO or type)(not LUAFILE or function()
+  local pack1=Util.packlen(1,2)
+  local pack2=Util.packlen(4,3)
+  local pack12=Util.packenxtend(pack1,pack2)
+  print(Util.serialize_simple(pack12))
+ end)
 ---@param t table
 ---@param s integer?
 function Util.unpacklen(t,s)
@@ -24,12 +36,6 @@ function Util.redirect(t,...)
 end
 function Util.empty_f() end
 Util.empty_t=setmetatable({},{__index=Util.empty_f,__newindex=Util.empty_f})
-function Util.batch(fn,...)
- for i=1,select("#",...) do
-  local ret=fn(select(i,...))
-  if ret then return ret end
- end
-end
 function Util.serialize_simple(value)
  local t=type(value)
  if t=="string" then

@@ -31,29 +31,34 @@ local pattern={
   pattern=[[\v\s*$]],
   highlight={matches=false},
  },
- cword=W.modifier(
+ cword=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=no_offset,after=false},
    jump={pos="start"},
+   pattern=nil,
   },
   function(x)
    x.pattern=vim.fn.expand("<cword>")
   end
  ),
- cword_range=W.modifier(
+ cword_range=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=no_offset,after=no_offset},
    jump={pos="range"},
+   pattern=nil,
   },
-  function(x) x.pattern=vim.fn.expand("<cword>") end
+  function(x)
+   x.pattern=vim.fn.expand("<cword>")
+  end
  ),
- selection=W.modifier(
+ selection=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=true,after=true},
    jump={pos="range"},
+   pattern=nil,
   },
   (function()
    local fn=vim.fn
@@ -69,7 +74,9 @@ local pattern={
     fn.setreg("@a",save)
     return ret
    end
-   return function(x) x.pattern=get_vs() end
+   return function(x)
+    x.pattern=get_vs()
+   end
   end)()
  ),
  e={
@@ -86,12 +93,13 @@ local pattern={
   pattern=[[\<\w]],
   highlight={matches=false},
  },
- h=W.modifier(
+ h=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=no_offset,after=false},
    jump={pos="start"},
    highlight={matches=false},
+   pattern=nil,
   },
   function(x)
    local cursor=vim.api.nvim_win_get_cursor(0)
@@ -99,12 +107,13 @@ local pattern={
    x.pattern=string.format([[\v%%%dl%%<%dc|%%%dl%%>0c]],l,c,l-1)
   end
  ),
- l=W.modifier(
+ l=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=no_offset,after=false},
    jump={pos="start"},
    highlight={matches=false},
+   pattern=nil,
   },
   function(x)
    local cursor=vim.api.nvim_win_get_cursor(0)
@@ -112,12 +121,13 @@ local pattern={
    x.pattern=string.format([[\v%%%dl%%>%dc|%%%dl%%>0c]],l,c,l+1)
   end
  ),
- j=W.modifier(
+ j=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=no_offset,after=false},
    jump={pos="start"},
    highlight={matches=false},
+   pattern=nil,
   },
   function(x)
    local cursor=vim.api.nvim_win_get_cursor(0)
@@ -125,12 +135,13 @@ local pattern={
    x.pattern=string.format([[\v%%>%dl(%%%dc|%%<%dc$)]],l,c,c)
   end
  ),
- k=W.modifier(
+ k=W.with_initialize(
   {
    search={mode="search",max_length=0},
    label={before=no_offset,after=false},
    jump={pos="start"},
    highlight={matches=false},
+   pattern=nil,
   },
   function(x)
    local cursor=vim.api.nvim_win_get_cursor(0)

@@ -8,9 +8,9 @@ local function decompose_rgb(color)
 end
 
 local function compose_rgb(r,g,b)
- r=math.min(255,math.max(0,r))
- g=math.min(255,math.max(0,g))
- b=math.min(255,math.max(0,b))
+ r=math.min(math.max(0,r),255)
+ g=math.min(math.max(0,g),255)
+ b=math.min(math.max(0,b),255)
  return M.RGBFormat.rgb_to_num({r,g,b})
 end
 
@@ -49,24 +49,26 @@ function NeovimFilter.apply_to_highlight(name,filter_func,options)
   vim.api.nvim_set_hl(0,name,hl)
  end
 end
+local function run_block_with_scheduled_resuming(fn)
+ local co=coroutine.create(fn)
+ local function resume_scheduled()
+  vim.schedule(function()
+   coroutine.resume(co)
+  end)
+  coroutine.yield()
+ end
+ coroutine.resume(co,resume_scheduled)
+end
 -- 批量处理高亮组
 function NeovimFilter.apply_to_all(filter_func,options)
- coroutine.wrap(function()
-  local co=coroutine.running()
-  local function resume_scheduled()
-   vim.schedule(function()
-    coroutine.resume(co)
-   end)
-   coroutine.yield()
-  end
-  coroutine.resume(co)
+ run_block_with_scheduled_resuming(function(resume_scheduled)
   options=options or {}
   local highlights=vim.fn.getcompletion("","highlight")
   for _,name in ipairs(highlights) do
    resume_scheduled()
    NeovimFilter.apply_to_highlight(name,filter_func,options)
   end
- end)()
+ end)
 end
 -- 处理多个特定高亮组
 function NeovimFilter.apply_to_names(names,filter_func,options)

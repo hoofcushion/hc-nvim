@@ -1,5 +1,5 @@
 return {
- main="nvim-treesitter.configs",
+ main="nvim-treesitter",
  ft={
   "astro",
   "glimmer",

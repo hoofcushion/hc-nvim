@@ -7,7 +7,7 @@ return function(_,opts)
  --- ---
  ---@class cmp.SourceObj:cmp.SourceConfig
  local Source={
-  max_item_count=1000,
+  -- max_item_count=100,
  }
  function Source:new(name,properties)
   local source=vim.tbl_deep_extend("force",Source,properties)
@@ -101,9 +101,9 @@ return function(_,opts)
    src.lazydev,
    src.bufname:with({priority=-2^31}),
    src.path:with({priority=-2^31}),
-   src.treesitter:with({priority=-2^31,max_item_count=5}),
-   src.rg:with({priority=-2^31,max_item_count=5}),
-   src.buffer:with({priority=-2^31,max_item_count=5}),
+   src.treesitter:with({priority=-2^31,max_item_count=3}),
+   src.rg:with({priority=-2^31,max_item_count=3}),
+   src.buffer:with({priority=-2^31,max_item_count=3}),
   },
  })
  -- local compare=require("cmp.config.compare")

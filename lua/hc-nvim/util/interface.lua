@@ -19,9 +19,6 @@ local function _del(buffer,mode,lhs)
  api.nvim_del_keymap(mode,lhs)
 end
 
-local function handle(err) vim.notify(err,vim.log.levels.ERROR) end
-local function try(fn) xpcall(fn,handle) end
-
 ---@param buffer integer?
 ---@param mode string[]
 ---@param lhs string[]
@@ -66,7 +63,7 @@ local function keymap_set(buffer,mode,lhs,rhs,opts,fallback)
     end
     opts.callback=cb
    end
-   try(function() _set(buffer,_mode,_lhs,_rhs,opts) end)
+   pcall(function() _set(buffer,_mode,_lhs,_rhs,opts) end)
   end
  end
 end
@@ -77,7 +74,7 @@ end
 local function keymap_del(buffer,mode,lhs)
  for _,l in Util.pipairs(lhs) do
   for _,m in Util.pipairs(mode) do
-   try(function() _del(buffer,m,l) end)
+   pcall(function() _del(buffer,m,l) end)
   end
  end
 end
@@ -295,15 +292,16 @@ function Mapping:create(buffer)
 end
 function Mapping:delete()
  if self.autocmd_id~=nil then
-  try(function() api.nvim_del_autocmd(self.autocmd_id) end)
+  pcall(function() api.nvim_del_autocmd(self.autocmd_id) end)
   self.autocmd_id=nil
  end
- if next(self.instances)~=nil then
-  for _,spec in ipairs(self.instances) do
+ local instances=self.instances
+ if next(instances)~=nil then
+  self.instances={}
+  for _,spec in ipairs(instances) do
    local buffer,mode,lhs=spec[1],spec[2],spec[3]
    keymap_del(buffer,mode,lhs)
   end
-  self.instances={}
  end
 end
 function Mapping:configure(opts)

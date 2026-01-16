@@ -1,20 +1,20 @@
 ---@diagnostic disable:unused-local
 ---@class LuaTyped
 local LuaTyped={
- unknown      =nil, ---@class unknown
- any          =nil, ---@class any
- _nil         =nil, ---@class nil
- boolean      =nil, ---@class boolean
- _true        =nil, ---@class true: boolean
- _false       =nil, ---@class false: boolean
- number       =nil, ---@class number
- integer      =nil, ---@class integer: number
- thread       =nil, ---@class thread
- table        =nil, ---@class table<K, V>: { [K]: V }
- string       =nil, ---@class string: stringlib
- userdata     =nil, ---@class userdata
- lightuserdata=nil, ---@class lightuserdata
- _function    =nil, ---@class function
+ unknown      =nil, ---@type unknown
+ any          =nil, ---@type any
+ _nil         =nil, ---@type nil
+ boolean      =nil, ---@type boolean
+ _true        =nil, ---@type true
+ _false       =nil, ---@type false
+ number       =nil, ---@type number
+ integer      =nil, ---@type integer
+ thread       =nil, ---@type thread
+ table        =nil, ---@type table
+ string       =nil, ---@type string
+ userdata     =nil, ---@type userdata
+ lightuserdata=nil, ---@type lightuserdata
+ _function    =nil, ---@type function
 }
 ---@generic T
 ---@param t T

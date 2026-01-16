@@ -3,18 +3,27 @@
 local Events=require("hc-nvim.setup.event")
 ---@type LazySpec
 return {
- -- Init
- {"folke/tokyonight.nvim",                     event="SafeState"},
- {"folke/which-key.nvim",                      event="SafeState"},
- {"folke/snacks.nvim",                         event="VimEnter"},
+ -- UI
+ {"folke/tokyonight.nvim",                     lazy=false},
+ {"folke/which-key.nvim",                      event="UIEnter"},
+ {"folke/snacks.nvim",                         event="UIEnter"},
  {"folke/noice.nvim",                          event="UIEnter"},
- {"hoofcushion/hc-filter",                     name="hc-filter",                            main="hc-filter",    virtual=true,event="SafeState",config=true},
+ {"nvim-lualine/lualine.nvim",                 event="UIEnter"},
+ {
+  "hoofcushion/hc-filter",
+  name="hc-filter",
+  main="hc-filter",
+  virtual=true,
+  event="SafeState",
+  priority=-1,
+  opts={preset="random_tune"},
+  config=true,
+ },
 
  {"echasnovski/mini.nvim"},
  {"hoofcushion/hc-nvim"},
 
  --- Information
- {"nvim-lualine/lualine.nvim",                 event=Events.File},
  -- {"Bekaboo/dropbar.nvim",                      event=Events.File},
  -- {"kevinhwang91/nvim-ufo",                     event=Events.File},
  -- {"chentoast/marks.nvim",                      event=Events.File},
@@ -80,7 +89,7 @@ return {
  -- {"zbirenbaum/copilot.lua"},
  {"luozhiya/fittencode.nvim",                  event="InsertEnter"},
  --- Git
- {"sindrets/diffview.nvim"},
+ -- {"sindrets/diffview.nvim"},
  {"lewis6991/gitsigns.nvim",                   event=Events.RootPattern(".git")},
  {"NeogitOrg/neogit"},
  -- {"kdheepak/lazygit.nvim"},

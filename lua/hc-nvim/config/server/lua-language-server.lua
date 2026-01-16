@@ -107,7 +107,7 @@ add_strategy(
    semantic={
     enable=true,
     keyword=false,
-    variable=true,
+    variable=false,
     annotation=true,
    },
    runtime={

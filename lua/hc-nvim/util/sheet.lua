@@ -1,11 +1,21 @@
 local Sheet={}
+---@enum(key) Sheet.style
 Sheet.chars={
- none={h=" ",v=" ",tl=" ",tr=" ",bl=" ",br=" ",t=" ",b=" ",l=" ",r=" ",c=" "},
- single={h="─",v="│",tl="┌",tr="┐",bl="└",br="┘",t="┬",b="┴",l="├",r="┤",c="┼"},
- double={h="═",v="║",tl="╔",tr="╗",bl="╚",br="╝",t="╦",b="╩",l="╠",r="╣",c="╬"},
- bold={h="━",v="┃",tl="┏",tr="┓",bl="┗",br="┛",t="┳",b="┻",l="┣",r="┫",c="╋"},
- rounded={h="─",v="│",tl="╭",tr="╮",bl="╰",br="╯",t="┬",b="┴",l="├",r="┤",c="┼"},
+ none={h="",vl="",v="",vr="",tl="",tr="",bl="",br="",t="",b="",l="",r="",c=""},
+ single={h="─",vl="│",v="│",vr="│",tl="┌",tr="┐",bl="└",br="┘",t="┬",b="┴",l="├",r="┤",c="┼"},
+ double={h="═",vl="║",v="║",vr="║",tl="╔",tr="╗",bl="╚",br="╝",t="╦",b="╩",l="╠",r="╣",c="╬"},
+ bold={h="━",vl="┃",v="┃",vr="┃",tl="┏",tr="┓",bl="┗",br="┛",t="┳",b="┻",l="┣",r="┫",c="╋"},
+ rounded={h="─",vl="│",v="│",vr="│",tl="╭",tr="╮",bl="╰",br="╯",t="┬",b="┴",l="├",r="┤",c="┼"},
 }
+---@class positive: integer
+---@param num number
+---@return positive
+local function to_positive(num)
+ local pos=math.floor(tonumber(num))
+ if not pos then error("") end
+ return pos
+end
+to_positive(1)
 ---@alias AlignmentFn fun(value:string,width:integer):string
 ---@type table<string,AlignmentFn>
 local Alignments={
@@ -31,8 +41,14 @@ local Alignments={
   return string.rep(" ",left_pad)..value..string.rep(" ",right_pad)
  end,
 }
+---@class Sheet.print.opts
+---@field headers? string[];
+---@field padding? integer;
+---@field style? Sheet.style;
+---@field alignments? string|string[];
+
 ---@param tbl table
----@param opts? {headers?:string[],padding?:integer,style?:string,alignments?:string|string[]}
+---@param opts? Sheet.print.opts
 function Sheet.print(tbl,opts)
  opts=opts or {}
  local headers=opts.headers
@@ -96,7 +112,7 @@ function Sheet.print(tbl,opts)
    local aligned_value=align_func(value,max_widths[i])
    cells[i]=string.rep(" ",padding)..aligned_value..string.rep(" ",padding)
   end
-  table.insert(buffer,chars.v..table.concat(cells,chars.v)..chars.v)
+  table.insert(buffer,chars.vl..table.concat(cells,chars.v)..chars.vr)
  end
  print_separator(chars.tl,chars.t,chars.tr)
  if headers then
@@ -107,25 +123,40 @@ function Sheet.print(tbl,opts)
  print_separator(chars.bl,chars.b,chars.br)
  print(table.concat(buffer,"\n"))
 end
--- -- 示例用法
--- local data={
---  {"Alice",  25,"Engineer"},
---  {"Bob",    30,"Designer"},
---  {"Charlie",28,"Manager"},
--- }
--- -- 左对齐所有列（默认）
--- Sheet.print(data,{headers={"Name","Age","Job"}})
--- -- 指定对齐方式
--- Sheet.print(data,{
---  headers={"Name","Age","Job"},
---  alignments={"left","center","right"},
--- })
--- -- 不同样式和对齐组合
--- Sheet.print(data,{
---  headers={"Name","Age","Job"},
---  style="double",
---  alignments={"center","right","left"},
--- })
--- Sheet.print(data,{headers={"Name","Age","Job"},style="bold"})
--- Sheet.print(data,{headers={"Name","Age","Job"},style="rounded"})
+if LUAFILE then
+ -- 示例用法
+ local data={
+  {"Alice",  25,"Engineer"},
+  {"Bob",    30,"Designer"},
+  {"Charlie",28,"Manager"},
+ }
+ -- 左对齐所有列（默认）
+ Sheet.print(data,{
+  headers={"Name","Age","Job"},
+ })
+ -- 指定对齐方式
+ Sheet.print(data,{
+  headers={"Name","Age","Job"},
+  alignments={"left","center","right"},
+ })
+ -- 不同样式和对齐组合
+ Sheet.print(data,{
+  headers={"Name","Age","Job"},
+  style="double",
+  alignments={"center","right","left"},
+ })
+ Sheet.print(data,{
+  headers={"Name","Age","Job"},
+  style="bold",
+ })
+ Sheet.print(data,{
+  headers={"Name","Age","Job"},
+  style="rounded",
+ })
+ Sheet.print(data,{
+  headers={"Name","Age","Job"},
+  style="none",
+  padding=0,
+ })
+end
 return Sheet

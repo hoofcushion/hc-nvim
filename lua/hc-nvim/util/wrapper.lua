@@ -1,9 +1,13 @@
 local Util=require("hc-nvim.util.init_space")
 ---@class Wrapper
 local M={}
-function M.modifier(opts,fn)
+---@generic T
+---@param opts T
+---@param init fun(opts:T)
+---@return fun():T
+function M.with_initialize(opts,init)
  return function()
-  fn(opts)
+  init(opts)
   return opts
  end
 end
@@ -20,27 +24,11 @@ function M.fn_cond(cond,lhs,rhs)
  end
 end
 function M.fn_with(fn,...)
- local args=Util.packlen(...)
- return function()
-  return fn(Util.unpacklen(args))
- end
-end
-function M.fn_states(fn,state)
- local i,max=0,#state
- return function()
-  i=i%max+1
-  return fn(state[i])
- end
-end
-function M.fn_seq(...)
- local fns={...}
- local i,max=1,#fns
- local fn=fns[i]
- return function()
-  local ret=fn()
-  i=i%max+1
-  fn=fns[i]
-  return ret
+ local pack1=Util.packlen(...)
+ return function(...)
+  local pack2=Util.packlen(...)
+  local pack=Util.packenxtend(pack1,pack2)
+  return fn(Util.unpacklen(pack))
  end
 end
 ---@param val any
@@ -71,9 +59,9 @@ function M.fn_eval(fn,expr,oppo)
   return fn(expr())
  end
 end
-function M.method(obj,fn)
+function M.curring(fn,arg)
  return function(...)
-  return fn(obj,...)
+  return fn(arg,...)
  end
 end
 function M.combine(...)
@@ -104,13 +92,6 @@ function M.toggle_option(name,states)
  end
  return function()
   vim.o[name]=not vim.o[name]
- end
-end
----@param cmd string 要执行的 Neovim 命令
----@return fun():nil
-function M.cmd(cmd)
- return function()
-  vim.api.nvim_command(cmd)
  end
 end
 return M

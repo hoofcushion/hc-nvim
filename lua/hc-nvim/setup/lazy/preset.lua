@@ -86,6 +86,7 @@ local PresetGetter={
   end
  end,
 }
+local priority=2^10
 local Preset={}
 function Preset.apply(specs)
  local normname=Util.Cache.create_simple(Util.Lazy.normname)
@@ -123,6 +124,10 @@ function Preset.apply(specs)
   if spec.dependencies~=nil then
    spec={spec,spec.dependencies}
    spec.dependencies=nil
+  end
+  if spec.priority==nil then
+   spec.priority=priority
+   priority=priority-1
   end
   --  if spec.auto==true then
   --   spec.lazy=vim.fn.argc()==0

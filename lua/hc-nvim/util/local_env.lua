@@ -64,7 +64,7 @@ local function new_autocmd_window(events,opts)
   for key,fn in pairs(fns) do
    local ok,clear=pcall(fn,ev)
    if not ok or clear then
-    fn[key]=nil
+    fns[key]=nil
    end
   end
  end

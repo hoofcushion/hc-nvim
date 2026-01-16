@@ -1,40 +1,27 @@
 local Util=require("hc-nvim.util")
 local cmp=require("cmp")
-local function curring(fn,arg)
- return function(...) return fn(arg,...) end
-end
 local mapping={}
+-- switch behavior from insert to select if holding key
+-- this increase performance
 mapping.select_prev=Util.Keymod.Hold.create(
- Util.Wrapper.fn_cond(cmp.visible,curring(cmp.select_prev_item,{behavior=cmp.SelectBehavior.Insert})),
- Util.Wrapper.fn_cond(cmp.visible,curring(cmp.select_prev_item,{behavior=cmp.SelectBehavior.Select})),
+ Util.Wrapper.fn_cond(cmp.visible,Util.Wrapper.curring(cmp.select_prev_item,{behavior=cmp.SelectBehavior.Insert})),
+ Util.Wrapper.fn_cond(cmp.visible,Util.Wrapper.curring(cmp.select_prev_item,{behavior=cmp.SelectBehavior.Select})),
  {speed=100,trigger=2}
 )
 mapping.select_next=Util.Keymod.Hold.create(
- Util.Wrapper.fn_cond(cmp.visible,curring(cmp.select_next_item,{behavior=cmp.SelectBehavior.Insert})),
- Util.Wrapper.fn_cond(cmp.visible,curring(cmp.select_next_item,{behavior=cmp.SelectBehavior.Select})),
+ Util.Wrapper.fn_cond(cmp.visible,Util.Wrapper.curring(cmp.select_next_item,{behavior=cmp.SelectBehavior.Insert})),
+ Util.Wrapper.fn_cond(cmp.visible,Util.Wrapper.curring(cmp.select_next_item,{behavior=cmp.SelectBehavior.Select})),
  {speed=100,trigger=2}
 )
 mapping.abort=Util.Wrapper.fn_cond(cmp.visible,cmp.abort)
 mapping.doc_up=Util.Wrapper.fn_cond(cmp.visible_docs,cmp.scroll_docs)
 mapping.doc_down=Util.Wrapper.fn_cond(cmp.visible_docs,cmp.scroll_docs)
-mapping.toggle_doc=function()
- if cmp.visible() then
-  if cmp.visible_docs() then
-   cmp.close_docs()
-  else
-   cmp.open_docs()
-  end
- end
-end
-mapping.confirm=Util.Wrapper.fn_cond(cmp.visible,curring(cmp.confirm,{select=true}))
-local config=require("cmp.config")
+mapping.toggle_doc=Util.Wrapper.fn_cond(cmp.visible_docs,cmp.close_docs,cmp.open_docs)
+mapping.confirm=Util.Wrapper.fn_cond(cmp.visible,Util.Wrapper.curring(cmp.confirm,{select=true}))
 local oldenabled
-local function eval(expr)
- return type(expr)=="function" and expr() or expr
-end
 mapping.toggle=function()
- if eval(config.global.enabled) then
-  oldenabled=config.global.enabled
+ if Util.eval(require("cmp.config").global.enabled) then
+  oldenabled=require("cmp.config").global.enabled
   cmp.setup({enabled=false})
  else
   cmp.setup({enabled=oldenabled})

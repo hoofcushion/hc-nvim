@@ -53,7 +53,7 @@ return Util.parse_override({
  {name=NS.telescope_builtin_tagstack,                     rhs=builtin.tagstack},
  {name=NS.telescope_builtin_treesitter,                   rhs=builtin.treesitter},
  {name=NS.telescope_builtin_vim_options,                  rhs=builtin.vim_options},
- {name=NS.telescope_ast_grep,                             rhs=Wrapper.cmd("Telescope ast_grep")},
+ {name=NS.telescope_ast_grep,                             cmd="Telescope ast_grep"},
  {
   override={priority=2},
   {name=NS.lsp_definition,               rhs=builtin.lsp_definitions},

@@ -6,10 +6,6 @@ function Util.get_source(stack)
  return info and info.source:sub(2) or "?"
 end
 Util.root_path=vim.fn.fnamemodify(Util.get_source(),":h:h:h:h:h")
-Util.paths={
- Util.root_path,
- vim.fn.stdpath("config"),
-}
 ---@return unknown
 function Util.path_require(modname,modpath)
  local fn=assert(loadfile(modpath))
@@ -20,43 +16,43 @@ function Util.path_require(modname,modpath)
  package.loaded[modname]=ret
  return ret
 end
-do
- local function _find_file(modname)
-  return vim.loader.find(modname,{patterns={""}})[1]
- end
- function Util.find_file(...)
-  return Util.batch(_find_file,...)
+local function with_fallback(fn,...)
+ for i=1,select("#",...) do
+  local ret=fn(select(i,...))
+  if ret then return ret end
  end
 end
-do
- local function _find_mod(modname)
-  return vim.loader.find(modname)[1]
- end
- function Util.find_mod(...)
-  return Util.batch(_find_mod,...)
- end
+local function _find_file(modname)
+ return vim.loader.find(modname,{patterns={""}})[1]
 end
-do
- local function _iter_mod(modnames)
-  for _,modname in Util.pipairs(modnames) do
-   local dir=Util.find_file(modname)
-   if dir then
-    for name in vim.fs.dir(dir.modpath) do
-     local mod=Util.find_mod(modname.."."..Util.trimsuffix(name,".lua"))
-     if mod then
-      coroutine.yield(mod.modname,mod.modpath)
-     end
+function Util.find_file(...)
+ return with_fallback(_find_file,...)
+end
+local function _find_mod(modname)
+ return vim.loader.find(modname)[1]
+end
+function Util.find_mod(...)
+ return with_fallback(_find_mod,...)
+end
+local function _iter_mod(modnames)
+ for _,modname in Util.pipairs(modnames) do
+  local dir=Util.find_file(modname)
+  if dir then
+   for name in vim.fs.dir(dir.modpath) do
+    local mod=Util.find_mod(modname.."."..Util.trimsuffix(name,".lua"))
+    if mod then
+     coroutine.yield(mod.modname,mod.modpath)
     end
    end
   end
  end
- --- Get all mod starts in giving prefix
- ---@param modnames string|string[]
- ---@return fun():string
- ---@return any
- function Util.iter_mod(modnames)
-  return coroutine.wrap(_iter_mod),modnames
- end
+end
+--- Get all mod starts in giving prefix
+---@param modnames string|string[]
+---@return fun():string
+---@return any
+function Util.iter_mod(modnames)
+ return coroutine.wrap(_iter_mod),modnames
 end
 ---@param path string
 ---@param fn fun(name: string, type: string, full_path: string)

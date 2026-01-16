@@ -14,8 +14,7 @@ function Server.setup()
    end
   end)
  end
- local lspMaps
- N.Util.lazy(function()
+ local lspMaps; lspMaps=N.Util.lazy(function()
   local interface_lsp=N.Setup.Mapping.Interface:export("lsp")
   interface_lsp:extend(require("hc-nvim.setup.server.mappings"))
   return interface_lsp
@@ -27,9 +26,9 @@ function Server.setup()
  local lsp_mapping_queue={}
  local function create()
   for buf in pairs(lsp_mapping_queue) do
+   lsp_mapping_queue[buf]=nil
    lspMaps:create(buf)
   end
-  lsp_mapping_queue={}
  end
  vim.api.nvim_create_autocmd("LspAttach",{
   group=vim.api.nvim_create_augroup("LSPMappingCreater",{}),
