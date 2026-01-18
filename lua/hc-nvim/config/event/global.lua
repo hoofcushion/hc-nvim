@@ -50,6 +50,15 @@ M.File=Util.Event.create({
   end,
  },
 })
+M.Directory=Util.Event.create({
+ name="File",
+ any={
+  event={"BufEnter","BufNewFile","VimEnter","BufReadPost"},
+  cond=function(ev)
+   return vim.fn.isdirectory(ev.file)==1
+  end,
+ },
+})
 M.Treesitter=Util.Event.create({
  name="Treesitter",
  any={

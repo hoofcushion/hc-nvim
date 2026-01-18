@@ -9,16 +9,7 @@ return {
  {"folke/snacks.nvim",                         event="UIEnter"},
  {"folke/noice.nvim",                          event="UIEnter"},
  {"nvim-lualine/lualine.nvim",                 event="UIEnter"},
- {
-  "hoofcushion/hc-filter",
-  name="hc-filter",
-  main="hc-filter",
-  virtual=true,
-  event="SafeState",
-  priority=-1,
-  opts={preset="random_tune"},
-  config=true,
- },
+ {"hoofcushion/hc-filter",                     name="hc-filter",                            main="hc-filter",                   virtual=true,event="SafeState",                dependencies="hoofcushion/hc-nvim"},
 
  {"echasnovski/mini.nvim"},
  {"hoofcushion/hc-nvim"},
@@ -38,26 +29,26 @@ return {
 
  --- Motions
  -- {"chrisgrieser/nvim-spider"},
- {"echasnovski/mini.ai",                       virtual=true},
- {"echasnovski/mini.operators",                virtual=true},
+ {"echasnovski/mini.ai",                       virtual=true,                                dependencies="echasnovski/mini.nvim"},
+ {"echasnovski/mini.operators",                virtual=true,                                dependencies="echasnovski/mini.nvim"},
  {"folke/flash.nvim"},
 
  --- Edit
- {"hoofcushion/hc-substitute",                 name="hc-substitute",                        main="hc-substitute",virtual=true},
- {"echasnovski/mini.align",                    virtual=true},
- {"echasnovski/mini.surround",                 virtual=true},
- {"echasnovski/mini.comment",                  virtual=true},
+ {"hoofcushion/hc-substitute",                 name="hc-substitute",                        main="hc-substitute",               virtual=true,dependencies="hoofcushion/hc-nvim"},
+ {"echasnovski/mini.align",                    virtual=true,                                dependencies="echasnovski/mini.nvim"},
+ {"echasnovski/mini.surround",                 virtual=true,                                dependencies="echasnovski/mini.nvim"},
+ {"echasnovski/mini.comment",                  virtual=true,                                dependencies="echasnovski/mini.nvim"},
  -- {"gbprod/yanky.nvim"},
  {"NMAC427/guess-indent.nvim",                 event=Events.File,                           config=true},
  -- {"monaqa/dial.nvim"},
 
  --- Tools
- {"hoofcushion/hc-func",                       name="hc-func",                              main="hc-func",      virtual=true,event=Events.File},
- {"hoofcushion/hc-analyzer",                   name="hc-analyzer",                          main="hc-analyzer",  virtual=true},
+ {"hoofcushion/hc-func",                       name="hc-func",                              main="hc-func",                     virtual=true,event=Events.File,                dependencies="hoofcushion/hc-nvim"},
+ {"hoofcushion/hc-analyzer",                   name="hc-analyzer",                          main="hc-analyzer",                 virtual=true,dependencies="hoofcushion/hc-nvim"},
  -- {"RaafatTurki/hex.nvim"},
  {"akinsho/toggleterm.nvim"},
  -- {"chrisgrieser/nvim-various-textobjs"},
- {"nvim-neo-tree/neo-tree.nvim",               ft="directory"},
+ {"nvim-neo-tree/neo-tree.nvim",               event=Events.File},
  {"nvim-pack/nvim-spectre"},
  {"s1n7ax/nvim-window-picker"},
  --- Profiller
@@ -127,5 +118,5 @@ return {
  -- {"iamcco/markdown-preview.nvim"},
 
  --- Libraries
- {"echasnovski/mini.icon",                     virtual=true},
+ {"echasnovski/mini.icon",                     virtual=true,                                dependencies="echasnovski/mini.nvim"},
 }
