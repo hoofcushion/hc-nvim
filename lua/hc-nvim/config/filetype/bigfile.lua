@@ -1,5 +1,6 @@
-local Config=require("hc-nvim.config")
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
+local Config=HCNvim.Config
+local Util=HCNvim.Util
 return {
  function(ev)
   if (Util.get_size(ev.file) or Util.get_size(ev.buf))>Config.performance.bigfile.bytes

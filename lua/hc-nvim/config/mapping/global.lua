@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
 return {
  {
   {name=NS.global_buffer_delete,  cmd="bdelete"},
@@ -93,14 +93,14 @@ return {
   {name=NS.global_window_right,cmd="wincmd l"},
  },
  {
-  {name=NS.global_option_wrap,          rhs=Util.Wrapper.toggle_option("wrap")},
-  {name=NS.global_option_cursorline,    rhs=Util.Wrapper.toggle_option("cursorline")},
-  {name=NS.global_option_cursorcolumn,  rhs=Util.Wrapper.toggle_option("cursorcolumn")},
-  {name=NS.global_option_signcolum,     rhs=Util.Wrapper.toggle_option("signcolumn",{"yes","no"})},
-  {name=NS.global_option_number,        rhs=Util.Wrapper.toggle_option("number")},
-  {name=NS.global_option_relativenumber,rhs=Util.Wrapper.toggle_option("relativenumber")},
-  {name=NS.global_option_foldenable,    rhs=Util.Wrapper.toggle_option("foldenable")},
-  {name=NS.global_option_syntax,        rhs=Util.Wrapper.toggle_option("syntax",{"on","off"})},
+  {name=NS.global_option_wrap,          rhs=HCNvim.Util.Wrapper.toggle_option("wrap")},
+  {name=NS.global_option_cursorline,    rhs=HCNvim.Util.Wrapper.toggle_option("cursorline")},
+  {name=NS.global_option_cursorcolumn,  rhs=HCNvim.Util.Wrapper.toggle_option("cursorcolumn")},
+  {name=NS.global_option_signcolum,     rhs=HCNvim.Util.Wrapper.toggle_option("signcolumn",{"yes","no"})},
+  {name=NS.global_option_number,        rhs=HCNvim.Util.Wrapper.toggle_option("number")},
+  {name=NS.global_option_relativenumber,rhs=HCNvim.Util.Wrapper.toggle_option("relativenumber")},
+  {name=NS.global_option_foldenable,    rhs=HCNvim.Util.Wrapper.toggle_option("foldenable")},
+  {name=NS.global_option_syntax,        rhs=HCNvim.Util.Wrapper.toggle_option("syntax",{"on","off"})},
   {
    name=NS.global_option_treesitter,
    rhs=function()
@@ -184,20 +184,20 @@ return {
   {name=NS.global_motion_E,     rhs="E"},
   {name=NS.global_motion_w,     rhs="w"},
   {name=NS.global_motion_W,     rhs="W"},
-  {name=NS.global_motion_0,     rhs=Util.KeyRecorder.loop_keys("0",{"0","^"}),  desc="Line start or non-blank start",opts={expr=true}},
-  {name=NS.global_motion_doller,rhs=Util.KeyRecorder.loop_keys("$",{"$","g_"}), desc="Line end or non-blank end",    opts={expr=true}},
-  {name=NS.global_motion_caret, rhs=Util.KeyRecorder.loop_keys("^",{"^","0"}),  desc="Line start or non-blank start",opts={expr=true}},
-  {name=NS.global_motion_g_,    rhs=Util.KeyRecorder.loop_keys("g_",{"g_","$"}),desc="Line end or non-blank end",    opts={expr=true}},
+  {name=NS.global_motion_0,     rhs=HCNvim.Util.KeyRecorder.loop_keys("0",{"0","^"}),  desc="Line start or non-blank start",opts={expr=true}},
+  {name=NS.global_motion_doller,rhs=HCNvim.Util.KeyRecorder.loop_keys("$",{"$","g_"}), desc="Line end or non-blank end",    opts={expr=true}},
+  {name=NS.global_motion_caret, rhs=HCNvim.Util.KeyRecorder.loop_keys("^",{"^","0"}),  desc="Line start or non-blank start",opts={expr=true}},
+  {name=NS.global_motion_g_,    rhs=HCNvim.Util.KeyRecorder.loop_keys("g_",{"g_","$"}),desc="Line end or non-blank end",    opts={expr=true}},
   {
    name=NS.global_motion_V,
-   rhs=Util.KeyRecorder.loop_keys_with_mode("V",{n="V",V="<esc>^vg_",v="<esc>"},{n="V",V="<esc>V",v="<esc>V"}),
+   rhs=HCNvim.Util.KeyRecorder.loop_keys_with_mode("V",{n="V",V="<esc>^vg_",v="<esc>"},{n="V",V="<esc>V",v="<esc>V"}),
    desc="Line or Charwise Line (non-blank)",
    opts={expr=true},
   },
   {
    name=NS.global_motion_j,
    rhs=(function()
-    local hold=Util.Keymod.Hold.create("j",function()
+    local hold=HCNvim.Util.Keymod.Hold.create("j",function()
      local win_lineend=vim.fn.line("w$")-vim.fn.line("w0")
      local lineend=vim.fn.line("$")
      local line=math.min(lineend,win_lineend)-1
@@ -205,10 +205,10 @@ return {
      return tostring(step)
       .."j"
     end)
-    local inblank=Util.Keymod.InBlank.create(nil,"^")
-    return Util.Keymod.Base.create(
+    local inblank=HCNvim.Util.Keymod.InBlank.create(nil,"^")
+    return HCNvim.Util.Keymod.Base.create(
      hold,
-     Util.Keymod.Base.concat(hold,inblank),
+     HCNvim.Util.Keymod.Base.concat(hold,inblank),
      function()
       return vim.fn.mode()~=""
      end
@@ -219,7 +219,7 @@ return {
   {
    name=NS.global_motion_k,
    rhs=(function()
-    local hold=Util.Keymod.Hold.create("k",function()
+    local hold=HCNvim.Util.Keymod.Hold.create("k",function()
      local win_lineend=vim.fn.line("w$")-vim.fn.line("w0")
      local lineend=vim.fn.line("$")
      local line=math.min(lineend,win_lineend)-1
@@ -227,10 +227,10 @@ return {
      return tostring(step)
       .."k"
     end)
-    local inblank=Util.Keymod.InBlank.create(nil,"^")
-    return Util.Keymod.Base.create(
+    local inblank=HCNvim.Util.Keymod.InBlank.create(nil,"^")
+    return HCNvim.Util.Keymod.Base.create(
      hold,
-     Util.Keymod.Base.concat(hold,inblank),
+     HCNvim.Util.Keymod.Base.concat(hold,inblank),
      function()
       return vim.fn.mode()~=""
      end
@@ -240,7 +240,7 @@ return {
   },
   {
    name=NS.global_motion_h,
-   rhs=Util.Keymod.Hold.create("h",function()
+   rhs=HCNvim.Util.Keymod.Hold.create("h",function()
     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
     local col_len=vim.fn.col("$")
     local col=math.min(win_width,col_len)-1
@@ -252,7 +252,7 @@ return {
   },
   {
    name=NS.global_motion_l,
-   rhs=Util.Keymod.Hold.create("l",function()
+   rhs=HCNvim.Util.Keymod.Hold.create("l",function()
     local win_width=vim.fn.getwininfo(vim.fn.win_getid())[1].width
     local col_len=vim.fn.col("$")
     local col=math.min(win_width,col_len)-1

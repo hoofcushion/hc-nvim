@@ -1,5 +1,5 @@
-local Util=require("hc-nvim.util")
-return Util.parse_override({
+local HCNvim=require("hc-nvim.init_space")
+return HCNvim.Util.parse_override({
  override={event="User",pattern="LazyDone",once=true,buffer=false},
  wkspec={"<leader>L",group="Lazy"},
  {lhs="<leader>Ll",cmd="Lazy",        desc="Lazy Dashboard"},

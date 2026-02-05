@@ -3,9 +3,7 @@
   "version": "LuaJIT",
   "path": [
    "lua/?/init.lua",
-   "lua/?.lua",
-   "?/init.lua",
-   "?.lua"
+   "lua/?.lua"
   ]
  },
  "format": {

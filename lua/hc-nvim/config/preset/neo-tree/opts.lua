@@ -73,10 +73,10 @@ return {
    with_expanders=true,
   },
  },
- popup_border_style=require("hc-nvim.config.rsc").border[Config.ui.border],
+ popup_border_style=Config.ui.border,
  window={
   position="right",
-  width=("%f%%"):format(Config.ui.size.horizontal*100),
+  width=("%d%%"):format(Config.ui.size.horizontal*100),
   mappings={
    ["<space>"]=false,
    ["O"]={"open_external",desc="Open file externally"},

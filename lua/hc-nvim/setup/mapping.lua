@@ -1,29 +1,29 @@
-local N=require("hc-nvim.init_space")
+local HCNvim=require("hc-nvim.init_space")
 local Mapping={}
 function Mapping.setup()
- local Interface=N.Util.Interface.new()
+ local Interface=HCNvim.Util.Interface.new()
  Mapping.Interface=Interface
- N.Util.track("interface")
- N.Util.try(
+ HCNvim.Util.track("interface")
+ HCNvim.Util.try(
   function()
-   local specs=N.Util.BufferCache.require("hc-nvim.config.interface")
+   local specs=HCNvim.Util.BufferCache.require("hc-nvim.config.interface")
    Interface:extend(specs)
   end,
-  N.Util.ERROR
+  HCNvim.Util.ERROR
  )
- N.Util.track()
- for modname,modpath in N.Util.iter_mod({
+ HCNvim.Util.track()
+ for modname,modpath in HCNvim.Util.iter_mod({
   "hc-nvim.config.mapping",
   "hc-nvim.user.mapping",
  }) do
-  N.Util.try(function()
-   local mapping=N.Util.path_require(modname,modpath)
+  HCNvim.Util.try(function()
+   local mapping=HCNvim.Util.path_require(modname,modpath)
    if mapping then
     Interface.forspecs(mapping,function(spec)
      Interface:add(spec):create()
     end)
    end
-  end,N.Util.ERROR)
+  end,HCNvim.Util.ERROR)
  end
 end
 return Mapping

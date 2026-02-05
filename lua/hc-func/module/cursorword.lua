@@ -1,10 +1,10 @@
-local Util=require("hc-nvim.util")
-local Config=require("hc-func.config")
-local Options=Config.options.cursorword
-local CursorWordAu=Util.ConductedAutocmd.new()
-local Highlight=Util.ConductedHighlight.new()
-local Timer=Util.ConductedTimer.new()
-local LocalEnv=Util.LocalEnv.new()
+local HCNvim=require("hc-nvim.init_space")
+local CursorWordAu=HCNvim.Util.ConductedAutocmd.new()
+local Highlight=HCNvim.Util.ConductedHighlight.new()
+local Timer=HCNvim.Util.ConductedTimer.new()
+local LocalEnv=HCNvim.Util.LocalEnv.new()
+local HCFunc=require("hc-func.init_space")
+local Options=HCFunc.Config.options.cursorword
 --- ---
 --- Matcher class
 --- ---
@@ -50,7 +50,7 @@ function CursorWord.clear()
  Match.fini()
  LocalEnv.buffer.current_pattern=nil
 end
-CursorWord.match=Util.throttle(0,vim.schedule_wrap(CursorWord.match))
+CursorWord.match=HCNvim.Util.throttle(0,vim.schedule_wrap(CursorWord.match))
 local defaults={delay=200,landing=100,fn=function() end}
 local function adaptive_debounce(opts)
  setmetatable(opts or {},{__index=defaults})

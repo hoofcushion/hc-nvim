@@ -45,44 +45,31 @@ function Util.get_size(id)
   return info~=nil and info.size or nil
  end
 end
-local fns
+local function get_file_buffers()
+ local buffers={}
+ local all_buffers=vim.api.nvim_list_bufs()
+ for _,buffer in ipairs(all_buffers) do
+  local bufname=vim.api.nvim_buf_get_name(buffer)
+  if bufname~="" then
+   table.insert(buffers,buffer)
+  end
+ end
+ return buffers
+end
+local function reload_all_buffers(buffers)
+ for _,buffer in ipairs(buffers) do
+  vim.api.nvim_buf_call(buffer,function()
+   vim.api.nvim_command("edit")
+  end)
+ end
+end
 local scheduled
-function Util.schedule_reattach_files(fn)
- fns=fns or {}
- table.insert(fns,fn)
+function Util.reload_file_buffers()
  if scheduled then
   return
  end
  scheduled=true
  vim.schedule(function()
-  scheduled=false
-  local function all_reopens()
-   local ret={}
-   local bufs=vim.api.nvim_list_bufs()
-   for _,buf in ipairs(bufs) do
-    local bufname=vim.api.nvim_buf_get_name(buf)
-    if bufname~="" then
-     table.insert(ret,buf)
-    end
-   end
-   return ret
-  end
-  local reopens=all_reopens()
-  for _,v in ipairs(fns) do
-   v()
-  end
-  if next(reopens)==nil then
-   return
-  end
-  vim.schedule(function()
-   local function edit_all()
-    for _,buf in ipairs(reopens) do
-     vim.api.nvim_buf_call(buf,function()
-      vim.api.nvim_command("edit")
-     end)
-    end
-   end
-   edit_all()
-  end)
+  reload_all_buffers(get_file_buffers())
  end)
 end

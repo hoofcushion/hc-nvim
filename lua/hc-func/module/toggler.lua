@@ -1,11 +1,11 @@
-local N=require("hc-func.init_space")
-local Util=require("hc-nvim.util")
-local TogglerAu=Util.ConductedAutocmd.new()
-local Options=N.Config.options.toggler
+local HCNvim=require("hc-nvim.init_space")
+local TogglerAu=HCNvim.Util.ConductedAutocmd.new()
+local HCFunc=require("hc-func.init_space")
+local Options=HCFunc.Config.options.toggler
 ---@type HC-Func.toggler.rule
 local Rules=setmetatable({},{
  __index=function(t,name)
-  return Util.Fallback.create(Options.rule.default,Options.rule[name])
+  return HCNvim.Util.Fallback.create(Options.rule.default,Options.rule[name])
  end,
 })
 local function check_bo(rule,name)
@@ -35,11 +35,11 @@ end
 TogglerAu:add({
  {{"BufEnter","BufWrite"},{
   callback=function(event)
-   for name,toggler in pairs(N.Function.togglers) do
+   for name,toggler in pairs(HCFunc.Function.togglers) do
     if  name~="toggler"
     and toggler.enable
     then
-     N.Function.suspend(name,get_target(name,event.buf))
+     HCFunc.Function.suspend(name,get_target(name,event.buf))
     end
    end
   end,
@@ -48,12 +48,12 @@ TogglerAu:add({
 TogglerAu:add({
  {{"FocusLost","FocusGained"},{
   callback=function(event)
-   for name,toggler in pairs(N.Function.togglers) do
+   for name,toggler in pairs(HCFunc.Function.togglers) do
     if  name~="toggler"
     and toggler.enable
     and Rules[name].auto_suspend
     then
-     N.Function.suspend(name,event.event=="FocusGained")
+     HCFunc.Function.suspend(name,event.event=="FocusGained")
     end
    end
   end,

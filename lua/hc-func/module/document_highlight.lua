@@ -1,8 +1,8 @@
-local Config=require("hc-func.config")
-local Util=require("hc-nvim.util")
-local Options=Config.options.document_highlight
-local DocHLAu=Util.ConductedAutocmd.new()
-local Timer=Util.ConductedTimer.new()
+local HCNvim=require("hc-nvim.init_space")
+local DocHLAu=HCNvim.Util.ConductedAutocmd.new()
+local Timer=HCNvim.Util.ConductedTimer.new()
+local HCFunc=require("hc-func.init_space")
+local Options=HCFunc.Config.options.document_highlight
 local method="textDocument/documentHighlight"
 local is_doc_hl={
  LspReferenceText=true,

@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
 -- 定义错误集合
 local e_format_workspace={
  no_lsp_client=function()
@@ -107,7 +107,7 @@ local function new_schedule(jobs,ps)
 end
 -- 主函数：格式化工作区
 local function format_workspace()
- Util.async(function()
+ HCNvim.Util.async(function()
   try(function()
    -- 获取支持格式化的LSP客户端
    local clients=vim.lsp.get_clients({
@@ -115,7 +115,7 @@ local function format_workspace()
    })
    assert(#clients>0,e_format_workspace.no_lsp_client())
    -- 选择LSP客户端
-   local client=Util.await(function(resume)
+   local client=HCNvim.Util.await(function(resume)
     vim.ui.select(clients,{
      prompt="Select LSP client:",
      format_item=function(item)
@@ -139,7 +139,7 @@ local function format_workspace()
    local jobs={}
    do
     -- 获取工作区中的git文件
-    local files=Util.get_ws_git_files()
+    local files=HCNvim.Util.get_ws_git_files()
     -- 格式化文件
     for _,file in ipairs(files) do
      local filetype=vim.filetype.match({filename=file})

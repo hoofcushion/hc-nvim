@@ -1,10 +1,10 @@
 ---@class HC-Nvim
-local M=require("hc-nvim.init_space")
+local HCNvim=require("hc-nvim.init_space")
 ---@generic T
 ---@param init fun():T
 ---@param set? fun(t:T)
 ---@return T
-function M.lazy(init,set)
+function HCNvim.lazy(init,set)
  set=set or function() end
  local lazyt=setmetatable({},{
   __index=function(_,k)
@@ -16,11 +16,10 @@ function M.lazy(init,set)
  set(lazyt)
  return lazyt
 end
-M.lazy(function() return require("hc-nvim.config") end,function(t) M.Config=t end)
-M.lazy(function() return require("hc-nvim.util") end,  function(t) M.Util=t end)
-M.lazy(function() return require("hc-nvim.setup") end, function(t) M.Setup=t end)
-function M.setup()
- HCNvim=M
- M.Setup.setup()
+HCNvim.lazy(function() return require("hc-nvim.config") end,function(t) HCNvim.Config=t end)
+HCNvim.lazy(function() return require("hc-nvim.util") end,  function(t) HCNvim.Util=t end)
+HCNvim.lazy(function() return require("hc-nvim.setup") end, function(t) HCNvim.Setup=t end)
+function HCNvim.setup()
+ HCNvim.Setup.setup()
 end
-return M
+return HCNvim

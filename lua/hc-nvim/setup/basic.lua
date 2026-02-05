@@ -1,16 +1,16 @@
-local N=require("hc-nvim.init_space")
+local HCNvim=require("hc-nvim.init_space")
 ---@class HC-Nvim.Basic
 local Basic={}
 function Basic.setup()
- for modname,modpath in N.Util.iter_mod({
+ for modname,modpath in HCNvim.Util.iter_mod({
   "hc-nvim.config.basic",
   "hc-nvim.user.basic",
  }) do
-  N.Util.try(
+  HCNvim.Util.try(
    function()
-    N.Util.path_require(modname,modpath)
+    HCNvim.Util.path_require(modname,modpath)
    end,
-   N.Util.ERROR
+   HCNvim.Util.ERROR
   )
  end
 end

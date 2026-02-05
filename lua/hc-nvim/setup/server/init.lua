@@ -1,21 +1,20 @@
-local N=require("hc-nvim.init_space")
+local HCNvim=require("hc-nvim.init_space")
 ---@class HC-Nvim.Server
 local Server={}
 function Server.setup()
- if N.Config.platform.is_vscode and not N.Config.server.vscode then
+ if HCNvim.Config.platform.is_vscode and not HCNvim.Config.server.vscode then
   return
  end
- if N.Config.server.auto_setup then
-  N.Util.schedule_reattach_files(function()
-   local Handler=require("hc-nvim.setup.server.handler")
-   local specs=N.Config.server.list
-   for _,spec in ipairs(specs) do
-    Handler.load(spec)
-   end
-  end)
+ if HCNvim.Config.server.auto_setup then
+  local Handler=require("hc-nvim.setup.server.handler")
+  local specs=HCNvim.Config.server.list
+  for _,spec in ipairs(specs) do
+   Handler.load(spec)
+  end
+  HCNvim.Util.reload_file_buffers()
  end
- local lspMaps; lspMaps=N.Util.lazy(function()
-  local interface_lsp=N.Setup.Mapping.Interface:export("lsp")
+ local lspMaps; lspMaps=HCNvim.Util.lazy(function()
+  local interface_lsp=HCNvim.Setup.Mapping.Interface:export("lsp")
   interface_lsp:extend(require("hc-nvim.setup.server.mappings"))
   return interface_lsp
  end,function(t)

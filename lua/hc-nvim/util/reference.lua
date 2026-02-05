@@ -2,7 +2,7 @@
 --- A reference of a table is a fake table that correspond to key index
 --- And return real value of that index, but it block all newindex.
 --- ---
-local Util=require("hc-nvim.util.init_space")
+local HCNvim=require("hc-nvim.init_space")
 local Reference={}
 --- return a reference table of `main`
 --- non table value and plian table will be automaticly dereference
@@ -29,7 +29,7 @@ local Reference={}
 ---```
 local function node(ref,keys)
  -- non table value auto dereference
- local orig=Util.tbl_get(ref(),keys)
+ local orig=HCNvim.Util.tbl_get(ref(),keys)
  if type(orig)~="table" then
   return orig
  end
@@ -41,18 +41,18 @@ local function node(ref,keys)
    break
   end
  end
- local tbl=nested and {} or Util.copy(orig)
+ local tbl=nested and {} or HCNvim.Util.copy(orig)
  -- reference proxy for table
  return setmetatable(tbl,{
   __index=function(_,k)
-   local _keys=Util.deepcopy(keys)
+   local _keys=HCNvim.Util.deepcopy(keys)
    table.insert(_keys,k)
    return node(ref,_keys)
   end,
   __newindex=function()
   end,
   __call=function()
-   return Util.tbl_get(ref(),keys)
+   return HCNvim.Util.tbl_get(ref(),keys)
   end,
  })
 end

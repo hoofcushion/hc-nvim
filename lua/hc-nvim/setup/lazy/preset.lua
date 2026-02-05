@@ -1,22 +1,21 @@
-local Config=require("hc-nvim.config")
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
+local Config=HCNvim.Config
+local Util=HCNvim.Util
+--- ---
+--- load dependencies
+--- ---
 local Loader=require("lazy.core.loader")
 local Plugin=require("lazy.core.plugin")
+--- ---
+--- initialize keymap interface
+--- ---
 local Interface=require("hc-nvim.setup.mapping").Interface
-local preset_modmap; Util.lazy(function() return Util.create_modmap("hc-nvim.config.preset") end,function(t) preset_modmap=t end)
----@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
-local PluginPresets=Util.Cache.table(function(name)
- local fields=preset_modmap[name]
- if not fields then
-  return Util.empty_t
- end
- return Util.Cache.table(function(field)
-  if fields[field] then
-   return loadfile(fields[field])()
-  end
- end)
-end)
-local Hook={}
+if not Interface then
+ Interface=Util.Interface.new()
+end
+--- ---
+--- Hook module
+--- ---
 if false then
  ---@class hook
  local hook={
@@ -24,6 +23,7 @@ if false then
   [2]=nil, ---@type function
  }
 end
+local Hook={}
 local rg=Util.RelationGraph.new()
 ---@param hooks hook[]
 function Hook.add(hooks)
@@ -39,7 +39,9 @@ function Hook.check(event)
   end
  end
 end
---- hooked lazy plugin field
+--- ---
+--- hooked preset loader
+--- ---
 local PresetGetter={
  keys=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
@@ -86,11 +88,24 @@ local PresetGetter={
   end
  end,
 }
-local priority=2^10
 local Preset={}
 function Preset.apply(specs)
+ local priority=2^10
  local normname=Util.Cache.create_simple(Util.Lazy.normname)
  local getname=Util.Cache.create_simple(Util.Lazy.getname)
+ local preset_modmap; Util.lazy(function() return Util.create_modmap("hc-nvim.config.preset") end,function(t) preset_modmap=t end)
+ ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
+ local PluginPresets=Util.Cache.table(function(name)
+  local fields=preset_modmap[name]
+  if not fields then
+   return Util.empty_t
+  end
+  return Util.Cache.table(function(field)
+   if fields[field] then
+    return loadfile(fields[field])()
+   end
+  end)
+ end)
  Util.Lazy.foreach(specs,function(spec)
   -- get preset
   local name=getname(spec)

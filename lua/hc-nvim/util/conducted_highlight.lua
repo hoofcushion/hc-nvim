@@ -1,4 +1,3 @@
-local Util=require("hc-nvim.util.init_space")
 ---@class ConductedHighlight
 local Highlight={
  highlights={},

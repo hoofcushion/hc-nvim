@@ -1,6 +1,6 @@
 local Config=require("hc-nvim.config")
 return {
- spec=require("hc-nvim.setup.mapping").Interface.wkspec,
+ spec=(require("hc-nvim.setup.mapping").Interface or {}).wkspec,
  delay=0,
  win={
   border=require("hc-nvim.config.rsc").border[Config.ui.border],

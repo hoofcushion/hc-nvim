@@ -1,6 +1,6 @@
-local Util=require("hc-nvim.util")
-local LocalEnv=Util.LocalEnv.new()
-local CodeLensAu=Util.ConductedAutocmd.new()
+local HCNvim=require("hc-nvim.init_space")
+local LocalEnv=HCNvim.Util.LocalEnv.new()
+local CodeLensAu=HCNvim.Util.ConductedAutocmd.new()
 local function refesh_codelens(opts)
  if vim.lsp.get_clients({bufnr=0,method="textDocument/codeLens"}) then
   vim.lsp.codelens.refresh(opts)

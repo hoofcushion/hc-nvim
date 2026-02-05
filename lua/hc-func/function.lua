@@ -1,4 +1,4 @@
-local N=require("hc-func.init_space")
+local HCFunc=require("hc-func.init_space")
 ---@class HC-Func.Function.context
 ---@field bufnr integer
 ---@field winnr integer
@@ -34,7 +34,7 @@ function Function.activate(name,target)
   return
  end
  toggler.active=target
- local mod=N.Module[name]
+ local mod=HCFunc.Module[name]
  local ok,msg=pcall(target and mod.activate or mod.deactivate)
  if not ok and msg then
   vim.notify(msg,vim.log.levels.ERROR)
@@ -56,7 +56,7 @@ function Function.enable(name,target)
   return
  end
  toggler.enable=target
- local mod=N.Module[name]
+ local mod=HCFunc.Module[name]
  local ok,msg=pcall(target and mod.enable or mod.disable)
  if not ok and msg then
   vim.notify(msg,vim.log.levels.ERROR)
@@ -87,11 +87,11 @@ function Function.fini()
  end
 end
 function Function.setup()
- for modname in pairs(N.Module) do
+ for modname in pairs(HCFunc.Module) do
   Function.togglers[modname]={enable=false,active=false,suspend=false}
  end
- for name in pairs(N.Module) do
-  local target=N.Config.options[name].enabled
+ for name in pairs(HCFunc.Module) do
+  local target=HCFunc.Config.options[name].enabled
   Function.enable(name,target)
   Function.activate(name,target)
  end

@@ -1,8 +1,8 @@
-local Config=require("hc-func.config")
-local Options=Config.options.rainbowcursor
-local Util=require("hc-nvim.util")
-local Autocmd=Util.ConductedAutocmd.new()
-local Updater=Util.ConductedTimer.new()
+local HCNvim=require("hc-nvim.init_space")
+local Autocmd=HCNvim.Util.ConductedAutocmd.new()
+local Updater=HCNvim.Util.ConductedTimer.new()
+local HCFunc=require("hc-func.init_space")
+local Options=HCFunc.Config.options.rainbowcursor
 local Iterator={
  index=1,
  length=0,
@@ -112,7 +112,7 @@ function M.enable()
  else
   Iterator:attach(Options.colors)
  end
- local refresh_cb=Util.throttle(Options.throttle,vim.schedule_wrap(function()
+ local refresh_cb=HCNvim.Util.throttle(Options.throttle,vim.schedule_wrap(function()
   HiGroup:set(Iterator:get())
  end))
  --- ---

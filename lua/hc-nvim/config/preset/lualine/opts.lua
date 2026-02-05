@@ -1,12 +1,18 @@
 local Util=require("hc-nvim.util")
 local Config=require("hc-nvim.config")
 local I18N=require("hc-nvim.setup.i18n")
-local Presets=LuaTyped.dict(LuaTyped.string,{
- getter=function() end, ---@type function
- cond=function() end, ---@type function
-})
+if false then
+ ---@class LualinePreset
+ ---@field getter function
+ ---@field cond function?
+ local Preset={}
+ ---@class LualinePresets
+ local Presets=LuaTyped.dict(LuaTyped.string,Preset)
+end
 --- Preset definition
-Presets={
+---@type LualinePresets
+local Presets={
+ ---@type LualinePreset
  filetype={
   getter=Util.Response.from_event({
    event="OptionSet",
@@ -128,7 +134,7 @@ Presets={
  },
  marks={
   getter=function()
-   local marks=vim.fn.getmarklist("%")
+   local marks=vim.fn.getmarklist(0)
    if next(marks)~=nil then
     local list={}
     for _,v in ipairs(marks) do
@@ -198,11 +204,11 @@ return {
    {Presets.filetype.getter},
    {Presets.filesystem_type.getter},
    {Presets.buftype.getter},
-   {Presets.fileencoding.getter,  cond=Presets.fileencoding.cond}, -- 添加了 cond
+   {Presets.fileencoding.getter,  cond=Presets.fileencoding.cond},
    {Presets.fileformat.getter},
   },
   lualine_x={
-   {Presets.fold_info.getter, cond=Presets.fold_info.cond}, -- 添加了 cond
+   {Presets.fold_info.getter, cond=Presets.fold_info.cond},
    {Presets.wrap_status.getter},
   },
   lualine_y={

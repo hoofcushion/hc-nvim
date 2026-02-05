@@ -98,7 +98,6 @@ function Util.fillsuffix(str,len,suffix)
  return #str<len and str..suffix:rep(len-#str) or str
 end
 --- 对 str，从左往右查找 pattern，并返回 sep 左侧的文字
---- 如果 rev 为 true，则从右往左查找，返回右侧的字符
 ---@param str string
 ---@param pattern string
 ---@return string
@@ -110,7 +109,6 @@ function Util.cut_before(str,pattern,plain)
  return str
 end
 --- 对 str，从右往左查找 pattern，并返回 sep 右侧的文字
---- 如果 rev 为 true，则从右往左查找，返回右侧的字符
 ---@param str string
 ---@param pattern string
 ---@return string

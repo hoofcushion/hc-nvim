@@ -1,9 +1,9 @@
-local M=require("hc-filter.init_space")
+local HCFilter=require("hc-filter.init_space")
 ---@class NeovimFilter
 local NeovimFilter={}
 local function decompose_rgb(color)
  if not color then return nil end
- local rgb=M.RGBFormat.num_to_rgb(color)
+ local rgb=HCFilter.RGBFormat.num_to_rgb(color)
  return rgb[1],rgb[2],rgb[3]
 end
 
@@ -11,7 +11,7 @@ local function compose_rgb(r,g,b)
  r=math.min(math.max(0,r),255)
  g=math.min(math.max(0,g),255)
  b=math.min(math.max(0,b),255)
- return M.RGBFormat.rgb_to_num({r,g,b})
+ return HCFilter.RGBFormat.rgb_to_num({r,g,b})
 end
 
 -- 创建滤镜处理器

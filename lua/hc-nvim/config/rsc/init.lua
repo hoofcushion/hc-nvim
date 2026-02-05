@@ -49,7 +49,7 @@ local tree={
  },
  devicon=true,
 }
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
 return setmetatable(Rsc,{
- __index=Util.ModTree.create(tree,{"hc-nvim.config.rsc"}),
+ __index=HCNvim.Util.ModTree.create(tree,{"hc-nvim.config.rsc"}),
 })

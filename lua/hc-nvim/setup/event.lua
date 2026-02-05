@@ -1,17 +1,19 @@
-local N=require("hc-nvim.init_space")
+local HCNvim=require("hc-nvim.init_space")
 ---@class HC-Nvim.Event
 local Event={}
 function Event.setup()
- for modname,modpath in N.Util.iter_mod({
+ ---@class HC-Nvim.Events
+ Event.Events={}
+ for modname,modpath in HCNvim.Util.iter_mod({
   "hc-nvim.config.event",
   "hc-nvim.user.event",
  }) do
-  N.Util.try(
+  HCNvim.Util.try(
    function()
-    local events=N.Util.path_require(modname,modpath)
-    N.Util.tbl_extend(Event,events)
+    local events=HCNvim.Util.path_require(modname,modpath)
+    HCNvim.Util.tbl_extend(Event.Events,events)
    end,
-   N.Util.ERROR
+   HCNvim.Util.ERROR
   )
  end
 end

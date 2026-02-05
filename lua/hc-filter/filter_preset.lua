@@ -1,59 +1,59 @@
-local M=require("hc-filter.init_space")
+local HCFilter=require("hc-filter.init_space")
 local FilterPreset={}
 function FilterPreset.grayscale_srgb()
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.grayscale_srgb(rgb)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.grayscale_srgb(rgb)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.saturation(factor)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.saturation(rgb,factor)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.saturation(rgb,factor)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.lightness(factor)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.lightness(rgb,factor)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.lightness(rgb,factor)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.lightup(factor)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.lightup(rgb,factor)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.lightup(rgb,factor)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.lightdown(factor)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.lightdown(rgb,factor)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.lightdown(rgb,factor)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.hue(shift)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.hue(rgb,shift)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.hue(rgb,shift)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.contrast(factor)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.contrast(rgb,factor)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.contrast(rgb,factor)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 function FilterPreset.invert()
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.invert(rgb)
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.invert(rgb)
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 local function get_symbol()
@@ -71,8 +71,8 @@ end
 function FilterPreset.random(factor)
  return function(r,g,b)
   local rgb={r,g,b}
-  local ret=M.ColorFilter.map(rgb,random_factor_map(factor))
-  return unpack(M.RGBFormat.rgb_to_normalize(ret))
+  local ret=HCFilter.ColorFilter.map(rgb,random_factor_map(factor))
+  return unpack(HCFilter.RGBFormat.rgb_to_normalize(ret))
  end
 end
 -- 随机调整 rgb 和 hsl 的数值

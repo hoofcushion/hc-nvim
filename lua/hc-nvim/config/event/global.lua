@@ -1,9 +1,9 @@
-local Util=require("hc-nvim.util")
----@class HC-Nvim.Event
+local HCNvim=require("hc-nvim.init_space")
+---@class HC-Nvim.Events
 local M={}
 function M.RootPattern(pattern)
- return Util.Event.create({
-  name="RootPattern: "..table.concat(Util.totable(pattern),", "),
+ return HCNvim.Util.Event.create({
+  name="RootPattern: "..table.concat(HCNvim.Util.totable(pattern),", "),
   any={
    event={"VimEnter","BufEnter","BufAdd"},
    calm=true,
@@ -14,7 +14,7 @@ function M.RootPattern(pattern)
  })
 end
 function M.LazyLoad(name)
- return Util.Event.create({
+ return HCNvim.Util.Event.create({
   name="LazyLoad"..name,
   any={
    event="User",
@@ -25,23 +25,23 @@ function M.LazyLoad(name)
   },
  })
 end
-M.NeoConfig=Util.Event.create({
+M.NeoConfig=HCNvim.Util.Event.create({
  name="NeoConfig",
  any={
   event={"BufEnter"},
   cond=function(ev)
-   return Util.is_profile(vim.fs.normalize(ev.file))
+   return HCNvim.Util.is_profile(vim.fs.normalize(ev.file))
   end,
  },
 })
-M.AfterEnter=Util.Event.from("AfterEnter",function(exec)
+M.AfterEnter=HCNvim.Util.Event.from("AfterEnter",function(exec)
  vim.api.nvim_create_autocmd("VimEnter",{
   callback=function()
    vim.schedule(exec)
   end,
  })
 end)
-M.File=Util.Event.create({
+M.File=HCNvim.Util.Event.create({
  name="File",
  any={
   event={"BufEnter","BufNewFile","VimEnter","BufReadPost"},
@@ -50,8 +50,8 @@ M.File=Util.Event.create({
   end,
  },
 })
-M.Directory=Util.Event.create({
- name="File",
+M.Directory=HCNvim.Util.Event.create({
+ name="Directory",
  any={
   event={"BufEnter","BufNewFile","VimEnter","BufReadPost"},
   cond=function(ev)
@@ -59,12 +59,12 @@ M.Directory=Util.Event.create({
   end,
  },
 })
-M.Treesitter=Util.Event.create({
+M.Treesitter=HCNvim.Util.Event.create({
  name="Treesitter",
  any={
   event="FileType",
   cond=function(ev)
-   return Util.ts_has_parser(ev.buf)
+   return HCNvim.Util.ts_has_parser(ev.buf)
   end,
  },
 })

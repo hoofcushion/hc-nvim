@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local Util=require("hc-nvim.util.init_space")
 local M={}
 local function init_rainbow_hl(name,layer,saturation,lightness)
  local groups={}

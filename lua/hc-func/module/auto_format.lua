@@ -1,7 +1,7 @@
-local Util=require("hc-nvim.util")
-local Config=require("hc-func.config")
-local Options=Config.options.auto_format
-local AutoFormatAu=Util.ConductedAutocmd.new()
+local HCNvim=require("hc-nvim.init_space")
+local AutoFormatAu=HCNvim.Util.ConductedAutocmd.new()
+local HCFunc=require("hc-func.init_space")
+local Options=HCFunc.Config.options.auto_format
 AutoFormatAu:add({
  {"BufWritePre",{
   callback=function(event)

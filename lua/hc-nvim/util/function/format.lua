@@ -1,12 +1,11 @@
-local Config=require("hc-nvim.config")
-local Util=require("hc-nvim.util")
-local LocalEnv=Util.LocalEnv.new()
+local HCNvim=require("hc-nvim.init_space")
+local LocalEnv=HCNvim.Util.LocalEnv.new()
 local click=0
 local format=vim.lsp.buf.format
 --- @param opts? vim.lsp.buf.format.Opts
 local function format_with_choice(opts)
  click=0
- if Config.platform.is_vscode then
+ if HCNvim.Config.platform.is_vscode then
   return vim.lsp.buf.format(opts)
  end
  opts=opts or {}
@@ -36,8 +35,8 @@ local function format_with_choice(opts)
    LocalEnv.buffer.lsp_format_choice=nil
   end
  end
- Util.async(function()
-  local choice=Util.await(function(resume)
+ HCNvim.Util.async(function()
+  local choice=HCNvim.Util.await(function(resume)
    vim.ui.select(clients,{
     prompt="Select formatting client:",
     format_item=function(item)
@@ -52,7 +51,7 @@ local function format_with_choice(opts)
   format(vim.tbl_extend("force",opts,{name=choice.name}))
  end)
 end
-local format_debounced=Util.landing(175,0,vim.schedule_wrap(format_with_choice))
+local format_debounced=HCNvim.Util.landing(175,0,vim.schedule_wrap(format_with_choice))
 ---@param opts? table Format options
 ---@return nil
 local function format_double_click(opts)

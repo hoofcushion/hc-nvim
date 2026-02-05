@@ -129,7 +129,7 @@ M.server={
   {name="rust-analyzer",       main="rust_analyzer"},
   {name="taplo"},
   {name="vim-language-server", main="vimls"},
-  {name="vls"},
+  -- {name="vls"},
   {name="yaml-language-server",main="yamlls"},
   {name="zk"},
   {name="zls"},

@@ -1,30 +1,31 @@
-local N=require("hc-nvim.init_space")
+local HCNvim=require("hc-nvim.init_space")
 -- return Specs
 ---@class HC-Nvim.Lazy
 local Lazy={}
+Lazy.Specs={}
 function Lazy.setup()
  ---HACK
  require("hc-nvim.setup.lazy.handler")
  require("hc-nvim.setup.lazy.orderload")
  table.insert(package.loaders,2,table.remove(package.loaders,3))
- N.Util.track("specs")
+ HCNvim.Util.track("specs")
  local Specs={}
- for modname in N.Util.iter_mod({
+ for modname in HCNvim.Util.iter_mod({
   "hc-nvim.config.plugin",
   "hc-nvim.user.plugin",
  }) do
-  N.Util.try(function()
+  HCNvim.Util.try(function()
    local spec=require(modname)
    table.insert(Specs,spec)
-  end,N.Util.ERROR)
+  end,HCNvim.Util.ERROR)
  end
- N.Util.track()
- N.Util.try(function()
-  N.Util.track("preset")
+ HCNvim.Util.track()
+ HCNvim.Util.try(function()
+  HCNvim.Util.track("preset")
   local Presets=require("hc-nvim.setup.lazy.preset")
   Presets.apply(Specs)
-  N.Util.track()
- end,N.Util.ERROR)
+  HCNvim.Util.track()
+ end,HCNvim.Util.ERROR)
  Lazy.Specs=Specs
 end
 return Lazy
