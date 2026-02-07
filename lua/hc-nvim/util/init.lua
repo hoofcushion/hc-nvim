@@ -6,10 +6,8 @@ if vim.env.UNITTEST then
   UnitTest:test()
  end)
 end
-
 ---@class hc_nvim.util
 local Util=require("hc-nvim.util.init_space")
-
 local res={}
 local function collect(fn)
  table.insert(res,{pcall(fn)})
@@ -59,4 +57,6 @@ M.lazy(function() return require("hc-nvim.util.type") end,               functio
 M.lazy(function() return require("hc-nvim.util.wrapper") end,            function(t) Util.Wrapper=t end)
 M.lazy(function() return require("hc-nvim.util.relation_graph") end,     function(t) Util.RelationGraph=t end)
 M.lazy(function() return require("hc-nvim.util.response") end,           function(t) Util.Response=t end)
+M.lazy(function() return require("hc-nvim.util.change_status") end,      function(t) Util.ChangeStatus=t end)
+M.lazy(function() return require("hc-nvim.util.trace") end,              function(t) Util.Trace=t end)
 return Util

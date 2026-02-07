@@ -1,3 +1,4 @@
+---@class HC-Nvim.Config
 local M={}
 ---@param lang string
 local function get_locale(lang)

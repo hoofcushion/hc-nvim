@@ -155,6 +155,6 @@
 ---| "WinNew"
 ---| "WinScrolled"
 ---| "WinResized"
----@param event vim.api.keyset.events|vim.api.keyset.events[]
+---@param event vim.api.keyset.events|(vim.api.keyset.events[])
 ---@param opts vim.api.keyset.create_autocmd
 function vim.api.nvim_create_autocmd(event,opts) end

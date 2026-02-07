@@ -61,7 +61,7 @@ return {
    end
    table.sort(choices)
    return function()
-    local vmode={v=true,V=true,[""]=true}
+    local vmode={v=true,V=true,["\22"]=true}
     local mode=vim.fn.mode()
     local is_visual=vmode[mode]
     if is_visual then

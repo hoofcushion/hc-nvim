@@ -222,7 +222,7 @@ function RangeMark:yank()
   regcontents=vim.api.nvim_buf_get_text(self.bufnr,s[1],s[2],e[1],e[2],Util.empty_t)
  elseif vmode=="V" then
   regcontents=vim.api.nvim_buf_get_lines(self.bufnr,s[1],e[1]+1,false)
- elseif vmode=="" then
+ elseif vmode=="\22" then
   regcontents={}
   for lnum=s[1],e[1] do
    local line=vim.fn.getline(lnum+1)
@@ -253,7 +253,7 @@ function RangeMark:put(reg)
   vim.api.nvim_buf_set_text(self.bufnr,s[1],s[2],e[1],e[2],regcontents)
  elseif vmode=="V" then
   vim.api.nvim_buf_set_lines(self.bufnr,s[1],e[1]+1,false,regcontents)
- elseif vmode=="" then
+ elseif vmode=="\22" then
   local reg_i=1
   for lnum=s[1],e[1] do
    local line=vim.fn.getline(lnum+1)
@@ -293,7 +293,7 @@ function RangeMark:swap(rhs)
  and vhit2~=vhit1
  --- Block horizontal movement
  --- Blockwise in same line, same height, and different width
- or vmode==""
+ or vmode=="\22"
  and rhs.start[1]==lhs.start[1]
  and vhit2==vhit1
  and vlen2~=vlen1
@@ -308,7 +308,7 @@ function RangeMark:highlight(hl_group,hl_opts,ns)
  vim.api.nvim_set_hl_ns(ns)
  local s=self:get_pos("start",0,0)
  local e=self:get_pos("finish",0,0)
- if self.vmode=="" then
+ if self.vmode=="\22" then
   local start_col,end_col=s[2],e[2]
   for linenr=s[1],e[1] do
    local line=vim.api.nvim_buf_get_lines(self.bufnr,linenr,linenr+1,true)[1]

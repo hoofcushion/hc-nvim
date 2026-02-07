@@ -6,7 +6,7 @@ Config.default={
  cursorword={
   enabled=true,
   pattern=(function()
-   local vmode={v=true,V=true,[""]=true}
+   local vmode={v=true,V=true,["\22"]=true}
    local fn=vim.fn
    return function()
     local text

@@ -4,7 +4,7 @@ local Util=require("hc-nvim.util.init_space")
 local is_visualmode={
  v=true,
  V=true,
- [""]=true,
+ ["\22"]=true,
 }
 ---@return visualmode
 function Util.get_vmode()
@@ -50,7 +50,7 @@ local function get_file_buffers()
  local all_buffers=vim.api.nvim_list_bufs()
  for _,buffer in ipairs(all_buffers) do
   local bufname=vim.api.nvim_buf_get_name(buffer)
-  if bufname~="" then
+  if bufname~="" and vim.fn.filereadable(bufname) then
    table.insert(buffers,buffer)
   end
  end

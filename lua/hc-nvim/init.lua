@@ -18,8 +18,10 @@ function HCNvim.lazy(init,set)
 end
 HCNvim.lazy(function() return require("hc-nvim.config") end,function(t) HCNvim.Config=t end)
 HCNvim.lazy(function() return require("hc-nvim.util") end,  function(t) HCNvim.Util=t end)
+
 HCNvim.lazy(function() return require("hc-nvim.setup") end, function(t) HCNvim.Setup=t end)
 function HCNvim.setup()
+ HCNvim.setup=function() end
  HCNvim.Setup.setup()
 end
 return HCNvim

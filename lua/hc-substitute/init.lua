@@ -1,14 +1,14 @@
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
 --- ---
 --- Main
 --- ---
 ---@class HC-Substitute
-local M=require("hc-substitute.init_space")
+local HCSubstitute=require("hc-substitute.init_space")
 ---@generic T
 ---@param init fun():T
 ---@param set? fun(t:T)
 ---@return T
-function M.lazy(init,set)
+function HCSubstitute.lazy(init,set)
  set=set or function() end
  local l=setmetatable({},{
   __index=function(_,k)
@@ -20,14 +20,14 @@ function M.lazy(init,set)
  set(l)
  return l
 end
-M.lazy(function() return require("hc-substitute.config") end,function(t) M.Config=t end)
-M.lazy(function() return require("hc-substitute.util") end,function(t) M.Util=t end)
-M.lazy(function() return require("hc-substitute.opfunc") end,function(t) M.OpFunc=t end)
-M.lazy(function() return require("hc-substitute.commands") end,function(t) M.Command=t end)
+HCSubstitute.lazy(function() return require("hc-substitute.config") end,  function(t) HCSubstitute.Config=t end)
+HCSubstitute.lazy(function() return require("hc-substitute.util") end,    function(t) HCSubstitute.Util=t end)
+HCSubstitute.lazy(function() return require("hc-substitute.opfunc") end,  function(t) HCSubstitute.OpFunc=t end)
+HCSubstitute.lazy(function() return require("hc-substitute.commands") end,function(t) HCSubstitute.Command=t end)
 local opfunc_vmode_map={
  char="v",
  line="V",
- block="",
+ block="\22",
 }
 ---@param marks RangeMark[]
 ---@param delay integer
@@ -57,9 +57,9 @@ end
 blink=vim.schedule_wrap(blink)
 ---@param mark RangeMark
 ---@param opts Substitute.config.paste?
-function M.paste(mark,opts)
- opts=M.Config.get(M.Config.current.paste,opts)
- local reg=Util.Register.current
+function HCSubstitute.paste(mark,opts)
+ opts=HCSubstitute.Config.get(HCSubstitute.Config.current.paste,opts)
+ local reg=HCNvim.Util.Register.current
  mark:put(reg)
  if opts.highlight.enabled then
   blink(
@@ -74,41 +74,41 @@ function M.paste(mark,opts)
  end
 end
 ---@param opts Substitute.config.paste?
-function M.paste_opfunc(vmode,opts)
- local mark=Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode])
- M.paste(mark,opts)
+function HCSubstitute.paste_opfunc(vmode,opts)
+ local mark=HCNvim.Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode])
+ HCSubstitute.paste(mark,opts)
 end
 ---@param opts Substitute.config.paste?
-function M.paste_op(opts)
- M.OpFunc.start(M.paste_opfunc,nil,opts)
+function HCSubstitute.paste_op(opts)
+ HCSubstitute.OpFunc.start(HCSubstitute.paste_opfunc,nil,opts)
 end
 ---@param opts Substitute.config.paste?
-function M.paste_eol(opts)
- M.OpFunc.start(M.paste_opfunc,"$",opts)
+function HCSubstitute.paste_eol(opts)
+ HCSubstitute.OpFunc.start(HCSubstitute.paste_opfunc,"$",opts)
 end
 ---@param opts Substitute.config.paste?
-function M.paste_line(opts)
- M.paste(
-  Util.RangeMark:get_line(nil,vim.v.count),
+function HCSubstitute.paste_line(opts)
+ HCSubstitute.paste(
+  HCNvim.Util.RangeMark:get_line(nil,vim.v.count),
   opts
  )
 end
 ---@param opts Substitute.config.paste?
-function M.paste_visual(opts)
- M.paste(Util.RangeMark:get_selection(),opts)
- M.Util.feedkeys("<esc>","nx")
+function HCSubstitute.paste_visual(opts)
+ HCSubstitute.paste(HCNvim.Util.RangeMark:get_selection(),opts)
+ HCSubstitute.Util.feedkeys("<esc>","nx")
 end
 local exchange_ns=vim.api.nvim_create_namespace("hc-substitute-exchange")
 ---@type RangeMark?
 local mark_start=nil
 ---@param mark RangeMark
 ---@param opts Substitute.config.exchange?
-function M.exchange(mark,opts)
+function HCSubstitute.exchange(mark,opts)
  if mark==nil then
-  M.exchange_cancel()
+  HCSubstitute.exchange_cancel()
   return false
  end
- opts=M.Config.get(M.Config.current.exchange,opts)
+ opts=HCSubstitute.Config.get(HCSubstitute.Config.current.exchange,opts)
  if mark_start==nil then
   mark_start=mark
   if opts.highlight.enabled then
@@ -141,65 +141,65 @@ function M.exchange(mark,opts)
  else
   end_mark:set_cursor(opts.end_pos)
  end
- M.exchange_cancel()
+ HCSubstitute.exchange_cancel()
  return true
 end
-function M.exchange_cancel()
+function HCSubstitute.exchange_cancel()
  mark_start=nil
  vim.api.nvim_buf_clear_namespace(0,exchange_ns,0,-1)
 end
 ---@param vmode visualmode
 ---@param opts Substitute.config.exchange?
-function M.exchange_opfunc(vmode,opts)
- M.exchange(Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode]),opts)
+function HCSubstitute.exchange_opfunc(vmode,opts)
+ HCSubstitute.exchange(HCNvim.Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode]),opts)
 end
 ---@param opts Substitute.config.exchange?
-function M.exchange_op(opts)
- M.OpFunc.start(M.exchange_opfunc,nil,opts)
+function HCSubstitute.exchange_op(opts)
+ HCSubstitute.OpFunc.start(HCSubstitute.exchange_opfunc,nil,opts)
 end
 ---@param opts Substitute.config.exchange?
-function M.exchange_eol(opts)
- M.OpFunc.start(M.exchange_opfunc,"$",opts)
+function HCSubstitute.exchange_eol(opts)
+ HCSubstitute.OpFunc.start(HCSubstitute.exchange_opfunc,"$",opts)
 end
 ---@param opts Substitute.config.exchange?
-function M.exchange_line(opts)
- M.exchange(
-  Util.RangeMark:get_line(nil,vim.v.count),
+function HCSubstitute.exchange_line(opts)
+ HCSubstitute.exchange(
+  HCNvim.Util.RangeMark:get_line(nil,vim.v.count),
   opts
  )
 end
 ---@param opts Substitute.config.exchange?
-function M.exchange_visual(opts)
- local ok=M.exchange(Util.RangeMark:get_selection(),opts)
+function HCSubstitute.exchange_visual(opts)
+ local ok=HCSubstitute.exchange(HCNvim.Util.RangeMark:get_selection(),opts)
  if ok then
-  M.Util.feedkeys("<esc>","nx")
+  HCSubstitute.Util.feedkeys("<esc>","nx")
  end
 end
 ---@param mark RangeMark
-function M.substitute(mark)
+function HCSubstitute.substitute(mark)
  local pattern=table.concat(mark:yank().regcontents,"\\n")
  pattern="\\V"..vim.fn.escape(pattern,"/\\")
  local cmd=string.format(":s/%s/",pattern)
- M.Util.feedkeys(cmd,"n")
+ HCSubstitute.Util.feedkeys(cmd,"n")
 end
 ---@param vmode visualmode
-function M.substitute_opfunc(vmode)
- M.substitute(Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode]))
+function HCSubstitute.substitute_opfunc(vmode)
+ HCSubstitute.substitute(HCNvim.Util.RangeMark:get_mark("[","]",opfunc_vmode_map[vmode]))
 end
-function M.substitute_op()
- M.OpFunc.start(M.substitute_opfunc)
+function HCSubstitute.substitute_op()
+ HCSubstitute.OpFunc.start(HCSubstitute.substitute_opfunc)
 end
-function M.substitute_visual()
- M.substitute(Util.RangeMark:get_selection())
+function HCSubstitute.substitute_visual()
+ HCSubstitute.substitute(HCNvim.Util.RangeMark:get_selection())
 end
 --- setup is optional since default options works perfectly
 ---@param opts Substitute.config
-function M.setup(opts)
- M.Config.setup(opts)
- M.Command.setup()
+function HCSubstitute.setup(opts)
+ HCSubstitute.Config.setup(opts)
+ HCSubstitute.Command.setup()
 end
-function M.fini()
- M.Config.fini()
- M.Command.fini()
+function HCSubstitute.fini()
+ HCSubstitute.Config.fini()
+ HCSubstitute.Command.fini()
 end
-return M
+return HCSubstitute

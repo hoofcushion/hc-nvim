@@ -14,3 +14,16 @@ vim.diagnostic.config({
  },
  severity_sort=true,
 })
+local function clear()
+ vim.cmd([[
+ hi! clear DiagnosticUnnecessary
+ hi! link DiagnosticUnnecessary NONE
+ ]])
+end
+if vim.v.vim_did_enter then
+ clear()
+end
+vim.api.nvim_create_autocmd({"VimEnter","ColorScheme"},{
+ group=vim.api.nvim_create_augroup("Disable DiagnosticUnnecessary Highlight",{clear=true}),
+ callback=clear,
+})

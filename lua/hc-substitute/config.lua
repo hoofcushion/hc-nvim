@@ -1,5 +1,5 @@
-local Util=require("hc-nvim.util")
-local Type=Util.Type
+local HCNvim=require("hc-nvim.init_space")
+local Type=HCNvim.Util.Type
 ---@class Substitute.config_manager
 local Config={}
 ---@class Substitute.config
@@ -22,11 +22,11 @@ Config.default={
   end_pos="cursor_e",
   ---@type "start"|"finish"|"cursor_s"|"cursor_e"
   end_mark="finish",
-  ---@type table<"v"|"V"|"",boolean>
+  ---@type table<"v"|"V"|"\22",boolean>
   end_select={
    v=false,
    V=false,
-   [""]=false,
+   ["\22"]=false,
   },
   highlight={
    enabled=true,
@@ -53,7 +53,7 @@ local valitab={
   end_select={
    v="boolean",
    V="boolean",
-   [""]="boolean",
+   ["\22"]="boolean",
   },
   highlight={
    enabled="boolean",
@@ -67,17 +67,17 @@ if UnitTest then
  UnitTest:add_case({name="hc-substitute",expect=true,test=function() return Type.check_type(valitab,"config",Config.default) end})
 end
 Config.current=Config.default
-Config.options=Util.Reference.get(function() return Config.current end)
+Config.options=HCNvim.Util.Reference.get(function() return Config.current end)
 function Config.fini()
  Config.current=Config.default
 end
 function Config.setup(opts)
  local new_options=vim.tbl_deep_extend("force",Config.current,opts)
- Util.try(
+ HCNvim.Util.try(
   function()
    assert(Type.check_type(valitab,"<hc-substitute.config>.options",new_options))
   end,
-  Util.ERROR
+  HCNvim.Util.ERROR
  )
  Config.current=new_options
 end

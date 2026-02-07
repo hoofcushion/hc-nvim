@@ -238,4 +238,4 @@ end
 -- local leak_test=assert(vim.uv.new_timer())
 -- leak_test:start(1000,0,function() end)
 -- collectgarbage("collect")
-return  TimerTrack
+return TimerTrack

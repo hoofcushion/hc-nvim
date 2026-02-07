@@ -1,4 +1,4 @@
-local M=require("hc-substitute.init_space")
+local HCSubstitute=require("hc-substitute.init_space")
 --- ---
 --- OpFunc imp.
 --- ---
@@ -16,6 +16,6 @@ end
 --- Set opfunc then start operator mode with a initial motion
 function OpFunc.start(opfunc,motion,...)
  OpFunc.set(opfunc,{...})
- M.Util.feedkeys("g@"..(motion or ""),"n")
+ HCSubstitute.Util.feedkeys("g@"..(motion or ""),"n")
 end
 return OpFunc

@@ -104,10 +104,11 @@ return Util.parse_override({
   {name=NS.lsp_signatureHelp,          lhs={"gK","<leader>lj"}},
   {name=NS.lsp_typeDefinition,         lhs="gL"},
   {name=NS.lsp_workspace_add_folder,   lhs="<leader>la"},
+  {name=NS.lsp_workspace_diagnostic,   lhs="<leader>lD"},
+  {name=NS.lsp_workspace_formatting,   lhs="<leader>lF"},
   {name=NS.lsp_workspace_list_folders, lhs="<leader>ll"},
   {name=NS.lsp_workspace_remove_folder,lhs="<leader>lr"},
   {name=NS.lsp_workspace_symbols,      lhs="<leader>lS"},
-  {name=NS.lsp_workspace_diagnostic,   lhs="<leader>lD"},
   {name=NS.lsp_inlay_hints_toggle,     lhs="<leader>ols"},
  },
  {

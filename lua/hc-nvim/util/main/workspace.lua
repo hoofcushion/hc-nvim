@@ -15,20 +15,25 @@ function Util.get_opened_files()
  end
  return opened
 end
-function Util.get_ws_files()
- local workspace_folders=Util.get_ws_folders()
+function Util.get_ws_files(base_dir)
+ local workspace_folders
+ if base_dir then
+  workspace_folders={base_dir}
+ else
+  workspace_folders=Util.get_ws_folders()
+ end
  local opened=Util.get_opened_files()
  local seen={}
  local files={}
  for _,folder in ipairs(workspace_folders) do
-  Util.scan(folder,function(_,type,path)
-   if type=="file" and not opened[path] then
-    if not seen[path] then
-     seen[path]=true
-     table.insert(files,path)
-    end
+  -- 使用 list_files 获取所有文件，然后过滤
+  local all_files=Util.list_files(folder)
+  for _,file in ipairs(all_files) do
+   if not opened[file] and not seen[file] then
+    seen[file]=true
+    table.insert(files,file)
    end
-  end)
+  end
  end
  return files
 end
@@ -49,8 +54,13 @@ function Util.get_git_files(git_root)
  end
  return {}
 end
-function Util.get_ws_git_files()
- local workspace_folders=Util.get_ws_folders()
+function Util.get_ws_git_files(base_dir)
+ local workspace_folders
+ if base_dir then
+  workspace_folders={base_dir}
+ else
+  workspace_folders=Util.get_ws_folders()
+ end
  local seen={}
  local files={}
  for _,folder in ipairs(workspace_folders) do

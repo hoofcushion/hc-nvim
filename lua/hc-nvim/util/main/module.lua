@@ -65,6 +65,28 @@ function Util.scan(path,fn)
   end
  end
 end
+local function list_files(res,path)
+ for name,type in vim.fs.dir(path) do
+  if name~="." and name~=".." then
+   local full_path=path.."/"..name
+   if type~="directory" then
+    table.insert(res,full_path)
+   end
+   list_files(res,full_path)
+  end
+ end
+end
+
+---@param path string
+---@return string[] 文件路径列表
+function Util.list_files(path)
+ local result={}
+ local stat=vim.uv.fs_stat(path)
+ if stat and stat.type=="directory" then
+  list_files(result,path)
+ end
+ return result
+end
 ---@param full_path string
 ---@param base_path string
 ---@return string[]

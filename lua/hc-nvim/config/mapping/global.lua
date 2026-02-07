@@ -210,7 +210,7 @@ return {
      hold,
      HCNvim.Util.Keymod.Base.concat(hold,inblank),
      function()
-      return vim.fn.mode()~=""
+      return vim.fn.mode()~="\22"
      end
     )
    end)(),
@@ -232,7 +232,7 @@ return {
      hold,
      HCNvim.Util.Keymod.Base.concat(hold,inblank),
      function()
-      return vim.fn.mode()~=""
+      return vim.fn.mode()~="\22"
      end
     )
    end)(),

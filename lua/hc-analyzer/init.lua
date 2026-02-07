@@ -1,4 +1,4 @@
-local Util=require("hc-nvim.util")
+local HCNvim=require("hc-nvim.init_space")
 ---@class ResourceRecord
 ---@field autocmds integer
 ---@field commands integer
@@ -26,9 +26,9 @@ function M.setup(opts)
   }
   pcall(function()
    stats.autocmds=#vim.api.nvim_get_autocmds({})
-   stats.commands=Util.count(vim.api.nvim_get_commands({}))
+   stats.commands=HCNvim.Util.count(vim.api.nvim_get_commands({}))
    stats.keymaps=#vim.api.nvim_get_keymap("n") -- 修正模式参数
-   stats.namespaces=Util.count(vim.api.nvim_get_namespaces())
+   stats.namespaces=HCNvim.Util.count(vim.api.nvim_get_namespaces())
   end)
   return stats
  end
@@ -47,8 +47,8 @@ function M.setup(opts)
    table.remove(records,1)
   end
  end))
- for modname,modpath in Util.iter_mod({"hc-analyzer.field"}) do
-  Util.path_require(modname,modpath)
+ for modname,modpath in HCNvim.Util.iter_mod({"hc-analyzer.field"}) do
+  HCNvim.Util.path_require(modname,modpath)
  end
 end
 --- 获取统计数据

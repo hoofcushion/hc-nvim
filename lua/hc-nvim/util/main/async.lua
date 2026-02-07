@@ -17,8 +17,13 @@ end
 --- 执行一个异步块
 ---@param block function
 ---@return nil
-function Util.async(block)
- local co=coroutine.create(block)
+function Util.async(block,handler)
+ local co=coroutine.create(function()
+  local ok,err=pcall(block)
+  if handler then
+   handler(ok,err)
+  end
+ end)
  async_infos[co]=true
  assert2(2,coroutine.resume(co))
 end
@@ -174,4 +179,93 @@ function Util.await_schedule(fn,delay)
  return Util.await(function(resume)
   Util.schedule(function() resume(fn) end,delay)
  end)
+end
+---@param job job 异步任务
+---@param delay integer 延迟时间
+---@return job 包装后的任务
+function Util.async_scheduled(job,delay)
+ return function(resume)
+  -- 创建一个包装的 resume 函数
+  local function wrapped_resume(...)
+   local args={...}
+   local n=select("#",...)
+   -- 延迟执行实际的 resume
+   Util.schedule(function()
+    resume(unpack(args,1,n))
+   end,delay)
+  end
+
+  -- 执行原任务，但使用包装后的 resume
+  local ok,err=pcall(job,wrapped_resume)
+  if not ok then
+   -- 错误处理也延迟
+   Util.schedule(function()
+    resume(false,"job error: "..tostring(err))
+   end,delay)
+  end
+ end
+end
+--- 创建带超时的任务包装器
+--- 包装后的任务将额外返回一个指示值
+---@param job job 异步任务
+---@param timeout integer 超时时间（毫秒）
+---@return job 包装后的任务
+function Util.async_timeout(job,timeout)
+ return function(resume)
+  local completed=false
+  local timer=assert(vim.uv.new_timer())
+  -- 设置超时
+  timer:start(timeout,0,function()
+   timer:close()
+   Util.schedule(function()
+    if not completed then
+     completed=true
+     resume(false,"timeout after "..timeout.."ms")
+    end
+   end)
+  end)
+  -- 包装的 resume 函数
+  local function wrapped_resume(...)
+   if not completed then
+    completed=true
+    timer:close()
+    resume(true,...)
+   end
+  end
+
+  -- 执行原任务
+  local ok,err=pcall(job,wrapped_resume)
+  if not ok and not completed then
+   completed=true
+   timer:close()
+   resume(false,"job error: "..tostring(err))
+  end
+ end
+end
+--- 等待所有异步任务完成
+---@async
+---@param jobs job[] 异步任务数组
+---@return job 合并的任务
+function Util.async_job_all(jobs)
+ local co=coroutine.running()
+ assert2(2,async_infos[co],"Not in a async block")
+ local completed=0
+ local total=#jobs
+ if total==completed then
+  return function(resume) resume() end
+ end
+ local results={}
+ return function(resume)
+  for index,job in ipairs(jobs) do
+   local function task_resume(...)
+    results[index]={...}
+    completed=completed+1
+    if completed>=total then
+     resume(results)
+    end
+   end
+   -- 启动任务
+   assert2(2,pcall(job,task_resume))
+  end
+ end
 end

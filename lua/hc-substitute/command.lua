@@ -1,21 +1,21 @@
-local Util=require("hc-nvim.util")
-local M=require("hc-substitute.init_space")
+local HCNvim=require("hc-nvim.init_space")
+local HCSubstitute=require("hc-substitute.init_space")
 local commands={
  {"HCPaste",
   function(cmd)
    if cmd.args~="" then
-    M.Opfunc.start(M.paste_opfunc,cmd.args)
+    HCSubstitute.OpFunc.start(HCSubstitute.paste_opfunc,cmd.args)
    elseif cmd.range~=0 then
-    M.paste(Util.RangeMark:get_line(cmd.line1-1,cmd.line2-cmd.line1))
+    HCSubstitute.paste(HCNvim.Util.RangeMark:get_line(cmd.line1-1,cmd.line2-cmd.line1))
    end
   end,
   {nargs="?",range=true}},
  {"HCExchange",
   function(cmd)
    if cmd.args~="" then
-    M.Opfunc.start(M.exchange_opfunc,cmd.args)
+    HCSubstitute.OpFunc.start(HCSubstitute.exchange_opfunc,cmd.args)
    elseif cmd.range~=0 then
-    M.exchange(Util.RangeMark:get_line(cmd.line1-1,cmd.line2-cmd.line1))
+    HCSubstitute.exchange(HCNvim.Util.RangeMark:get_line(cmd.line1-1,cmd.line2-cmd.line1))
    end
   end,
   {nargs="?",range=true}},
