@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 --- Iterate the value itself, and stop.
 local function self_iter(any,done)

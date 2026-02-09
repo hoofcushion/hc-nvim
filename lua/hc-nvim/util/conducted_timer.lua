@@ -6,9 +6,10 @@ local ConductedTimer={
  timers={},
  params={},
 }
+ConductedTimer.__index=ConductedTimer
 -- get a conducted timer
 function ConductedTimer:get()
- local timer=vim.uv.new_timer() or error()
+ local timer=assert(vim.uv.new_timer())
  table.insert(self.timers,timer)
  return timer
 end
@@ -39,7 +40,7 @@ function ConductedTimer:fini()
  self.params={}
 end
 function ConductedTimer.new()
- local obj=setmetatable({},{__index=ConductedTimer})
+ local obj=setmetatable({},ConductedTimer)
  obj:fini()
  return obj
 end

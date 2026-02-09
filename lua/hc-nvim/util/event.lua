@@ -8,7 +8,7 @@
 
 if false then
  ---@class EventSignature
- local _EventDefinition={
+ local _EventSignature={
   event="FileType", ---@type vim.api.keyset.events|vim.api.keyset.events[]
   pattern="lua", ---@type string|string[]|nil
  }
@@ -97,7 +97,7 @@ function Event.normalize_step_config(step_config)
  end
  -- Create augroup if group name is provided
  if type(step_config.group)=="string" and step_config.group~="" then
-  step_config.group=vim.api.nvim_create_augroup(step_config.group,{clear=true})
+  step_config.group=vim.api.nvim_create_augroup(step_config.group--[[@as string]],{clear=true})
  end
  -- Normalize event lists
  if step_config.all then
@@ -120,7 +120,7 @@ function Event.normalize_sequence_config(sequence_config)
  end
  -- Create augroup if group name is provided
  if type(sequence_config.group)=="string" and sequence_config.group~="" then
-  sequence_config.group=vim.api.nvim_create_augroup(sequence_config.group,{clear=true})
+  sequence_config.group=vim.api.nvim_create_augroup(sequence_config.group--[[@as string]],{clear=true})
  end
  -- Normalize all steps
  for i,step in ipairs(sequence_config.steps) do

@@ -46,4 +46,20 @@ function Lazy.foreach(spec,fn)
  end
  return spec
 end
+local function _list_spec(res,spec)
+ if type(spec)=="string" then
+  table.insert(res,{spec})
+ elseif (#spec>1 or type(spec[1])=="table") and Util.is_list(spec) then
+  for _,v in ipairs(spec) do
+   _list_spec(res,v)
+  end
+ else
+  table.insert(res,spec)
+ end
+end
+function Lazy.list_spec(spec)
+ local res={}
+ _list_spec(res,spec)
+ return res
+end
 return Lazy

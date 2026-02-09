@@ -77,7 +77,7 @@ function Config.setup(opts)
   function()
    assert(Type.check_type(valitab,"<hc-substitute.config>.options",new_options))
   end,
-  HCNvim.Util.ERROR
+  HCNvim.Util.notify.ERROR
  )
  Config.current=new_options
 end

@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 ---@param ... string
 ---@return string
@@ -130,4 +130,25 @@ function Util.split(str,parttern,plain)
   pos=e+1
  end
  return parts
+end
+local function _gsplit(status)
+ local str,pattern,plain,pos=status[1],status[2],status[3],status[4]
+ local len=#str
+ if pos>len then
+  return
+ end
+ local s,e=string.find(str,pattern,pos,plain)
+ if s==nil then
+  status[4]=math.huge
+  return str:sub(pos),true
+ end
+ if e<s then e=s end
+ status[4]=e+1
+ return str:sub(pos,s-1),false
+end
+--- for part,is_end in gsplit(...) do
+---@return fun(...):string,boolean?
+---@return unknown
+function Util.gsplit(str,pattern,plain)
+ return _gsplit,{str,pattern,plain,1}
 end

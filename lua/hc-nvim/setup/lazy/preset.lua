@@ -93,7 +93,9 @@ function Preset.apply(specs)
  local priority=2^10
  local normname=Util.Cache.create_simple(Util.Lazy.normname)
  local getname=Util.Cache.create_simple(Util.Lazy.getname)
- local preset_modmap; Util.lazy(function() return Util.create_modmap("hc-nvim.config.preset") end,function(t) preset_modmap=t end)
+ local preset_modmap; Util.lazy(function()
+  return Util.create_modmap("hc-nvim.config.preset")
+ end,function(t) preset_modmap=t end)
  ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
  local PluginPresets=Util.Cache.table(function(name)
   local fields=preset_modmap[name]
@@ -106,9 +108,16 @@ function Preset.apply(specs)
    end
   end)
  end)
- Util.Lazy.foreach(specs,function(spec)
+ local plain_spec_list=Util.Lazy.list_spec(specs)
+ for index,spec in ipairs(plain_spec_list) do
+  if spec.import~=nil then
+   goto continue
+  end
   -- get preset
   local name=getname(spec)
+  if name==nil then
+   goto continue
+  end
   local modname=normname(name)
   local preset=PluginPresets[modname]
   local base=preset.base
@@ -119,7 +128,6 @@ function Preset.apply(specs)
   end
   if Config.platform.vscode and spec.vscode==false then
    spec.enabled=false
-   return
   end
   -- set hooked getter
   for field,getter in pairs(PresetGetter) do
@@ -147,6 +155,12 @@ function Preset.apply(specs)
   --  if spec.auto==true then
   --   spec.lazy=vim.fn.argc()==0
   --  end
- end)
+  if spec.lazy==nil then
+   spec.lazy=true
+  end
+  plain_spec_list[index]=spec
+  ::continue::
+ end
+ return plain_spec_list
 end
 return Preset

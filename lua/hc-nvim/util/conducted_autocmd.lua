@@ -8,6 +8,7 @@ local Autocmd={
  ids={}, ---@type table<integer,boolean>
  params={}, ---@type Autocmd.param[]
 }
+Autocmd.__index=Autocmd
 ---@private
 function Autocmd:cb_decor(callback)
  return function(event)
@@ -86,21 +87,23 @@ function Autocmd:add(params)
 end
 function Autocmd:enable()
  for _,p in ipairs(self.params) do
-  local id=vim.api.nvim_create_autocmd(p[1],p[2])
-  self.ids[id]=true
+  local ok,id=pcall(function() return vim.api.nvim_create_autocmd(p[1],p[2]) end)
+  if ok and type(id)=="integer" then
+   self.ids[id]=true
+  end
  end
  return self
 end
 function Autocmd:disable()
  for id in pairs(self.ids) do
-  vim.api.nvim_del_autocmd(id)
+  pcall(function() vim.api.nvim_del_autocmd(id) end)
  end
  self.ids={}
  return self
 end
 function Autocmd:fini()
  for id in pairs(self.ids) do
-  vim.api.nvim_del_autocmd(id)
+  pcall(function() vim.api.nvim_del_autocmd(id) end)
  end
  self.active=false
  self.attached_bufs={}
@@ -110,7 +113,7 @@ function Autocmd:fini()
  return self
 end
 function Autocmd.new()
- local obj=setmetatable({},{__index=Autocmd})
+ local obj=setmetatable({},Autocmd)
  obj.active=false
  obj.attached_bufs={}
  obj.buffer=false

@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 ---@generic T:table
 ---@param tbl T
@@ -300,4 +300,19 @@ function Util.is_list(tbl)
   end
  end
  return true
+end
+local IS_NIL=setmetatable({},{__tostring="Nil"})
+local IS_NAN=setmetatable({},{__tostring="NaN"})
+function Util.pindex(t,k)
+ if k==nil then
+  k=IS_NIL
+ elseif k~=k then
+  k=IS_NAN
+ end
+ local ret=t[k]
+ if ret==nil then
+  ret={}
+  t[k]=ret
+ end
+ return ret
 end

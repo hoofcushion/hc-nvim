@@ -158,26 +158,28 @@ function BufferCache.print_stats()
  -- 准备表格数据
  local table_data={}
  -- 添加表头
- local headers={"Filename","Cache(ms)","Source(ms)","Saved(ms)","Cached"}
+ local headers={"Filename","Cache(ms)","Source(ms)","Saved(ms)"}
  -- 添加数据行
- for _,record in ipairs(records) do
-  if record.name~="_" then
-   table.insert(table_data,{
-    vim.fn.fnamemodify(record.name,":t"),
-    string.format("%.3f",record.cache*1000),
-    string.format("%.3f",record.source*1000),
-    string.format("%.3f",(record.source-record.cache)*1000),
-   })
-  end
+ local function prefix_repl(str,prefix,repl)
+  return str:sub(1,#prefix)==prefix and (repl or "") ..str:sub(#prefix+1) or str
  end
+ for _,record in ipairs(records) do
+  table.insert(table_data,{
+   prefix_repl(record.name,vim.fn.expand("$HOME"),"~"),
+   string.format("%.3f",record.cache*1000),
+   string.format("%.3f",record.source*1000),
+   string.format("%.3f",(record.source-record.cache)*1000),
+  })
+ end
+ table.sort(table_data,function(a,b)
+  return a[1]<b[1]
+ end)
  -- 添加总计行
  local total_cache=0
  local total_source=0
  for _,record in ipairs(records) do
-  if record.name~="_" then
-   total_cache=total_cache+record.cache
-   total_source=total_source+record.source
-  end
+  total_cache=total_cache+record.cache
+  total_source=total_source+record.source
  end
  local total_saved=total_source-total_cache
  table.insert(table_data,{
@@ -196,7 +198,7 @@ function BufferCache.print_stats()
  })
  Util.Sheet.print(table_data,{
   headers=headers,
-  alignments={"left","right","right","right","center"},
+  alignments={"left","center","center","center"},
   style="single",
  })
 end

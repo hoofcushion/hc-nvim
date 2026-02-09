@@ -1,2 +1,2 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 return {}

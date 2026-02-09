@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 ---@param stack integer?
 function Util.get_source(stack)
@@ -67,16 +67,14 @@ function Util.scan(path,fn)
 end
 local function list_files(res,path)
  for name,type in vim.fs.dir(path) do
-  if name~="." and name~=".." then
-   local full_path=path.."/"..name
-   if type~="directory" then
-    table.insert(res,full_path)
-   end
+  local full_path=path.."/"..name
+  if type=="directory" then
    list_files(res,full_path)
+  else
+   table.insert(res,full_path)
   end
  end
 end
-
 ---@param path string
 ---@return string[] 文件路径列表
 function Util.list_files(path)
@@ -87,13 +85,20 @@ function Util.list_files(path)
  end
  return result
 end
----@param full_path string
----@param base_path string
----@return string[]
-local function get_relative_parts(full_path,base_path)
- local relative_path=full_path:sub(#base_path+2)
- local parts=Util.split(relative_path,"/")
- return parts
+local function build_path(modmap,modpath,full_path)
+ local relative_path=full_path:sub(#modpath+2)
+ local current_table=modmap
+ local list=Util.split(relative_path,"/")
+ local len=#list
+ for i,part in ipairs(list) do
+  local clean_name=Util.trimsuffix(part,".lua")
+  if i==len then
+   current_table[clean_name]=full_path
+  else
+   current_table[part]=current_table[part] or {}
+   current_table=current_table[part]
+  end
+ end
 end
 -- print(table.concat(Util.split(relative_path,"/"),"/"))
 ---@param modname string
@@ -101,23 +106,13 @@ end
 function Util.create_modmap(modname)
  local found=vim.loader.find(modname,{patterns={""}})[1]
  local modpath=found and found.modpath or nil
- if not modpath then
+ if modpath==nil then
   return {}
  end
  local modmap={}
- Util.scan(modpath,function(_,type,full_path)
-  local parts=get_relative_parts(full_path,modpath)
-  local current_table=modmap
-  local len=#parts
-  for i,part in ipairs(parts) do
-   if i==len and type=="file" then
-    local clean_name=Util.trimsuffix(part,".lua")
-    current_table[clean_name]=full_path
-    break
-   end
-   current_table[part]=current_table[part] or {}
-   current_table=current_table[part]
-  end
- end)
+ local files=Util.list_files(modpath)
+ for _,full_path in ipairs(files) do
+  build_path(modmap,modpath,full_path)
+ end
  return modmap
 end

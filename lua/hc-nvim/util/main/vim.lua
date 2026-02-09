@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 ---@enum (key) visualmode
 local is_visualmode={

@@ -4,7 +4,6 @@ local HCNvim=require("hc-nvim.init_space")
 local Lazy={}
 Lazy.Specs={}
 function Lazy.setup()
- ---HACK
  require("hc-nvim.setup.lazy.handler")
  require("hc-nvim.setup.lazy.orderload")
  table.insert(package.loaders,2,table.remove(package.loaders,3))
@@ -23,7 +22,7 @@ function Lazy.setup()
  HCNvim.Util.try(function()
   HCNvim.Util.track("preset")
   local Presets=require("hc-nvim.setup.lazy.preset")
-  Presets.apply(Specs)
+  Specs=Presets.apply(Specs)
   HCNvim.Util.track()
  end,HCNvim.Util.ERROR)
  Lazy.Specs=Specs

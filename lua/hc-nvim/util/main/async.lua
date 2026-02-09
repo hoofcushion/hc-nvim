@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 local async_infos=setmetatable({},{__mode="k"})
 ---@alias job async fun(resume:function):...?

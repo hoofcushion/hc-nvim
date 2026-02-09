@@ -2,7 +2,6 @@ local function augroup(name)
  return vim.api.nvim_create_augroup("HCNvim_"..name,{clear=true})
 end
 -- Automatically enter insert mode when open terminal
-
 vim.api.nvim_create_autocmd("TermOpen",{
  group=augroup("ternimal_auto_insert"),
  callback=function(event)

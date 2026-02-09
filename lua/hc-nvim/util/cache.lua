@@ -1,19 +1,6 @@
-local IS_NIL=setmetatable({},{__tostring="Nil"})
-local IS_NAN=setmetatable({},{__tostring="NaN"})
+local Util=require("hc-nvim.util.init_space")
 local IS_RET=setmetatable({},{__tostring="Ret"})
-local function pindex(t,k)
- if k==nil then
-  k=IS_NIL
- elseif k~=k then
-  k=IS_NAN
- end
- local ret=t[k]
- if ret==nil then
-  ret={}
-  t[k]=ret
- end
- return ret
-end
+---@class Cache
 local Cache={}
 --- fancy function cache, supports:
 ---  * special index
@@ -27,17 +14,17 @@ function Cache.create(fn)
  local function retf(...)
   local c=cache
   for i=1,select("#",...) do
-   c=pindex(c,select(i,...))
+   c=Util.pindex(c,select(i,...))
   end
   local ret=c[IS_RET]
   if ret==nil then
-   ret=vim.F.pack_len(fn(...))
+   ret=Util.packlen(fn(...))
    c[IS_RET]=ret
   end
   if ret.n==1 then
    return ret[1]
   end
-  return vim.F.unpack_len(ret)
+  return Util.unpacklen(ret)
  end
  return retf
 end

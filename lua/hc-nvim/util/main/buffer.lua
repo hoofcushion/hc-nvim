@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 --- a version of nvim_buf_set_text with shorter function signature
 ---@param buf integer

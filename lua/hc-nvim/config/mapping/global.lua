@@ -114,6 +114,68 @@ return {
   },
  },
  {
+  {
+   name=NS.global_paste_next_line,
+   lhs="]p",
+   rhs=function()
+    if vim.fn.getregtype(vim.v.register)=="V" then
+     return "p"
+    end
+    return "o<esc>P"
+   end,
+   opts={expr=true},
+  },
+  {
+   name=NS.global_paste_prev_line,
+   lhs="[p",
+   rhs=function()
+    if vim.fn.getregtype(vim.v.register)=="V" then
+     return "P"
+    end
+    return "O<esc>p"
+   end,
+  },
+ },
+ {
+  {
+   name=NS.global_sketch_open,
+   lhs="<leader>bs",
+   rhs=function()
+    local int=math.floor
+    local buf=vim.api.nvim_create_buf(false,true)
+    local columns=vim.o.columns
+    local lines=vim.o.lines
+    local size=(columns*lines)^0.5
+    local width=int(size*0.8)
+    local height=int(size/2*0.8)
+    local win=vim.api.nvim_open_win(buf,true,{
+     relative="editor",
+     col=int(columns-width)/2,
+     row=int(lines-height)/2,
+     width=width,
+     height=height,
+     style="minimal",
+     border="single",
+     title="[sketch buffer]"
+    })
+    local wo=vim.wo[win]
+    wo.number=false
+    wo.relativenumber=false
+    wo.signcolumn="no"
+    wo.foldcolumn="0"
+    local bo=vim.bo[buf]
+    bo.bufhidden="wipe"
+    for _,lhs in ipairs({"q","<esc>"}) do
+     vim.api.nvim_buf_set_keymap(buf,"n",lhs,"<ignore>",{
+      callback=function()
+       vim.api.nvim_buf_delete(buf,{force=true})
+      end,
+     })
+    end
+   end,
+  },
+ },
+ {
   {name=NS.global_cmd_nohlsearch, cmd="nohlsearch"},
   {name=NS.global_cmd_write,      cmd="write",     mode={"i","n","x","s"}},
   {name=NS.global_escape_terminal,rhs="<c-\\><c-n>"},

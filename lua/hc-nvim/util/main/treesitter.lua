@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 ---@param node TSNode
 ---@param find string|fun(node:TSNode):boolean?

@@ -1,3 +1,4 @@
+local Util=require("hc-nvim.util.init_space")
 ---@alias StringOrTable string|table<string,string>|string[]
 ---@alias ValidScope string
 ---@alias Options table<string, any>
@@ -119,12 +120,14 @@ local function set_auto(opts)
  if opts.scheduled then
   callback=vim.schedule_wrap(callback)
  end
- vim.api.nvim_create_autocmd(event,{
-  pattern=opts.pattern,
-  callback=function(env)
-   callback(env.buf,opts.options)
-  end,
- })
+ Util.TryCall.ERROR(function()
+  vim.api.nvim_create_autocmd(event,{
+   pattern=opts.pattern,
+   callback=function(env)
+    callback(env.buf,opts.options)
+   end,
+  })
+ end)
 end
 ---@param opts ScopeOpts
 local function set_scoped(opts)

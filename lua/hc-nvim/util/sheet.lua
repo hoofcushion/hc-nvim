@@ -7,15 +7,6 @@ Sheet.chars={
  bold={h="━",vl="┃",v="┃",vr="┃",tl="┏",tr="┓",bl="┗",br="┛",t="┳",b="┻",l="┣",r="┫",c="╋"},
  rounded={h="─",vl="│",v="│",vr="│",tl="╭",tr="╮",bl="╰",br="╯",t="┬",b="┴",l="├",r="┤",c="┼"},
 }
----@class positive: integer
----@param num number
----@return positive
-local function to_positive(num)
- local pos=math.floor(tonumber(num))
- if not pos then error("") end
- return pos
-end
-to_positive(1)
 ---@alias AlignmentFn fun(value:string,width:integer):string
 ---@type table<string,AlignmentFn>
 local Alignments={

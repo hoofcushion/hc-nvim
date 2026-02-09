@@ -14,6 +14,7 @@ vim.diagnostic.config({
  },
  severity_sort=true,
 })
+--- disable DiagnosticUnnecessary highlight group
 local function clear()
  vim.cmd([[
  hi! clear DiagnosticUnnecessary

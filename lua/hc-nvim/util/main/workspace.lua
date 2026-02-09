@@ -1,4 +1,4 @@
----@class hc_nvim.util
+---@class HC-Nvim.Util
 local Util=require("hc-nvim.util.init_space")
 function Util.get_ws_folders()
  local workspace_folders=vim.lsp.buf.list_workspace_folders()
