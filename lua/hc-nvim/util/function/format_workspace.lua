@@ -175,6 +175,9 @@ local function buf_write_file(filename,content,trace)
  local ok,err=pcall(function()
   local existing_buf=buf_exists(filename)
   local buf=existing_buf or buf_new(filename)
+  if not existing_buf then
+   vim.bo[buf].buftype=""
+  end
   local lines=vim.split(content,"\n")
   vim.api.nvim_buf_set_lines(buf,0,-1,false,lines)
   vim.api.nvim_buf_call(buf,function()
