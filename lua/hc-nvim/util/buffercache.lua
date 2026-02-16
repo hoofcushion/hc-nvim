@@ -161,7 +161,7 @@ function BufferCache.print_stats()
  local headers={"Filename","Cache(ms)","Source(ms)","Saved(ms)"}
  -- 添加数据行
  local function prefix_repl(str,prefix,repl)
-  return str:sub(1,#prefix)==prefix and (repl or "") ..str:sub(#prefix+1) or str
+  return str:sub(1,#prefix)==prefix and (repl or "")..str:sub(#prefix+1) or str
  end
  for _,record in ipairs(records) do
   table.insert(table_data,{

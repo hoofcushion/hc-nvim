@@ -1,6 +1,5 @@
 local HCNvim=require("hc-nvim.init_space")
 local LocalEnv=HCNvim.Util.LocalEnv.new()
-local change_status=HCNvim.Util.ChangeStatus.new("format")
 local function format(...)
  return vim.lsp.buf.format(...)
 end

@@ -24,6 +24,7 @@ end
 local _pattern={
  vim.fs.normalize(vim.fn.stdpath("config")) --[[@as string]],
  vim.fs.normalize(vim.fn.stdpath("data")) --[[@as string]],
+ vim.env.VIMRUNTIME --[[@as string]],
 }
 --- Tells current file is or not part of  neovim profile
 ---@param file string

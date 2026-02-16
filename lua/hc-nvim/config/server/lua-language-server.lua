@@ -195,4 +195,13 @@ config.on_init=function(client)
  })
  update_strategy()
 end
+-- 自定义复用逻辑
+config.reuse_client=function(client,cfg)
+ -- 如果当前目录是 profile，强制复用
+ if Util.is_profile(vim.fn.getcwd()) then
+  return true
+ end
+ -- 否则使用默认的复用逻辑
+ return vim.lsp._reuse_client_default(client,cfg)
+end
 return config

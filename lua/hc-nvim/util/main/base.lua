@@ -46,7 +46,7 @@ function Util.serialize_simple(value)
   local i=1
   for k,v in pairs(value) do
    i=i+1
-   buffer[i]="["..Util.serialize(k).."]="..Util.serialize(v)..","
+   buffer[i]="["..Util.serialize_simple(k).."]="..Util.serialize_simple(v)..","
   end
   buffer[i+1]="}"
   return table.concat(buffer)

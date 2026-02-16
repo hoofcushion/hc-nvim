@@ -156,7 +156,7 @@ return {
      height=height,
      style="minimal",
      border="single",
-     title="[sketch buffer]"
+     title="[sketch buffer]",
     })
     local wo=vim.wo[win]
     wo.number=false

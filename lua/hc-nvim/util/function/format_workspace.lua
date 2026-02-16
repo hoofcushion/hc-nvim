@@ -50,7 +50,6 @@ end
 ---@param files string[]
 ---@param trace any
 ---@return string[]
----@return integer
 local function filter_by_changed_files(files,trace)
  local change_status=HCNvim.Util.ChangeStatus.new("format_workspace")
  local changed={}
@@ -63,7 +62,7 @@ local function filter_by_changed_files(files,trace)
  if #changed<#files then
   trace:debug("changed_filtered",string.format("Filtered by changed: %d > %d",#files,#changed))
  end
- return changed,#files-#changed
+ return changed
 end
 ---@return any[]
 local function get_clients()
@@ -339,86 +338,151 @@ local function show_format_summary(summary,trace)
  table.insert(buffer,msg)
  table.insert(buffer,"======================")
  local level=success>0 and vim.log.levels.INFO or vim.log.levels.WARN
- trace:record(level,"complete",table.concat(buffer,"\n"))
+ trace:record(level, "complete",              table.concat(buffer,"\n"))
 end
+---@class FormatWorkspace.format_workspace.opts
+---@field path?         string;                  -- 要格式化的目录路径
+---@field git?          boolean;                 -- 是否要使用`git`过滤
+---@field quiet?        boolean;                 -- 是否禁用`log`打印
+---@field level?        integer|fun():integer;   -- 设置`log`过滤等级
+---@field callback?     fun(ok:boolean,...:any); -- 格式化完毕后执行的`callback`
+---@field only_changed? boolean;                 -- 是否基于修改时间判断是否需要格式化
+---@field progress?     boolean;                 -- 是否显示进度
+---@field dry?          boolean;                 -- 是否避免写入任何文件
+local opts={}
 --- 主函数：格式化工作区
----@param opts? {
---- path?:string; -- 要格式化的目录路径
---- git?:boolean; -- 是否要使用 git 过滤
---- quiet?:boolean; -- 是否禁用 log 打印
---- level?:integer|fun():integer; -- 设置 log 过滤等级
---- callback?:fun(ok:boolean,...:any); -- 格式化完毕后执行的 callback
---- progress?:boolean; -- 是否显示进度
---- dry?:boolean; -- 是否避免写入任何文件
----}
+---@param opts? FormatWorkspace.format_workspace.opts
 function FormatWorkspace.format_workspace(opts)
  opts=opts or {}
  local log=opts.quiet==nil or (not opts.quiet)
  local level=opts.level
  local trace=log and HCNvim.Util.Trace.new(level) or HCNvim.Util.Trace.Ignore
  local progress=opts.progress==nil or (not not opts.progress)
- local dry=not not opts.dry
- opts.callback=(opts.callback or function(ok,...)
+ local is_dry_run=not not opts.dry
+ opts.callback=opts.callback or function(ok,...)
   if not ok then
    trace:error("error",...)
    trace:write_summary()
   end
- end)
- local function job()
-  local clients=get_clients()
-  if #clients==0 then
-   trace:info("no_clients","No LSP clients found")
-   return nil
-  end
-  local client=select_lsp_client(clients)
-  if not client then
-   trace:info("no_selection","No client selected")
-   return
-  end
-  local use_git=(opts.git==nil or opts.git)
-  local get_files=(use_git and get_ws_git_files or get_ws_files)
-  local all_files=get_files(opts.path,trace)
-  if #all_files==0 then
-   trace:info("no_files","No files found")
-   return
-  end
-  local type_filtered=filter_by_client_filetypes(client,all_files,trace)
-  if #type_filtered==0 then
-   trace:info("no_matching","No matching filetypes")
-   return
-  end
-  local changed_files,unchanged_count=filter_by_changed_files(type_filtered,trace)
-  if #changed_files==0 then
-   trace:info("no_changes","No files to format")
-   return
-  end
-  local formatted_files=client_format_files(client,changed_files,trace,progress)
-  if #formatted_files==0 then
-   trace:info("no_changes","No files formatted")
-   return
-  end
-  local write=dry and function() return #formatted_files,0 end or write_format_results
-  local success_count,failed_count=write(formatted_files,trace,progress)
-  if success_count==0 then
-   trace:info("no_changes","No files writed")
-   return
-  end
-  show_format_summary({
-   success=success_count,
-   failed=failed_count,
-   total=#type_filtered,
-   formatted=#formatted_files,
-   unchanged=unchanged_count,
-  },trace)
  end
+ local function async_block()
+  ---@type (fun():boolean)[]
+  local jobs={}
+  local ctx={}
+  local res={
+   success=0,
+   failed=0,
+   total=0,
+   formatted=0,
+   unchanged=0,
+  }
+  local job_signal={
+   stop=false,
+   continue=true,
+  }
+  -- 任务1: 获取客户端
+  ctx.clients={}
+  table.insert(jobs,function()
+   local clients=get_clients()
+   if #clients==0 then
+    trace:info("no_clients","No LSP clients found")
+    return job_signal.stop
+   end
+   ctx.clients=clients
+  end)
+  -- 任务2: 选择客户端
+  ctx.client=nil
+  table.insert(jobs,function()
+   local client=select_lsp_client(ctx.clients)
+   if client==nil then
+    trace:info("no_selection","No client selected")
+    return job_signal.stop
+   end
+   ctx.client=client
+  end)
+  -- 任务3: 获取文件
+  ctx.files={}
+  table.insert(jobs,function()
+   local use_git=not not (opts.git==nil or opts.git)
+   local get_files=(use_git and get_ws_git_files or get_ws_files)
+   local all_files=get_files(opts.path,trace)
+   if #all_files==0 then
+    trace:info("no_files","No files found")
+    return job_signal.stop
+   end
+   ctx.files=all_files
+  end)
+  -- 任务4: 按文件类型过滤
+  table.insert(jobs,function()
+   local type_filtered_files=filter_by_client_filetypes(ctx.client,ctx.files,trace)
+   if #type_filtered_files==0 then
+    trace:info("no_matching","No matching filetypes")
+    return job_signal.stop
+   end
+   ctx.files=type_filtered_files
+   res.total=#type_filtered_files
+  end)
+  -- 任务5: 按修改时间过滤
+  table.insert(jobs,function()
+   local use_change_status=not not (opts.only_changed==nil or opts.only_changed)
+   if not use_change_status then
+    return job_signal.continue
+   end
+   local changed_files=filter_by_changed_files(ctx.files,trace)
+   if #changed_files==0 then
+    trace:info("no_changes","No files to format")
+    return job_signal.stop
+   end
+   local unchanged_count=#(ctx.files)-#changed_files
+   ctx.files=changed_files
+   res.unchanged=unchanged_count
+  end)
+  -- 任务6: 格式化文件
+  table.insert(jobs,function()
+   local formatted_files=client_format_files(ctx.client,ctx.files,trace,progress)
+   if #formatted_files==0 then
+    trace:info("no_changes","No files formatted")
+    return job_signal.stop
+   end
+   ctx.formatted_files=formatted_files
+   res.formatted=#formatted_files
+  end)
+  -- 任务7: 写入文件
+  table.insert(jobs,function()
+   if is_dry_run then
+    res.success=#ctx.formatted_files
+    res.failed=0
+   end
+   local success_count,failed_count=write_format_results(ctx.formatted_files,trace,progress)
+   if success_count==0 then
+    trace:info("no_changes","No files writed")
+    return job_signal.stop
+   end
+   res.success=success_count
+   res.failed=failed_count
+  end)
+  for _,job in ipairs(jobs) do
+   local success,result=pcall(job)
+   if success then
+    if result==job_signal.stop then
+     break
+    end
+   else
+    trace:error("pipe_line_failed",result)
+   end
+  end
+  show_format_summary(res,trace)
+ end
+
  HCNvim.Util.async(function()
-  opts.callback(pcall(job))
+  opts.callback(pcall(async_block))
  end)
 end
 ; (LUAFILEDO or type)(not LUAFILE or function()
  FormatWorkspace.format_workspace({
   dry=true,
   level=-math.huge,
+  only_changed=false,
   -- quiet=true,
  })
 end)
