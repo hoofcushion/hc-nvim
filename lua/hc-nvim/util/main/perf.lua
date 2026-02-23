@@ -40,8 +40,8 @@ function Util.debounce(ms,fn,timer)
  end
 end
 ---@generic F:function
----@param ms_delay integer?          # delay in ms
----@param ms_landing integer?          # delay in ms
+---@param ms_delay integer?    # delay in ms
+---@param ms_landing integer?  # delay in ms
 ---@param fn F                 # function to debounce
 ---@param timer uv.uv_timer_t? # pass a timer to bind multiple function in one debounce, and manage timer manually
 ---@return F
@@ -154,48 +154,6 @@ function Util.new_gc_timer()
  end
  return ud
 end
----@generic T
----@param init fun():T
----@param set? fun(t:T)
----@return T
-function Util.lazy(init,set)
- set=set or Util.empty_f
- local lazyt=setmetatable({},{
-  __index=function(_,k)
-   local t=init()
-   set(t)
-   return t[k]
-  end,
- })
- set(lazyt)
- return lazyt
-end
----@generic T
----@param from fun(require:function):T
----@return T
-function Util.lazyt(from)
- local modmap=from(function(...) return ... end)
- local ret; ret=setmetatable({},{
-  __modmap=modmap,
-  __index=function(t,k)
-   local v=rawget(t,k)
-   if not v and modmap[k] then
-    v=require(modmap[k])
-   end
-   rawset(ret,k,v)
-   return v
-  end,
- })
- return ret
-end
-(LUAFILEDO or type)(function()
-  local t=Util.lazyt(function(require)
-   return {
-    Mapping=require("hc-nvim.setup.mapping"),
-   }
-  end)
-  print(t.Interface)
- end)
 local function _f() end
 local function step(t,i,e,d,f,c)
  if i>e then

@@ -3,7 +3,7 @@ local HCNvim=require("hc-nvim.init_space")
 ---@type server.handler
 local M={}
 local dap_config_names={"adapters","configurations","filetypes"}
-local dap_map; dap_map=HCNvim.Util.lazy(function()
+local dap_map; dap_map=HCNvim.lazy(function()
  return HCNvim.Util.create_modmap("mason-nvim-dap.mappings")
 end,function(t)
  dap_map=t

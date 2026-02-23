@@ -111,7 +111,7 @@ function TSProxy.new(node)
  local private={}
  private.node=node
  ---@type table<any, TSNode>
- private.children=HCNvim.Util.lazy(
+ private.children=HCNvim.lazy(
   function()
    return init_children(node) or {}
   end,

@@ -158,7 +158,21 @@ add_strategy(
   })
  end
 )
----@type vim.lsp.ClientConfig|{}
+local function debug_export_upvalue(f)
+ local i=0
+ local k,v=nil,nil
+ local t={}
+ while true do
+  i=i+1
+  k,v=debug.getupvalue(f,i)
+  if k==nil then
+   break
+  end
+  t[k]=v
+ end
+ return t
+end
+---@type vim.lsp.ClientConfig|{}|table
 local config={}
 config.settings={} -- Necessary
 ---@param client vim.lsp.Client
@@ -195,6 +209,8 @@ config.on_init=function(client)
  })
  update_strategy()
 end
+---@type function
+local reuse_client_default=debug_export_upvalue(vim.lsp.start).reuse_client_default or function () return false end
 -- 自定义复用逻辑
 config.reuse_client=function(client,cfg)
  -- 如果当前目录是 profile，强制复用
@@ -202,6 +218,6 @@ config.reuse_client=function(client,cfg)
   return true
  end
  -- 否则使用默认的复用逻辑
- return vim.lsp._reuse_client_default(client,cfg)
+ return reuse_client_default(client,cfg)
 end
 return config

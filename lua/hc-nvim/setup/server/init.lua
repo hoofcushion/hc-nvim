@@ -13,7 +13,7 @@ function Server.setup()
   end
   HCNvim.Util.reload_file_buffers()
  end
- local lspMaps; lspMaps=HCNvim.Util.lazy(function()
+ local lspMaps; lspMaps=HCNvim.lazy(function()
   local interface_lsp=HCNvim.Setup.Mapping.Interface:export("lsp")
   interface_lsp:extend(require("hc-nvim.setup.server.mappings"))
   return interface_lsp

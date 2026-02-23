@@ -1,6 +1,4 @@
 local HCNvim=require("hc-nvim.init_space")
-local Config=HCNvim.Config
-local Util=HCNvim.Util
 --- ---
 --- load dependencies
 --- ---
@@ -11,7 +9,7 @@ local Plugin=require("lazy.core.plugin")
 --- ---
 local Interface=require("hc-nvim.setup.mapping").Interface
 if not Interface then
- Interface=Util.Interface.new()
+ Interface=HCNvim.Util.Interface.new()
 end
 --- ---
 --- Hook module
@@ -24,7 +22,7 @@ if false then
  }
 end
 local Hook={}
-local rg=Util.RelationGraph.new()
+local rg=HCNvim.Util.RelationGraph.new()
 ---@param hooks hook[]
 function Hook.add(hooks)
  for _,hook in ipairs(hooks) do
@@ -54,7 +52,7 @@ local PresetGetter={
  event=function(plugin,field,value,preset,name)
   ---@diagnostic disable-next-line: missing-fields
   value=Plugin._values(plugin,{[field]=value},field,false)
-  value=Util.Event.normalize_event_list(value) or {}
+  value=HCNvim.Util.Event.normalize_event_list(value) or {}
   if value~=nil and next(value)~=nil then
    return value
   end
@@ -76,7 +74,7 @@ local PresetGetter={
    Loader.config(plugin)
   end
   if preset.keyimp then
-   local specs=Util.eval(preset.keyimp,plugin)
+   local specs=HCNvim.Util.eval(preset.keyimp,plugin)
    if specs~=nil then
     Interface.forspecs(specs,function(mapspec)
      Interface:add(mapspec):create()
@@ -84,31 +82,31 @@ local PresetGetter={
    end
   end
   if preset.after then
-   Util.eval(preset.after,plugin)
+   HCNvim.Util.eval(preset.after,plugin)
   end
  end,
 }
 local Preset={}
 function Preset.apply(specs)
  local priority=2^10
- local normname=Util.Cache.create_simple(Util.Lazy.normname)
- local getname=Util.Cache.create_simple(Util.Lazy.getname)
- local preset_modmap; Util.lazy(function()
-  return Util.create_modmap("hc-nvim.config.preset")
+ local normname=HCNvim.Util.Cache.create_simple(HCNvim.Util.Lazy.normname)
+ local getname=HCNvim.Util.Cache.create_simple(HCNvim.Util.Lazy.getname)
+ local preset_modmap; HCNvim.lazy(function()
+  return HCNvim.Util.create_modmap("hc-nvim.config.preset")
  end,function(t) preset_modmap=t end)
  ---@type table<string,(LazyPluginSpec|{base:LazyPluginSpec,keyimp:table,after:function,hook:{[1]:string[],[2]:function}[]})>
- local PluginPresets=Util.Cache.table(function(name)
+ local PluginPresets=HCNvim.Util.Cache.table(function(name)
   local fields=preset_modmap[name]
   if not fields then
-   return Util.empty_t
+   return HCNvim.Util.empty_t
   end
-  return Util.Cache.table(function(field)
+  return HCNvim.Util.Cache.table(function(field)
    if fields[field] then
     return loadfile(fields[field])()
    end
   end)
  end)
- local plain_spec_list=Util.Lazy.list_spec(specs)
+ local plain_spec_list=HCNvim.Util.Lazy.list_spec(specs)
  for index,spec in ipairs(plain_spec_list) do
   if spec.import~=nil then
    goto continue
@@ -126,7 +124,7 @@ function Preset.apply(specs)
     spec[k]=v
    end
   end
-  if Config.platform.vscode and spec.vscode==false then
+  if HCNvim.Config.platform.vscode and spec.vscode==false then
    spec.enabled=false
   end
   -- set hooked getter
@@ -134,9 +132,9 @@ function Preset.apply(specs)
    local orig=spec[field]
    spec[field]=function(plugin)
     local value=orig or preset[field]
-    Util.deepset(plugin,field,value)
+    HCNvim.Util.deepset(plugin,field,value)
     local ret=getter(plugin,field,value,preset,modname)
-    Util.deepset(plugin,field,ret)
+    HCNvim.Util.deepset(plugin,field,ret)
     return ret
    end
   end
