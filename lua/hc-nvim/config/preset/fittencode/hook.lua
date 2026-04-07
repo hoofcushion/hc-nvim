@@ -2,7 +2,7 @@ return {
  {
   {"lualine.nvim"},
   function()
-   local fapi=require("fittencode.api").api
+   local fapi=require("fittencode.api")
    local sections={
     {function() return "AI" end,cond=fapi.has_suggestions,color={fg="#37b0e7",bg="#101945"}},
     -- {function() return fengine.get_suggestions().lines[1] end,cond=fengine.has_suggestions,color={fg="#37b0e7",bg="#101945"}},

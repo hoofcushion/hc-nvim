@@ -1,4 +1,4 @@
-local fittencode_api=require("fittencode.api").api
+local fittencode_api=require("fittencode.api")
 return {
  {name=NS.fittencode_accept_all_suggestions,rhs=fittencode_api.accept_all_suggestions},
  {name=NS.fittencode_accept_line,           rhs=fittencode_api.accept_line},
