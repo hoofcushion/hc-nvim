@@ -40,7 +40,7 @@ function FileType.setup()
    HCNvim.Util.ERROR
   )
  end
- vim.api.nvim_create_autocmd("BufEnter",{
+ vim.api.nvim_create_autocmd({"BufReadPost","BufNewFile"},{
   callback=FileType.check,
  })
  HCNvim.Util.reload_file_buffers()

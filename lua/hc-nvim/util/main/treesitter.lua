@@ -8,7 +8,7 @@ function Util.ts_lookup(node,find)
  if type(find)~="function" then
   local target=find
   find=function(_node)
-   return _node:type()==target
+   return _node:type()==target or vim.list_contains(_node:parent():field(target),_node)
   end
  end
  while n and not find(n) do

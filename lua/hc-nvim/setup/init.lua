@@ -28,8 +28,8 @@ function Setup.setup()
   {name="Mapping", schedule=false,load=function() Setup.Mapping.setup() end},  -- register keymaps
   {name="Lazy",    schedule=false,load=function() Setup.Lazy.setup() end},     -- load lazy.nvim plugin configs
   {name="Vscode",  schedule=false,load=function() Setup.Vscode.setup() end},   -- load extra vscode-neovim setting
+  {name="FileType",schedule=false, load=function() Setup.FileType.setup() end}, -- load custom filetypes
   {name="Basic",   schedule=true, load=function() Setup.Basic.setup() end},    -- run basic setup scripts
-  {name="FileType",schedule=true, load=function() Setup.FileType.setup() end}, -- load custom filetypes
   {name="Server",  schedule=true, load=function() Setup.Server.setup() end},   -- load language tools settings
  }
  for _,spec in ipairs(loaders) do

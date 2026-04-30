@@ -325,4 +325,20 @@ return {
    opts={expr=true},
   },
  },
+ {
+  {name=NS.insert_delete,rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Delete>",true,false,true),"m") end},
+  {name=NS.insert_w,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<c-o>w",true,false,true),"n") end},  
+  {name=NS.insert_b,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<c-o>b",true,false,true),"n") end},  
+  {name=NS.insert_h,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Left>",true,false,true),"m") end},  
+  {name=NS.insert_j,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Down>",true,false,true),"m") end},  
+  {name=NS.insert_k,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Up>",true,false,true),"m") end},    
+  {name=NS.insert_l,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Right>",true,false,true),"m") end}, 
+ },
+ {
+  {name=NS.cmdline_delete,rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Delete>",true,false,true),"m") end},
+  {name=NS.cmdline_h,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Left>",true,false,true),"m") end},
+  {name=NS.cmdline_j,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Down>",true,false,true),"m") end},
+  {name=NS.cmdline_k,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Up>",true,false,true),"m") end},
+  {name=NS.cmdline_l,     rhs=function() vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Right>",true,false,true),"m") end},
+ },
 }

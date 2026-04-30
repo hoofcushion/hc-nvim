@@ -83,11 +83,11 @@ return {
 
  --- Treesitter
  {"nvim-treesitter/nvim-treesitter",           event=Events.Treesitter},
+ -- {"nvim-treesitter/nvim-treesitter-textobjects"},
+ -- {"andymass/vim-matchup",                      event=Events.Treesitter},
+ -- {"JoosepAlviste/nvim-ts-context-commentstring"},
 
- {"andymass/vim-matchup",                      event=Events.Treesitter},
- {"JoosepAlviste/nvim-ts-context-commentstring"},
  {"mizlan/iswap.nvim"},
- {"nvim-treesitter/nvim-treesitter-textobjects"},
  {"altermo/ultimate-autopair.nvim",            event={"InsertEnter","CmdlineEnter"}},
 
  {"Wansmer/treesj"},

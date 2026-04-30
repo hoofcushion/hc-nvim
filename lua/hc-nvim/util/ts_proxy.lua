@@ -30,20 +30,42 @@ function TSProxy:__tostring()
  if not node then
   return "nil"
  end
- local result={}
- local index=0
- for child,field in node:iter_children() do
-  index=index+1
-  local field_str=field or "anonymous"
-  local type_str=child:type()
-  table.insert(result,string.format("[%2d] %-12s %s",index,field_str,type_str))
- end
- local buffer={
-  node:type(),": {\n",
-  table.concat(result,"\n  ")
-  "\n}",
+ local column_buffer={
+  index=0,
+  field=0,
+  type=0,
+  list={},
  }
- return table.concat(buffer,"\n")
+ local child_index=0
+ -- 第一遍遍历：收集信息并计算宽度
+ for child,field in node:iter_children() do
+  child_index=child_index+1
+  column_buffer.index=math.max(column_buffer.index,math.floor(math.log(child_index,10))+1)
+  local field_str=field or "anonymous"
+  column_buffer.field=math.max(column_buffer.field,#field_str)
+  local type_str=child:type()
+  column_buffer.type=math.max(column_buffer.type,#type_str)
+  local text=vim.treesitter.get_node_text(child,0)
+  table.insert(column_buffer.list,{child_index,field_str,type_str,text})
+ end
+ -- 构建输出行
+ local lines={}
+ table.insert(lines,string.format("%s: {",node:type()))
+ for _,info in ipairs(column_buffer.list) do
+  local format_str=string.format(" %%%dd | %%%ds | %%%ds | %%s",
+   column_buffer.index,
+   column_buffer.field,
+   column_buffer.type
+  )
+  local idx=info[1]
+  local field_str=info[2]
+  local type_str=info[3]
+  local text=info[4]
+  local line=string.format(format_str,idx,field_str,type_str,text)
+  table.insert(lines,line)
+ end
+ table.insert(lines,"}")
+ return table.concat(lines,"\n")
 end
 ---初始化节点的子节点映射表
 ---创建多种访问键：

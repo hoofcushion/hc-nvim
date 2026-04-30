@@ -5,8 +5,10 @@ function Util.packlen(...)
 end
 function Util.packenxtend(pack1,pack2)
  local new={n=0}
- table.move(pack1,1,pack1.n,new.n+1,new); new.n=new.n+pack1.n
- table.move(pack2,1,pack2.n,new.n+1,new); new.n=new.n+pack2.n
+ table.move(pack1,1,pack1.n,new.n+1,new)
+ new.n=new.n+pack1.n
+ table.move(pack2,1,pack2.n,new.n+1,new)
+ new.n=new.n+pack2.n
  return new
 end
 (LUAFILEDO or type)(not LUAFILE or function()
@@ -57,6 +59,62 @@ end
 (LUAFILEDO or type)(not LUAFILE or function()
   print(Util.serialize_simple("1"))
  end)
+local function is_name(str)
+ if type(str)~="string" or #str==0 then
+  return false
+ end
+ -- 首字符必须是字母或下划线
+ local first=str:byte(1)
+ if
+     not (first>=0x61 and first<=0x7A) -- a-z
+ and not (first>=0x41 and first<=0x5A) -- A-Z
+ and first~=0x5F
+ then                                  -- _
+  return false
+ end
+ -- 后续字符必须是字母、数字或下划线
+ for i=2,#str do
+  local b=str:byte(i)
+  if
+      not (b>=0x61 and b<=0x7A) -- a-z
+  and not (b>=0x41 and b<=0x5A) -- A-Z
+  and not (b>=0x30 and b<=0x39) -- 0-9
+  and b~=0x5F
+  then                          -- _
+   return false
+  end
+ end
+ -- Lua 关键字（Lua 5.1~5.4 通用）
+ local keywords={
+  ["and"]=true,
+  ["break"]=true,
+  ["do"]=true,
+  ["else"]=true,
+  ["elseif"]=true,
+  ["end"]=true,
+  ["false"]=true,
+  ["for"]=true,
+  ["function"]=true,
+  ["goto"]=true,
+  ["if"]=true,
+  ["in"]=true,
+  ["local"]=true,
+  ["nil"]=true,
+  ["not"]=true,
+  ["or"]=true,
+  ["repeat"]=true,
+  ["return"]=true,
+  ["then"]=true,
+  ["true"]=true,
+  ["until"]=true,
+  ["while"]=true,
+  ["global"]=true, -- lua 5.5
+ }
+ if keywords[str] then
+  return false
+ end
+ return true
+end
 function Util.serialize(value)
  local t=type(value)
  if t=="string" then
@@ -71,13 +129,13 @@ function Util.serialize(value)
   end
   local max_list_key=i
   for k,v in pairs(value) do
-   if not (type(k)=="number"
-    and k>=1
-    and math.floor(k)==k
-    and k<=max_list_key)
-   then
+   if not (type(k)=="number" and k>=1 and math.floor(k)==k and k<=max_list_key) then
     i=i+1
-    buffer[i]="["..Util.serialize(k).."]="..Util.serialize(v)..","
+    if is_name(k) then
+     buffer[i]=k.."="..Util.serialize(v)..","
+    else
+     buffer[i]="["..Util.serialize(k).."]="..Util.serialize(v)..","
+    end
    end
   end
   -- remove comma

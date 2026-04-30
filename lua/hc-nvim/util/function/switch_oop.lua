@@ -98,7 +98,9 @@ local function switch_oop(buf,win)
   end
  end)
 end
-switch_oop()
+if LUAFILE then
+ switch_oop()
+end
 return {
  switch=switch_oop,
 }
