@@ -12,6 +12,7 @@ HCNvim.lazy(function() return require("hc-nvim.setup.mapping") end, function(t) 
 HCNvim.lazy(function() return require("hc-nvim.setup.option") end,  function(t) Setup.Option=t end)
 HCNvim.lazy(function() return require("hc-nvim.setup.server") end,  function(t) Setup.Server=t end)
 HCNvim.lazy(function() return require("hc-nvim.setup.vscode") end,  function(t) Setup.Vscode=t end)
+HCNvim.lazy(function() return require("hc-nvim.setup.compat") end,  function(t) Setup.Compat=t end)
 function Setup.setup()
  HCNvim.Util.track("Setup")
  -- init plugin rtp
@@ -20,17 +21,18 @@ function Setup.setup()
  _G.NS=HCNvim.Util.namespace
  -- load modules
  local loaders={
+  {name="Compat",  schedule=false,load=function() Setup.Compat.setup() end},
   {name="LuaTyped",schedule=false,load=function() Setup.LuaTyped.setup() end},
   {name="Luafile", schedule=false,load=function() Setup.Luafile.setup() end},
-  {name="Option",  schedule=false,load=function() Setup.Option.setup() end},   -- set neovim options
-  {name="I18N",    schedule=false,load=function() Setup.I18N.setup() end},     -- load language packs
-  {name="Event",   schedule=false,load=function() Setup.Event.setup() end},    -- register custom events
-  {name="Mapping", schedule=false,load=function() Setup.Mapping.setup() end},  -- register keymaps
-  {name="Lazy",    schedule=false,load=function() Setup.Lazy.setup() end},     -- load lazy.nvim plugin configs
-  {name="Vscode",  schedule=false,load=function() Setup.Vscode.setup() end},   -- load extra vscode-neovim setting
-  {name="FileType",schedule=false, load=function() Setup.FileType.setup() end}, -- load custom filetypes
-  {name="Basic",   schedule=true, load=function() Setup.Basic.setup() end},    -- run basic setup scripts
-  {name="Server",  schedule=true, load=function() Setup.Server.setup() end},   -- load language tools settings
+  {name="Option",  schedule=false,load=function() Setup.Option.setup() end},    -- set neovim options
+  {name="I18N",    schedule=false,load=function() Setup.I18N.setup() end},      -- load language packs
+  {name="Event",   schedule=false,load=function() Setup.Event.setup() end},     -- register custom events
+  {name="Mapping", schedule=false,load=function() Setup.Mapping.setup() end},   -- register keymaps
+  {name="Lazy",    schedule=false,load=function() Setup.Lazy.setup() end},      -- load lazy.nvim plugin configs
+  {name="Vscode",  schedule=false,load=function() Setup.Vscode.setup() end},    -- load extra vscode-neovim setting
+  {name="FileType",schedule=false,load=function() Setup.FileType.setup() end},  -- load custom filetypes
+  {name="Basic",   schedule=true, load=function() Setup.Basic.setup() end},     -- run basic setup scripts
+  {name="Server",  schedule=true, load=function() Setup.Server.setup() end},    -- load language tools settings
  }
  for _,spec in ipairs(loaders) do
   local function load()
