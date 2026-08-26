@@ -135,13 +135,14 @@ local Presets={
  marks={
   getter=function()
    local marks=vim.fn.getmarklist(0)
-   if next(marks)~=nil then
-    local list={}
-    for _,v in ipairs(marks) do
-     table.insert(list,v.mark:sub(-1))
-    end
-    return table.concat(list)
+   if next(marks)==nil then
+    return ""
    end
+   local list={}
+   for _,v in ipairs(marks) do
+    table.insert(list,v.mark:sub(-1))
+   end
+   return table.concat(list)
   end,
  },
  buftype={

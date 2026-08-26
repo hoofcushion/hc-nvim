@@ -25,7 +25,6 @@ return {
  {"nvim-telescope/telescope.nvim"},
 
  --- Motions
- -- {"chrisgrieser/nvim-spider"},
  {"echasnovski/mini.ai",                       virtual=true,                                dependencies="echasnovski/mini.nvim"},
  {"echasnovski/mini.operators",                virtual=true,                                dependencies="echasnovski/mini.nvim"},
  {"folke/flash.nvim"},
@@ -82,10 +81,8 @@ return {
  {"folke/lazydev.nvim",                        event=Events.NeoConfig},
 
  --- Treesitter
- {"nvim-treesitter/nvim-treesitter",           event=Events.Treesitter},
- -- {"nvim-treesitter/nvim-treesitter-textobjects"},
- -- {"andymass/vim-matchup",                      event=Events.Treesitter},
- -- {"JoosepAlviste/nvim-ts-context-commentstring"},
+ {"romus204/tree-sitter-manager.nvim"},
+ {"nvim-treesitter/nvim-treesitter-textobjects"},
 
  {"mizlan/iswap.nvim"},
  {"altermo/ultimate-autopair.nvim",            event={"InsertEnter","CmdlineEnter"}},

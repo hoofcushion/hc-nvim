@@ -113,29 +113,29 @@ return {
    end,
   },
  },
- {
-  {
-   name=NS.global_paste_next_line,
-   lhs="]p",
-   rhs=function()
-    if vim.fn.getregtype(vim.v.register)=="V" then
-     return "p"
-    end
-    return "o<esc>P"
-   end,
-   opts={expr=true},
-  },
-  {
-   name=NS.global_paste_prev_line,
-   lhs="[p",
-   rhs=function()
-    if vim.fn.getregtype(vim.v.register)=="V" then
-     return "P"
-    end
-    return "O<esc>p"
-   end,
-  },
- },
+ -- {
+ --  {
+ --   name=NS.global_paste_next_line,
+ --   lhs="]p",
+ --   rhs=function()
+ --    if vim.fn.getregtype(vim.v.register)=="V" then
+ --     return "p"
+ --    end
+ --    return "o<esc>P"
+ --   end,
+ --   opts={expr=true},
+ --  },
+ --  {
+ --   name=NS.global_paste_prev_line,
+ --   lhs="[p",
+ --   rhs=function()
+ --    if vim.fn.getregtype(vim.v.register)=="V" then
+ --     return "P"
+ --    end
+ --    return "O<esc>p"
+ --   end,
+ --  },
+ -- },
  {
   {
    name=NS.global_sketch_open,

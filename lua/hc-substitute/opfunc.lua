@@ -4,14 +4,10 @@ local HCSubstitute=require("hc-substitute.init_space")
 --- ---
 local OpFunc={}
 function OpFunc.set(opfunc,args)
- if args~=nil then
-  local _=opfunc
-  opfunc=function(vmode)
-   _(vmode,unpack(args))
-  end
+ local opfunc_with_args=function()
+  opfunc(unpack(args))
  end
- _G.opfunc=opfunc
- vim.o.opfunc=[[v:lua.opfunc]]
+ vim.o.opfunc=opfunc_with_args
 end
 --- Set opfunc then start operator mode with a initial motion
 function OpFunc.start(opfunc,motion,...)
